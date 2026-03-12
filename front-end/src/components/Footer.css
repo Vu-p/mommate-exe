@@ -1,0 +1,99 @@
+.footer-figma {
+  background-color: #EFEEF5;
+  padding: 80px 0 0 0;
+}
+
+.footer-container-figma {
+  display: grid;
+  grid-template-columns: 1.2fr 2fr 1.2fr;
+  gap: 60px;
+  margin-bottom: 80px;
+}
+
+.footer-brand-figma h3 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--secondary);
+  margin-bottom: 24px;
+}
+
+.footer-brand-figma p {
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.social-links-figma {
+  display: flex;
+  gap: 16px;
+}
+
+.social-links-figma a {
+  color: var(--text-muted);
+  transition: color 0.3s;
+}
+
+.social-links-figma a:hover {
+  color: var(--primary);
+}
+
+.footer-links-figma {
+  display: flex;
+  justify-content: space-between;
+}
+
+.link-group-figma h4, .footer-contact-figma h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--secondary);
+  margin-bottom: 24px;
+}
+
+.link-group-figma {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.link-group-figma a {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  transition: color 0.3s;
+}
+
+.link-group-figma a:hover {
+  color: var(--primary);
+}
+
+.footer-contact-figma {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contact-item-figma {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.footer-bottom-figma {
+  border-top: 1px solid rgba(0,0,0,0.1);
+  padding: 30px 0;
+}
+
+.bottom-content-figma {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.bottom-links-figma a {
+  color: var(--secondary);
+  text-decoration: underline;
+}

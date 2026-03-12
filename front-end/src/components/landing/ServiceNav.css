@@ -1,0 +1,40 @@
+.service-nav {
+  background-color: transparent;
+  padding: 24px 0;
+  position: relative;
+  z-index: 20;
+}
+
+.service-nav-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1100px;
+  margin: 0 auto;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  padding-bottom: 24px;
+}
+
+.service-link {
+  color: var(--secondary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+  opacity: 0.8;
+  letter-spacing: 0.5px;
+}
+
+.service-link:hover {
+  color: var(--primary);
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .service-nav-content {
+    overflow-x: auto;
+    justify-content: flex-start;
+    gap: 30px;
+    padding: 10px 20px;
+  }
+}

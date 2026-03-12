@@ -1,0 +1,58 @@
+.newsletter-figma {
+  padding: 100px 0;
+  background-color: #F8F7FA;
+}
+
+.newsletter-box-figma {
+  background-color: var(--white);
+  padding: 80px 40px;
+  border-radius: 40px;
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
+  box-shadow: var(--shadow-md);
+}
+
+.newsletter-box-figma h2 {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--secondary);
+  margin-bottom: 16px;
+}
+
+.newsletter-box-figma p {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  margin-bottom: 40px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.subscribe-form-figma {
+  display: flex;
+  background: #F8F7FA;
+  padding: 8px;
+  border-radius: 100px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.subscribe-form-figma input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0 24px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.btn-subscribe {
+  background-color: var(--primary-light);
+  color: var(--primary);
+  padding: 14px 40px;
+  border-radius: 100px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+}

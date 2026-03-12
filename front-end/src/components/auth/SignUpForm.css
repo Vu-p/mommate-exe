@@ -1,0 +1,55 @@
+.signup-form-container {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--secondary);
+  margin-bottom: var(--spacing-xxl);
+  text-align: center;
+}
+
+.signup-form {
+  width: 100%;
+}
+
+.submit-btn {
+  width: 100%;
+  max-width: 180px;
+  background-color: var(--primary);
+  color: var(--white);
+  padding: 12px;
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: 1rem;
+  margin: var(--spacing-xl) auto;
+  display: block;
+  box-shadow: 0 10px 20px rgba(199, 169, 209, 0.3);
+  transition: all var(--transition-fast);
+}
+
+.toggle-auth-text {
+  margin-top: var(--spacing-lg);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+}
+
+.toggle-btn:hover {
+  text-decoration: underline;
+}
