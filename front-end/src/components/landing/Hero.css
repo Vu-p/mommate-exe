@@ -125,6 +125,7 @@
   width: 100%;
   line-height: 0;
   z-index: 5;
+  pointer-events: none;
 }
 
 .hero-curve svg {
