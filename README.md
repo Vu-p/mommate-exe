@@ -48,16 +48,18 @@ mommate-exe/
    npm run dev
    ```
 
-### Backend Setup
+### Deployment (Vercel & Render)
 
-1. Navigate to the `back-end` directory:
-   ```bash
-   cd back-end
-   ```
-2. Install dependencies (if applicable):
-   ```bash
-   npm install
-   ```
+#### Frontend (Vercel - Free & No Card Required)
+
+1.  Sign in to **[vercel.com](https://vercel.com/)** with GitHub.
+2.  **Add New Project** -> Select `mommate-exe`.
+3.  **IMPORTANT**: In the "Project Settings", set the **Root Directory** to `front-end`.
+4.  Vercel will automatically build and deploy.
+
+#### Backend (Future Setup)
+
+When the backend is ready, you can deploy it to **Render** or **Railway** as a separate service. The frontend will connect to it via an environment variable (e.g., `VITE_API_URL`).
 
 ## License
 
