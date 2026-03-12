@@ -8,7 +8,8 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* Removed smooth scroll to prevent mobile stutter with JS animations */
+  scroll-padding-top: 100px;
 }
 
 body {

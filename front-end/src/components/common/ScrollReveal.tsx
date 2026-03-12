@@ -11,17 +11,17 @@ const ScrollReveal = ({ children, delay = 0, className }: ScrollRevealProps) => 
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{
         once: true,
-        amount: 0.05,
-        margin: '0px 0px 120px 0px', // trigger 120px TRƯỚC khi phần tử vào viewport
+        amount: 0.1,
+        margin: '0px 0px -50px 0px', // Triggers slightly before/as element enters
       }}
       transition={{
-        duration: 0.6,
+        duration: 0.7,
         delay,
-        ease: [0.25, 0.46, 0.45, 0.94],
+        ease: "easeOut",
       }}
       style={{ willChange: 'transform, opacity' }}
     >
