@@ -1,4 +1,5 @@
 services:
+  # 1. Frontend - Luôn luôn miễn phí và không bị "ngủ"
   - type: static
     name: mommate-frontend
     env: static
@@ -8,3 +9,12 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
+
+  # 2. Backend - Sẽ chạy gói Free (Web Service) khi bạn có code
+  - type: web
+    name: mommate-backend
+    env: node # Dùng Node thay vì Docker để được Free build từ GitHub
+    plan: free
+    rootDirectory: back-end
+    buildCommand: npm install
+    startCommand: npm start
