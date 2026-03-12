@@ -48,7 +48,7 @@ mommate-exe/
    npm run dev
    ```
 
-### Deployment (Vercel & Render)
+### Deployment (Vercel)
 
 #### Frontend (Vercel - Free & No Card Required)
 
@@ -59,7 +59,7 @@ mommate-exe/
 
 #### Backend (Future Setup)
 
-When the backend is ready, you can deploy it to **Render** or **Railway** as a separate service. The frontend will connect to it via an environment variable (e.g., `VITE_API_URL`).
+When the backend is ready, you can deploy it to a service like **Railway** or **Render** (via their native Node.js runtime). The frontend will connect to it via an environment variable (e.g., `VITE_API_URL`).
 
 ## License
 
