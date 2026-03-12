@@ -1,0 +1,40 @@
+# === Logs ===
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# === Dependencies ===
+node_modules/
+**/node_modules/
+
+# === Build outputs ===
+dist/
+dist-ssr/
+build/
+out/
+
+# === Environment ===
+.env
+.env.local
+.env.*.local
+
+# === IDE / Editor ===
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.sw?
+*.sln
+*.njsproj
+*.ntvs*
+
+# === OS ===
+.DS_Store
+Thumbs.db
+
+# === Vite / TypeScript ===
+*.local
+tsconfig.tsbuildinfo
