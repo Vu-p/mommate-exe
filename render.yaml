@@ -1,0 +1,7 @@
+services:
+  front-end:
+    type: web
+    env: docker
+    plan: free
+    dockerFilePath: front-end/Dockerfile
+    dockerContext: front-end
