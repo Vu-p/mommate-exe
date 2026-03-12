@@ -66,3 +66,33 @@
   font-size: 0.85rem;
   color: var(--text-muted);
 }
+@media (max-width: 968px) {
+  .testimonials-header h2 {
+    font-size: 2.4rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .testimonials {
+    padding: 60px 0;
+  }
+
+  .testimonials-header h2 {
+    font-size: 2.2rem;
+  }
+
+  .testimonial-row {
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .test-card-figma {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .testimonials-header h2 {
+    font-size: 1.8rem;
+  }
+}

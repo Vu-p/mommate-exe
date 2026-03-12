@@ -97,3 +97,39 @@
   color: var(--secondary);
   text-decoration: underline;
 }
+@media (max-width: 968px) {
+  .footer-container-figma {
+    grid-template-columns: 1fr 1.5fr;
+    gap: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-figma {
+    padding-top: 60px;
+  }
+
+  .footer-container-figma {
+    grid-template-columns: 1fr;
+    gap: 48px;
+    margin-bottom: 60px;
+  }
+
+  .footer-links-figma {
+    flex-wrap: wrap;
+    gap: 32px;
+  }
+
+  .bottom-content-figma {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-links-figma {
+    flex-direction: column;
+    gap: 32px;
+  }
+}

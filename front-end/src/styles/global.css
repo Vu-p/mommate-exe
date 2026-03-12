@@ -44,6 +44,12 @@ a {
   padding: 0 var(--spacing-md);
 }
 
+@media (max-width: 640px) {
+  .container {
+    padding: 0 var(--spacing-sm);
+  }
+}
+
 /* ===== Back to Top Button ===== */
 .back-to-top {
   position: fixed;

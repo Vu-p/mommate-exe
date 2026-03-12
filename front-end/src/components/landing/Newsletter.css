@@ -56,3 +56,53 @@
   font-weight: 700;
   cursor: pointer;
 }
+@media (max-width: 968px) {
+  .newsletter-box-figma h2 {
+    font-size: 2.6rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .newsletter-figma {
+    padding: 60px 0;
+  }
+
+  .newsletter-box-figma {
+    padding: 60px 24px;
+    border-radius: 30px;
+  }
+
+  .newsletter-box-figma h2 {
+    font-size: 2.2rem;
+  }
+
+  .newsletter-box-figma p {
+    font-size: 1rem;
+    margin-bottom: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .newsletter-box-figma h2 {
+    font-size: 1.8rem;
+  }
+
+  .subscribe-form-figma {
+    flex-direction: column;
+    background: transparent;
+    gap: 12px;
+    padding: 0;
+  }
+
+  .subscribe-form-figma input {
+    background: #F8F7FA;
+    padding: 16px 24px;
+    border-radius: 100px;
+    width: 100%;
+  }
+
+  .btn-subscribe {
+    width: 100%;
+    padding: 16px;
+  }
+}
