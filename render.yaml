@@ -1,7 +1,10 @@
 services:
-  front-end:
-    type: web
-    env: docker
-    plan: free
-    dockerFilePath: front-end/Dockerfile
-    dockerContext: front-end
+  - type: static
+    name: mommate-frontend
+    env: static
+    buildCommand: cd front-end && npm install && npm run build
+    staticPublishPath: front-end/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
