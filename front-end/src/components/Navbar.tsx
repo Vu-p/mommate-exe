@@ -1,8 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User as UserIcon, LogOut, ChevronDown, LayoutDashboard } from 'lucide-react';
+import { useAuth } from '../context/AuthContext.tsx';
+import logo from '../assets/images/logo.png';
 import './Navbar.css';
+import './NavbarAdmin.css';
 
 interface NavbarProps {
   currentMode?: 'login' | 'signup';
@@ -14,6 +17,9 @@ const Navbar = ({ currentMode }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const lastScrollY = useRef(0);
 
   useEffect(() => {
@@ -36,7 +42,18 @@ const Navbar = ({ currentMode }: NavbarProps) => {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsUserDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, [isMobileMenuOpen]);
 
   // Close mobile menu on route change
@@ -69,33 +86,80 @@ const Navbar = ({ currentMode }: NavbarProps) => {
             <div className="container navbar-content">
               <div className="nav-group left desktop-only">
                 <Link to="/" className="nav-link">Home</Link>
-                <a href="#about" className="nav-link">About</a>
-                <a href="#contact" className="nav-link">Contact Us</a>
+                <a href="#contact" className="nav-link">Contact us</a>
               </div>
 
               <div className="nav-group center">
                 <Link to="/" className="brand-logo" onClick={() => setIsMobileMenuOpen(false)}>
+                  <img src={logo} alt="Mommate" className="logo-img" />
                   Mommate
                 </Link>
               </div>
 
               <div className="nav-group right desktop-only">
-                <motion.button
-                  className={`auth-btn-nav ${activeMode === 'login' ? 'primary' : 'link'}`}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => toggleAuth('login')}
-                >
-                  Log In
-                </motion.button>
-                <motion.button
-                  className={`auth-btn-nav ${activeMode === 'signup' || (!activeMode && isLanding) ? 'primary' : 'link'}`}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => toggleAuth('signup')}
-                >
-                  Sign Up
-                </motion.button>
+                {user ? (
+                  <div className="user-profile-nav" ref={dropdownRef}>
+                    <button 
+                      className="user-dropdown-toggle"
+                      onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                    >
+                      <div className="user-avatar">
+                        <UserIcon size={20} />
+                      </div>
+                      <span className="user-name">{user.firstName}</span>
+                      <ChevronDown size={16} className={isUserDropdownOpen ? 'rotate' : ''} />
+                    </button>
+
+                    <AnimatePresence>
+                      {isUserDropdownOpen && (
+                        <motion.div 
+                          className="user-dropdown-menu"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 10 }}
+                        >
+                          {user.role === 'admin' && (
+                            <Link to="/admin" className="dropdown-item admin-link" onClick={() => setIsUserDropdownOpen(false)}>
+                              <LayoutDashboard size={16} /> Admin Panel
+                            </Link>
+                          )}
+                          <Link to="/account/request" className="dropdown-item">
+                            <UserIcon size={16} /> Dashboard
+                          </Link>
+                          <button 
+                            className="dropdown-item logout" 
+                            onClick={() => {
+                              logout();
+                              setIsUserDropdownOpen(false);
+                              navigate('/');
+                            }}
+                          >
+                            <LogOut size={16} /> Log out
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ) : (
+                  <>
+                    <motion.button
+                      className={`auth-btn-nav ${activeMode === 'login' ? 'primary' : 'link'}`}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => toggleAuth('login')}
+                    >
+                      Log in
+                    </motion.button>
+                    <motion.button
+                      className={`auth-btn-nav ${activeMode === 'signup' || (!activeMode && isLanding) ? 'primary' : 'link'}`}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => toggleAuth('signup')}
+                    >
+                      Sign Up
+                    </motion.button>
+                  </>
+                )}
               </div>
 
               <button 
@@ -127,8 +191,43 @@ const Navbar = ({ currentMode }: NavbarProps) => {
               </div>
               
               <div className="mobile-auth-actions">
-                <button className="mobile-auth-btn secondary" onClick={() => toggleAuth('login')}>Log In</button>
-                <button className="mobile-auth-btn primary" onClick={() => toggleAuth('signup')}>Create Account</button>
+                {user ? (
+                  <div className="mobile-user-info">
+                    <div className="user-profile-info">
+                      <div className="user-avatar-large">
+                        <UserIcon size={32} />
+                      </div>
+                      <div className="user-text-info">
+                        <span className="user-full-name">{user.firstName} {user.lastName}</span>
+                        <span className="user-email">{user.email}</span>
+                      </div>
+                    </div>
+                    <button 
+                      className="mobile-auth-btn primary" 
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        navigate('/account/request');
+                      }}
+                    >
+                      Dashboard
+                    </button>
+                    <button 
+                      className="mobile-auth-btn secondary logout" 
+                      onClick={() => {
+                        logout();
+                        setIsMobileMenuOpen(false);
+                        navigate('/');
+                      }}
+                    >
+                      Log Out
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <button className="mobile-auth-btn secondary" onClick={() => toggleAuth('login')}>Log In</button>
+                    <button className="mobile-auth-btn primary" onClick={() => toggleAuth('signup')}>Create Account</button>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>

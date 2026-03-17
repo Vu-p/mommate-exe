@@ -1,0 +1,247 @@
+.account-requests-page {
+  background-color: var(--white);
+  padding-top: 80px;
+}
+
+.account-dashboard {
+  padding-top: 24px;
+  padding-bottom: 100px;
+}
+
+.account-dashboard .breadcrumb {
+  margin-bottom: 48px;
+}
+
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 64px;
+  align-items: flex-start;
+}
+
+/* Sidebar Styling */
+.dashboard-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.user-profile-summary {
+  padding-left: 120px;
+  margin-bottom: 24px;
+}
+
+.avatar-placeholder {
+  width: 64px;
+  height: 64px;
+  background-color: #F8F9FA;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #adb5bd;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  color: var(--secondary);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+
+.nav-item:hover:not(.active) {
+  background-color: #F8F9FA;
+}
+
+.nav-item.active {
+  color: var(--primary-dark);
+}
+
+.nav-item.expandable {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  padding: 0;
+}
+
+.nav-item-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  width: 100%;
+}
+
+.nav-submenu {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-top: 8px;
+  padding-bottom: 16px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.submenu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px 12px 60px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #adb5bd;
+  transition: all 0.3s;
+}
+
+.submenu-item.active {
+  background-color: #F8F7FF;
+  color: var(--primary-dark);
+}
+
+.sidebar-nav > div:not(.expandable) {
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  border-radius: 0;
+}
+
+/* Content Area */
+.dashboard-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.request-card {
+  background: white;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 16px;
+  padding: 40px;
+}
+
+.request-card-info {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.request-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.request-main h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #5D5A88;
+}
+
+.request-time {
+  font-size: 0.9rem;
+  color: #adb5bd;
+  font-weight: 500;
+}
+
+.request-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #adb5bd;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.carer-icon-mini {
+  width: 24px;
+  height: 24px;
+  background-color: #F8F9FA;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-footer-layout {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+  justify-content: flex-end;
+}
+
+.btn-view-details {
+  background: transparent;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #adb5bd;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.btn-pay-action,
+.btn-review-action {
+  background-color: var(--primary);
+  color: white;
+  padding: 8px 24px;
+  border-radius: 100px;
+  border: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-pay-action:hover,
+.btn-review-action:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(93, 90, 136, 0.2);
+}
+
+.dashboard-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.btn-next {
+  background-color: white;
+  border: 1.5px solid var(--secondary);
+  color: var(--secondary);
+  padding: 8px 32px;
+  border-radius: 100px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-next:hover {
+  background-color: var(--secondary);
+  color: white;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+}

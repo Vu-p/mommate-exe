@@ -7,7 +7,7 @@ const Newsletter = () => {
       <div className="container">
         <div className="newsletter-box-figma">
           <h2>Subscribe for all needs!</h2>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus amet dui qui vitae quis leo.</p>
+          <p>Stay updated with our latest services and expert care tips for your motherhood journey.</p>
           <div className="subscribe-form-figma">
             <input type="email" placeholder="Enter your email" aria-label="Email address" />
             <motion.button 

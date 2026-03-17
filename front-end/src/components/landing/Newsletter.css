@@ -1,6 +1,6 @@
 .newsletter-figma {
-  padding: 100px 0;
-  background-color: #F8F7FA;
+  padding: 120px 0;
+  background-color: var(--white);
 }
 
 .newsletter-box-figma {
@@ -31,11 +31,13 @@
 
 .subscribe-form-figma {
   display: flex;
-  background: #F8F7FA;
+  background: var(--bg);
   padding: 8px;
   border-radius: 100px;
-  max-width: 500px;
+  max-width: 550px;
   margin: 0 auto;
+  border: 1px solid rgba(167, 139, 250, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .subscribe-form-figma input {
@@ -48,13 +50,21 @@
 }
 
 .btn-subscribe {
-  background-color: var(--primary-light);
-  color: var(--primary);
-  padding: 14px 40px;
+  background-color: var(--primary);
+  color: var(--white);
+  padding: 16px 44px;
   border-radius: 100px;
   border: none;
   font-weight: 700;
   cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-subscribe:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(167, 139, 250, 0.3);
 }
 @media (max-width: 968px) {
   .newsletter-box-figma h2 {

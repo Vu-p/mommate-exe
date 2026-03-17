@@ -57,8 +57,8 @@ a {
   bottom: 32px;
   right: 32px;
   z-index: 999;
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: var(--primary);
   color: var(--white);
@@ -67,10 +67,12 @@ a {
   justify-content: center;
   cursor: pointer;
   border: none;
-  box-shadow: 0 6px 20px rgba(197, 164, 209, 0.5);
-  transition: box-shadow 0.3s;
+  box-shadow: var(--shadow-lg);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .back-to-top:hover {
-  box-shadow: 0 8px 28px rgba(197, 164, 209, 0.7);
+  transform: translateY(-5px);
+  background: var(--primary-dark);
+  box-shadow: 0 12px 30px rgba(167, 139, 250, 0.4);
 }

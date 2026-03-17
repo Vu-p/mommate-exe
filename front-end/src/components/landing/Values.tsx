@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Shield, Users, ThumbsUp } from 'lucide-react';
 import './Values.css';
 
@@ -27,7 +26,7 @@ const Values = () => {
         <div className="values-intro-figma">
            <span className="label">WHY TRUST US</span>
            <h2>Top Values For You</h2>
-           <p>Embrace this vastness venture forth,</p>
+           <p>We are committed to providing the best profiles and certified support for every family.</p>
         </div>
         
         <div className="values-grid-figma">

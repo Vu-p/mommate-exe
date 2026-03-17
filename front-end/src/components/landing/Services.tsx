@@ -1,37 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import serviceA from '../../assets/images/service-a.png';
-import serviceRecovery from '../../assets/images/service-recovery.png';
-import serviceNewborn from '../../assets/images/service-newborn.png';
+import api from '../../utils/api';
 import './Services.css';
-
-const services = [
-  {
-    id: 'Service A',
-    title: 'Breast/ Chest Feeding Support',
-    desc: 'Expert assistance for your feeding journey, ensuring a healthy start for you and your baby.',
-    img: serviceA,
-    subImg: serviceNewborn
-  },
-  {
-    id: 'Service B',
-    title: 'Postpartum recovery',
-    desc: 'Expert care for your recovery journey, ensuring both physical and emotional well-being after childbirth.',
-    img: serviceRecovery,
-    subImg: serviceA
-  },
-  {
-      id: 'Service C',
-      title: 'Newborn care',
-      desc: 'Specialized care for your little ones during the most critical first weeks of life. Professional support for your baby\'s health.',
-      img: serviceNewborn,
-      subImg: serviceRecovery
-  }
-];
+import { Link } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 
 const Services = () => {
-  const [activeTab, setActiveTab] = useState('Service A');
-  const activeService = services.find(s => s.id === activeTab);
+  const [services, setServices] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('Postpartum care');
+  const [categories, setCategories] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        setLoading(true);
+        const { data } = await api.get('/services');
+        setServices(data);
+        
+        // Extract unique categories
+        const uniqueCategories = Array.from(new Set(data.map((s: any) => s.category))) as string[];
+        setCategories(uniqueCategories.length > 0 ? uniqueCategories : ['Postpartum care', 'Pregnancy', 'Family']);
+        if (uniqueCategories.length > 0) setActiveTab(uniqueCategories[0]);
+      } catch (error) {
+        console.error('Error fetching services for landing:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
+  // Find a service for the active category
+  const activeService = services.find(s => s.category === activeTab) || services[0];
+  // Find a secondary image for the stack if available
+  const subService = services.find(s => s.category === activeTab && s._id !== activeService?._id) || services[1] || activeService;
 
   return (
     <section className="services" id="services">
@@ -42,7 +46,7 @@ const Services = () => {
             <h2>Explore our services</h2>
           </div>
           <div className="service-tabs">
-            {['Service A', 'Service B', 'Service C', 'Service D'].map((tab) => (
+            {categories.map((tab) => (
               <button 
                 key={tab} 
                 className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
@@ -51,46 +55,57 @@ const Services = () => {
                 {tab}
               </button>
             ))}
-            <a href="#" className="see-all-link">See all</a>
+            <Link to="/services" className="see-all-link">See all</Link>
           </div>
         </div>
 
-        <div className="service-content-figma">
-          <div className="service-images-figma">
-            <AnimatePresence mode="wait">
-              <motion.div 
-                key={activeTab}
-                className="image-stack-figma"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.5 }}
-              >
-                <div className="sub-img-figma">
-                   <img src={activeService?.subImg} alt="" />
-                </div>
-                <div className="main-img-figma">
-                   <img src={activeService?.img} alt={activeService?.title} />
-                </div>
-              </motion.div>
-            </AnimatePresence>
+        {loading ? (
+          <div className="landing-loading">
+            <Loader2 className="spinner" />
+            <p>Loading premium services...</p>
           </div>
-          
-          <div className="service-info-figma">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4 }}
-              >
-                <h3>{activeService?.title || 'Service Title'}</h3>
-                <p>{activeService?.desc || 'Deeply committed to your postpartum wellness and comfort.'}</p>
-                <button className="explore-btn-figma">Explore more</button>
-              </motion.div>
-            </AnimatePresence>
+        ) : services.length > 0 ? (
+          <div className="service-content-figma">
+            <div className="service-images-figma">
+              <AnimatePresence mode="wait">
+                <motion.div 
+                  key={activeTab}
+                  className="image-stack-figma"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <div className="sub-img-figma">
+                     <img src={subService?.image || subService?.img} alt="" />
+                  </div>
+                  <div className="main-img-figma">
+                     <img src={activeService?.image || activeService?.img} alt={activeService?.title} />
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+            
+            <div className="service-info-figma">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <h3>{activeService?.title || 'Service Title'}</h3>
+                  <p>{activeService?.description || activeService?.desc || 'Deeply committed to your postpartum wellness and comfort.'}</p>
+                  <Link to={`/services/${activeService?._id}`} className="explore-btn-figma">Explore more</Link>
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="empty-state">
+            <p>No services available at the moment. Check back soon!</p>
+          </div>
+        )}
       </div>
     </section>
   );

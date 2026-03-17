@@ -1,5 +1,6 @@
-import { useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion'; // Re-triggering resolution
+import { useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../components/Navbar.tsx';
 import Breadcrumbs from '../components/common/Breadcrumbs.tsx';
 import SignUpForm from '../components/auth/SignUpForm.tsx';
@@ -8,11 +9,20 @@ import SocialLogins from '../components/auth/SocialLogins.tsx';
 import Footer from '../components/Footer.tsx';
 import signupImg from '../assets/images/signup-mock.png';
 import './Auth.css';
+import { useAuth } from '../context/AuthContext.tsx';
 
 const Auth = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
   const mode = searchParams.get('mode') || 'signup';
   const isLogin = mode === 'login';
+
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/');
+    }
+  }, [user, loading, navigate]);
 
   const toggleToLogin = () => setSearchParams({ mode: 'login' });
   const toggleToSignup = () => setSearchParams({ mode: 'signup' });

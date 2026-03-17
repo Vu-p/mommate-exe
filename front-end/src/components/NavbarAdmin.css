@@ -1,0 +1,10 @@
+.admin-link {
+  color: var(--primary) !important;
+  font-weight: 700 !important;
+  background: rgba(167, 139, 250, 0.05);
+  margin-bottom: 4px;
+}
+
+.admin-link:hover {
+  background: rgba(167, 139, 250, 0.1) !important;
+}

@@ -1,0 +1,281 @@
+.service-detail-page {
+  background-color: var(--white);
+  padding-top: 80px;
+}
+
+.service-detail-content {
+  padding-top: 24px;
+  padding-bottom: 100px;
+}
+
+.service-top-section {
+  margin-top: 40px;
+  margin-bottom: 80px;
+}
+
+.gallery-container {
+  display: grid;
+  grid-template-columns: 100px 1fr 350px;
+  gap: 32px;
+  align-items: start;
+}
+
+.thumbnails {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.thumb {
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.thumb.active {
+  border-color: var(--primary);
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholder-thumb {
+  background-color: var(--bg);
+  border: 1px dashed var(--primary-light);
+}
+
+.main-image {
+  height: 500px;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.main-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.service-intro-card {
+  padding: 0;
+}
+
+.service-intro-card h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--secondary);
+  margin-bottom: 24px;
+  line-height: 1.2;
+}
+
+.user-type {
+  font-weight: 700;
+  color: var(--secondary);
+  opacity: 0.8;
+  margin-bottom: 16px;
+}
+
+.service-intro-card p {
+  color: var(--secondary);
+  opacity: 0.6;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.btn-booking-primary {
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+  padding: 12px 32px;
+  border-radius: 100px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-booking-primary:hover {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+/* Benefits Section */
+.service-benefits {
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto 100px;
+}
+
+.service-benefits h3 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--secondary);
+  margin-bottom: 32px;
+}
+
+.service-benefits p {
+  color: var(--secondary);
+  opacity: 0.7;
+  line-height: 1.8;
+  margin-bottom: 48px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.btn-booking-secondary {
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+  padding: 14px 40px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-consultation {
+  background-color: #5B617E;
+  color: var(--white);
+  padding: 14px 40px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Treatment Details */
+.treatment-details {
+  margin-bottom: 100px;
+}
+
+.treatment-details h3 {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--secondary);
+  margin-bottom: 64px;
+}
+
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.treatment-step-card {
+  background: var(--white);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.step-header {
+  background-color: #F3F0FF;
+  padding: 12px 24px;
+  text-align: center;
+}
+
+.step-header h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  text-transform: capitalize;
+  margin: 0;
+}
+
+.step-body {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 40px;
+  padding: 32px;
+  align-items: center;
+}
+
+.step-img-placeholder {
+  width: 200px;
+  height: 140px;
+  background-color: var(--bg);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.step-img-placeholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.step-text p {
+  color: var(--secondary);
+  opacity: 0.7;
+  line-height: 1.6;
+}
+
+/* Bottom CTA */
+.bottom-cta {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+}
+
+.btn-book-now {
+  background-color: #5B617E;
+  color: var(--white);
+  padding: 14px 48px;
+  border-radius: 100px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-explore {
+  background-color: transparent;
+  color: var(--secondary);
+  padding: 14px 48px;
+  border-radius: 100px;
+  border: 1px solid rgba(0,0,0,0.2);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 1100px) {
+  .gallery-container {
+    grid-template-columns: 80px 1fr;
+  }
+  
+  .service-intro-card {
+    grid-column: span 2;
+    margin-top: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .gallery-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .thumbnails {
+    flex-direction: row;
+    order: 2;
+  }
+  
+  .main-image {
+    height: 300px;
+  }
+  
+  .step-body {
+    grid-template-columns: 1fr;
+  }
+  
+  .step-img-placeholder {
+    width: 100%;
+  }
+}

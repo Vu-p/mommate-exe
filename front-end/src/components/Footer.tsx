@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Facebook, Instagram, Twitter, Linkedin } from 'lucide-react';
+import logo from '../assets/images/logo.png';
 import './Footer.css';
 
 const Footer = () => {
@@ -7,8 +7,11 @@ const Footer = () => {
     <footer className="footer-figma">
       <div className="container footer-container-figma">
         <div className="footer-brand-figma">
-          <h3>Mommate</h3>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+          <div className="footer-logo-container">
+            <img src={logo} alt="Mommate" className="footer-logo-img" />
+            <h3>Mommate</h3>
+          </div>
+          <p>Professional Caregiver Ecosystem</p>
           <div className="social-links-figma">
             <a href="#"><Facebook size={20} /></a>
             <a href="#"><Twitter size={20} /></a>

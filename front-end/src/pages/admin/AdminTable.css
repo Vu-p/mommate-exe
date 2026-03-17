@@ -1,0 +1,184 @@
+.admin-page-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-text h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--secondary);
+  margin-bottom: 8px;
+}
+
+.header-text p {
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.add-btn {
+  background: var(--primary-gradient);
+  color: var(--white);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
+}
+
+.add-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(167, 139, 250, 0.5);
+}
+
+.table-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search-box {
+  background: var(--white);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 12px 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 400px;
+  color: var(--text-light);
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-weight: 500;
+  color: var(--secondary);
+}
+
+.filter-btn {
+  background: var(--white);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 12px 20px;
+  border-radius: 12px;
+  color: var(--secondary);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.admin-card {
+  background: var(--white);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th {
+  text-align: left;
+  padding: 0 20px 20px;
+  color: var(--text-light);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.admin-table td {
+  padding: 24px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  font-weight: 500;
+  color: var(--secondary);
+}
+
+.td-title {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.badge {
+  background: #f1f5f9;
+  color: var(--text-light);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.price-tag {
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.action-group {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.icon-btn.edit {
+  background: #f8fafc;
+  color: #3b82f6;
+}
+
+.icon-btn.edit:hover {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.icon-btn.delete {
+  background: #f8fafc;
+  color: #ef4444;
+}
+
+.icon-btn.delete:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.table-loading {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-light);
+  font-weight: 600;
+}

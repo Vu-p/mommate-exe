@@ -10,19 +10,19 @@ const SocialLogins = ({ isLogin }: SocialLoginsProps) => {
     <div className="social-logins">
       <p className="social-text">{isLogin ? 'Or log in with' : 'Or sign up with'}</p>
       <div className="social-buttons">
-        <motion.button 
+        <motion.button
           className="social-btn google"
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.98 }}
         >
           Google
         </motion.button>
-        <motion.button 
+        <motion.button
           className="social-btn facebook"
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.98 }}
         >
-          facebook
+          Facebook
         </motion.button>
       </div>
     </div>
