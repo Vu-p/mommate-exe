@@ -119,8 +119,8 @@ const seedData = async () => {
         password: hashedPassword,
         role: UserRole.CARER,
         phoneNumber: '0901234567',
-        avatar: 'https://i.pravatar.cc/150?u=carerA',
-        address: 'Hồ Chí Minh'
+        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+        address: '123 Đường Nguyễn Huệ, Quận Hải Châu, Đà Nẵng'
       },
       {
         firstName: 'Tran',
@@ -129,8 +129,8 @@ const seedData = async () => {
         password: hashedPassword,
         role: UserRole.CARER,
         phoneNumber: '0907654321',
-        avatar: 'https://i.pravatar.cc/150?u=carerB',
-        address: 'Hà Nội'
+        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+        address: '456 Đường Trần Hưng Đạo, Quận Thanh Khê, Đà Nẵng'
       },
       {
         firstName: 'Test',
@@ -139,8 +139,8 @@ const seedData = async () => {
         password: hashedPassword,
         role: UserRole.PARENT,
         phoneNumber: '0988888888',
-        avatar: 'https://i.pravatar.cc/150?u=parent',
-        address: 'Đà Nẵng'
+        avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+        address: '789 Đường Ông Ích Khiêm, Quận Liên Chiểu, Đà Nẵng'
       }
     ]);
 
@@ -153,7 +153,7 @@ const seedData = async () => {
         hourlyRate: 150000,
         rating: 4.8,
         reviewCount: 25,
-        location: 'Hồ Chí Minh',
+        location: '123 Đường Nguyễn Huệ, Quận Hải Châu, Đà Nẵng',
         age: 35,
         certifications: ['Certified Nurse', 'Pediatric Specialist'],
         services: [services[0]!._id, services[1]!._id, services[3]!._id],
@@ -170,7 +170,7 @@ const seedData = async () => {
         hourlyRate: 120000,
         rating: 4.9,
         reviewCount: 18,
-        location: 'Hà Nội',
+        location: '456 Đường Trần Hưng Đạo, Quận Thanh Khê, Đà Nẵng',
         age: 28,
         certifications: ['IBCLC Consultant'],
         services: [services[2]!._id],

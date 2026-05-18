@@ -1,0 +1,13 @@
+{
+  "name": "mommate-exe",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "seed": "npm --prefix back-end run seed",
+    "backend:dev": "npm --prefix back-end run dev",
+    "frontend:dev": "npm --prefix front-end run dev",
+    "backend:install": "npm --prefix back-end install",
+    "frontend:install": "npm --prefix front-end install",
+    "install:all": "npm --prefix back-end install && npm --prefix front-end install"
+  }
+}
