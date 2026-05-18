@@ -55,11 +55,11 @@ const Footer = () => {
           </div>
           <div className="contact-item-figma">
             <Phone size={18} />
-            <span>(415) 000-0000</span>
+            <span>0905 123 456</span>
           </div>
           <div className="contact-item-figma">
             <MapPin size={18} />
-            <span>794 McAllister St San Francisco, 94102</span>
+            <span>123 Nguyen Van Linh, Hai Chau, Da Nang</span>
           </div>
         </div>
       </div>
