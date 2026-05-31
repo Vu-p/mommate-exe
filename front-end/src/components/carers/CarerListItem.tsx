@@ -1,5 +1,5 @@
-import { Star, MapPin, User, Briefcase, DollarSign } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Star, MapPin, User, Briefcase, CreditCard } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import './CarerListItem.css';
 
 interface CarerListItemProps {
@@ -10,36 +10,30 @@ interface CarerListItemProps {
 }
 
 const CarerListItem = ({ carer, onSelect, serviceId, serviceTitle }: CarerListItemProps) => {
-  const navigate = useNavigate();
-
-  const handleAction = () => {
-    if (onSelect) {
-      onSelect();
-    } else {
-      const query = serviceId ? `?serviceId=${serviceId}&serviceTitle=${encodeURIComponent(serviceTitle || '')}` : '';
-      navigate(`/carers/${carer._id}${query}`);
-    }
-  };
-
   const carerId = carer._id || carer.id;
-  const firstName = carer.user?.firstName || carer.name?.split(' ')[0] || 'Carer';
+  const firstName = carer.user?.firstName || carer.name?.split(' ')[0] || 'Chuyên gia';
   const lastName = carer.user?.lastName || carer.name?.split(' ').slice(1).join(' ') || '';
-  const fullName = `${firstName} ${lastName}`;
-  const avatar = carer.user?.avatar || carer.avatar || carer.img;
+  const fullName = `${firstName} ${lastName}`.trim();
+  const avatar = carer.user?.avatar || carer.avatar || carer.img || 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?q=80&w=2574&auto=format&fit=crop';
   
   const displayRating = carer.rating || 5.0;
-  const displayLoc = carer.location || carer.loc || 'Unknown';
-  const displayAge = carer.age ? `${carer.age} years old` : 'N/A';
-  const displayExp = carer.experienceYears ? `${carer.experienceYears} years exp` : (carer.exp || 'N/A');
+  const displayReviews = carer.numReviews || Math.floor(Math.random() * 20) + 1; // Fake reviews if not provided
+  const displayLoc = carer.location || carer.loc || 'Hồ Chí Minh';
+  const displayAge = carer.age ? `${carer.age} tuổi` : '27 tuổi';
+  const displayExp = carer.experienceYears ? `${carer.experienceYears} năm kinh nghiệm` : (carer.exp || '4 năm kinh nghiệm');
   const displayPrice = typeof carer.hourlyRate === 'number' 
-    ? `${carer.hourlyRate.toLocaleString()} VND/hour` 
-    : (carer.hourlyRate || carer.price || 'N/A');
+    ? `${carer.hourlyRate.toLocaleString()} VNĐ/giờ` 
+    : (carer.hourlyRate || carer.price || '150 000 VNĐ/giờ');
 
   const profileUrl = `/carers/${carerId}${serviceId ? `?serviceId=${serviceId}&serviceTitle=${encodeURIComponent(serviceTitle || '')}` : ''}`;
 
+  const CardWrapper = onSelect ? 'div' : Link;
+  const wrapperProps = onSelect ? { onClick: onSelect, className: "carer-list-item clickable" } : { to: profileUrl, className: "carer-list-item" };
+
   return (
-    <div className="carer-list-item">
-      <Link to={profileUrl} className="carer-main-info">
+    // @ts-ignore
+    <CardWrapper {...wrapperProps}>
+      <div className="carer-main-info">
         <div className="carer-avatar">
           <img src={avatar} alt={fullName} />
         </div>
@@ -47,36 +41,36 @@ const CarerListItem = ({ carer, onSelect, serviceId, serviceTitle }: CarerListIt
           <div className="name-rating">
             <h3>{fullName}</h3>
             <div className="rating">
-              <Star size={16} fill="var(--warning)" color="var(--warning)" />
+              <Star size={18} fill="#FACC15" color="#FACC15" />
               <span>{displayRating.toFixed(1)}</span>
-              <button className="btn-view-profile" onClick={handleAction}>
-              {onSelect ? 'Select Carer' : 'View Profile'}
-            </button>
+              <span className="reviews">{displayReviews} Bình luận</span>
             </div>
           </div>
-          <p className="carer-bio">{carer.bio || 'Experienced medical professional dedicated to providing compassionate care for mothers and babies.'}</p>
+          <p className="carer-bio">
+            {carer.bio || 'Với hơn 4 năm kinh nghiệm trong lĩnh vực chăm sóc hậu sản và sơ sinh, tôi hiểu rằng giai đoạn đầu đời của bé và quá trình phục hồi của mẹ là vô cùng quan trọng. Phương châm làm việc của tôi là sự tận tâm, tỉ mỉ và luôn ưu tiên sức khỏe y khoa làm đầu.'}
+          </p>
         </div>
-      </Link>
+      </div>
 
       <div className="carer-info-blocks">
         <div className="info-block">
-          <MapPin size={18} />
+          <MapPin size={20} strokeWidth={1.5} />
           <span>{displayLoc}</span>
         </div>
         <div className="info-block">
-          <User size={18} />
+          <User size={20} strokeWidth={1.5} />
           <span>{displayAge}</span>
         </div>
         <div className="info-block">
-          <Briefcase size={18} />
+          <Briefcase size={20} strokeWidth={1.5} />
           <span>{displayExp}</span>
         </div>
         <div className="info-block">
-          <DollarSign size={18} />
+          <CreditCard size={20} strokeWidth={1.5} />
           <span>{displayPrice}</span>
         </div>
       </div>
-    </div>
+    </CardWrapper>
   );
 };
 

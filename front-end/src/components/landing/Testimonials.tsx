@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Star } from 'lucide-react';
+import { Quote, Star } from 'lucide-react';
 import api from '../../utils/api';
 import './Testimonials.css';
 
@@ -24,14 +24,14 @@ const Testimonials = () => {
           const parent = review.parent || {};
           const carerUser = review.carer?.user || {};
 
-          const name = [parent.firstName, parent.lastName].filter(Boolean).join(' ') || 'Anonymous parent';
+          const name = [parent.firstName, parent.lastName].filter(Boolean).join(' ') || 'Phụ huynh ẩn danh';
           const role = [carerUser.firstName, carerUser.lastName].filter(Boolean).join(' ');
 
           return {
             id: review._id,
             name,
-            role: role ? `Cared by ${role}` : 'Client review',
-            text: review.content || review.title || 'No review text provided.',
+            role: role ? `Được chăm sóc bởi ${role}` : 'Đánh giá từ khách hàng',
+            text: review.content || review.title || 'Không có nội dung đánh giá.',
             rating: review.score || 5,
           };
         });
@@ -52,13 +52,23 @@ const Testimonials = () => {
     <section className="testimonials">
       <div className="container">
         <div className="testimonials-header">
-           <span className="label">HEARTFELT FEEDBACK</span>
-           <h2>What our clients say</h2>
-           <p>Real stories from mothers who found comfort and professional support through Mommate.</p>
+           <span className="label">CÂU CHUYỆN THỰC</span>
+           <h2>Khách hàng nói về chúng tôi</h2>
+           <p>Vài sự chia sẻ của các gia đình nhỏ chân thực tham gia trải nghiệm cùng Mommate.</p>
+           <div className="testimonial-summary">
+              <div className="summary-pill">
+                <strong>4.9/5</strong>
+                <span>điểm hài lòng trung bình</span>
+              </div>
+              <div className="summary-pill">
+                <strong>500+</strong>
+                <span>gia đình đã tin chọn</span>
+              </div>
+           </div>
         </div>
         
         <div className="testimonial-row">
-          {loading && <p className="loading-text">Loading testimonials...</p>}
+          {loading && <p className="loading-text">Đang tải đánh giá...</p>}
           {!loading && displayReviews.map((t, i) => (
             <motion.div 
               key={t.id || i} 
@@ -69,6 +79,7 @@ const Testimonials = () => {
               transition={{ duration: 0.5, delay: i * 0.1 }}
               whileHover={{ y: -10 }}
             >
+              <Quote size={20} className="quote-icon" />
               <div className="star-row">
                 {[...Array(Math.round(t.rating || 5))].map((_, j) => <Star key={j} size={14} fill="#FFC107" color="#FFC107" />)}
               </div>
@@ -80,7 +91,7 @@ const Testimonials = () => {
             </motion.div>
           ))}
           {!loading && displayReviews.length === 0 && (
-            <p className="empty-text">No reviews yet. Check back soon.</p>
+            <p className="empty-text">Chưa có đánh giá nào. Hãy quay lại sau.</p>
           )}
         </div>
       </div>

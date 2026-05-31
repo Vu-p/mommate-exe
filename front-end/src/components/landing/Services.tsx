@@ -3,12 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../utils/api';
 import './Services.css';
 import { Link } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Clock3, Loader2, Sparkles } from 'lucide-react';
+import serviceImg1 from '../../assets/images/service-1.png';
+import serviceImg2 from '../../assets/images/service-2.png';
 
 const Services = () => {
   const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('Postpartum care');
+  const [activeTab, setActiveTab] = useState('Hậu sản');
   const [categories, setCategories] = useState<string[]>([]);
 
   useEffect(() => {
@@ -20,7 +22,7 @@ const Services = () => {
         
         // Extract unique categories
         const uniqueCategories = Array.from(new Set(data.map((s: any) => s.category))) as string[];
-        setCategories(uniqueCategories.length > 0 ? uniqueCategories : ['Postpartum care', 'Pregnancy', 'Family']);
+        setCategories(uniqueCategories.length > 0 ? uniqueCategories : ['Hậu sản', 'Thai kỳ', 'Gia đình']);
         if (uniqueCategories.length > 0) setActiveTab(uniqueCategories[0]);
       } catch (error) {
         console.error('Error fetching services for landing:', error);
@@ -42,8 +44,8 @@ const Services = () => {
       <div className="container">
         <div className="services-header">
           <div className="header-text-group">
-            <span className="label">CHOOSE YOUR FAVOURITE SERVICE</span>
-            <h2>Explore our services</h2>
+            <span className="label">ĐỒNG HÀNH CÙNG MẸ QUA CÁC GIAI ĐOẠN</span>
+            <h2>Khám phá dịch vụ</h2>
           </div>
           <div className="service-tabs">
             {categories.map((tab) => (
@@ -55,14 +57,14 @@ const Services = () => {
                 {tab}
               </button>
             ))}
-            <Link to="/services" className="see-all-link">See all</Link>
+            <Link to="/services" className="see-all-link">Xem thêm</Link>
           </div>
         </div>
 
         {loading ? (
           <div className="landing-loading">
             <Loader2 className="spinner" />
-            <p>Loading premium services...</p>
+            <p>Đang tải dịch vụ...</p>
           </div>
         ) : services.length > 0 ? (
           <div className="service-content-figma">
@@ -77,10 +79,10 @@ const Services = () => {
                   transition={{ duration: 0.5 }}
                 >
                   <div className="sub-img-figma">
-                     <img src={subService?.image || subService?.img} alt="" />
+                     <img src={subService?.image || subService?.img || serviceImg1} alt="" />
                   </div>
                   <div className="main-img-figma">
-                     <img src={activeService?.image || activeService?.img} alt={activeService?.title} />
+                     <img src={activeService?.image || activeService?.img || serviceImg2} alt={activeService?.title} />
                   </div>
                 </motion.div>
               </AnimatePresence>
@@ -94,16 +96,32 @@ const Services = () => {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.4 }}
                 >
-                  <h3>{activeService?.title || 'Service Title'}</h3>
-                  <p>{activeService?.description || activeService?.desc || 'Deeply committed to your postpartum wellness and comfort.'}</p>
-                  <Link to={`/services/${activeService?._id}`} className="explore-btn-figma">Explore more</Link>
+                  <h3>{activeService?.title || 'Tên dịch vụ'}</h3>
+                  <div className="service-meta-row">
+                    <span className="service-meta-chip">
+                      <Sparkles size={14} />
+                      {activeService?.category || 'Dịch vụ chăm sóc'}
+                    </span>
+                    <span className="service-meta-chip">
+                      <Clock3 size={14} />
+                      {activeService?.duration || 'Linh hoạt theo nhu cầu'}
+                    </span>
+                  </div>
+                  <p>{activeService?.description || activeService?.desc || 'Cam kết đồng hành cùng sức khỏe và sự thoải mái sau sinh của bạn.'}</p>
+                  {(activeService?.price || activeService?.basePrice) && (
+                    <div className="service-price-note">
+                      <span>Giá từ</span>
+                      <strong>{(activeService?.price || activeService?.basePrice).toLocaleString('vi-VN')} VND</strong>
+                    </div>
+                  )}
+                  <Link to={`/services/${activeService?._id}`} className="explore-btn-figma">Khám phá thêm</Link>
                 </motion.div>
               </AnimatePresence>
             </div>
           </div>
         ) : (
           <div className="empty-state">
-            <p>No services available at the moment. Check back soon!</p>
+            <p>Hiện chưa có dịch vụ nào. Vui lòng quay lại sau!</p>
           </div>
         )}
       </div>

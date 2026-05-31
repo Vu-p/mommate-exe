@@ -9,6 +9,9 @@ import Booking from './pages/Booking';
 import AccountRequests from './pages/AccountRequests';
 import Payment from './pages/Payment';
 import Review from './pages/Review';
+import CaregiverApplyOverview from './pages/CaregiverApplyOverview';
+import CaregiverApplyJob from './pages/CaregiverApplyJob';
+import AccountProfile from './pages/AccountProfile';
 import './styles/global.css';
 
 import AdminLayout from './components/admin/AdminLayout';
@@ -26,7 +29,9 @@ const TitleUpdater = () => {
     pathname.startsWith('/services') ? 'Services' :
     pathname.startsWith('/carers') ? 'Carers' :
     pathname.startsWith('/booking') ? 'Booking' :
+    pathname.startsWith('/account/profile') ? 'Account Profile' :
     pathname.startsWith('/account') ? 'Account Requests' :
+    pathname.startsWith('/caregiver/apply') ? 'Caregiver Application' :
     pathname.startsWith('/payment') ? 'Payment' :
     pathname.startsWith('/review') ? 'Review' :
     pathname.startsWith('/auth') ? 'Sign In / Sign Up' :
@@ -51,7 +56,12 @@ function App() {
         <Route path="/account/request" element={<AccountRequests />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/review" element={<Review />} />
+        <Route path="/account/profile" element={<AccountProfile />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/signup" element={<Auth defaultMode="signup" />} />
+        <Route path="/login" element={<Auth defaultMode="login" />} />
+        <Route path="/caregiver/apply/overview" element={<CaregiverApplyOverview />} />
+        <Route path="/caregiver/apply/job" element={<CaregiverApplyJob />} />
         
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
@@ -62,8 +72,6 @@ function App() {
           <Route path="bookings" element={<AdminBookings />} />
         </Route>
 
-        <Route path="/signup" element={<Navigate to="/auth" replace />} />
-        <Route path="/login" element={<Navigate to="/auth" replace />} />
       </Routes>
     </Router>
   );

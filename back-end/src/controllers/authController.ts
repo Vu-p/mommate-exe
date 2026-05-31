@@ -83,3 +83,22 @@ export const loginUser = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+// @desc    Start password reset flow
+// @route   POST /api/auth/forgot-password
+// @access  Public
+export const forgotPassword = async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  try {
+    if (email) {
+      await User.findOne({ email });
+    }
+
+    res.json({
+      message: 'If the email exists, MomMate support will send password reset instructions.',
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};

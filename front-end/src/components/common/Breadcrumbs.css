@@ -1,22 +1,23 @@
 .breadcrumbs {
-  padding: var(--spacing-lg) 0;
+  padding: 30px 0;
   background-color: transparent;
 }
 
 .breadcrumb-list {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: 8px;
 }
 
 .breadcrumb-item {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 600;
   color: var(--text-muted);
 }
 
 .breadcrumb-item a {
-  color: var(--text);
-  font-weight: 500;
+  color: var(--text-muted);
+  font-weight: 600;
   transition: color var(--transition-fast);
 }
 
@@ -25,7 +26,8 @@
 }
 
 .breadcrumb-item.active {
-  color: var(--text-muted);
+  color: var(--secondary);
+  font-weight: 900;
 }
 
 .separator {

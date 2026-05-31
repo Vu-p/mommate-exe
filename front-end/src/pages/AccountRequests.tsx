@@ -6,7 +6,7 @@ import Footer from '../components/Footer';
 import api from '../utils/api';
 import './AccountRequests.css';
 
-type RequestStatus = 'Pending' | 'Accepted' | 'Rejected';
+type RequestStatus = 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled';
 
 const AccountRequests = () => {
   const [status, setStatus] = useState<RequestStatus>('Pending');
@@ -32,8 +32,9 @@ const AccountRequests = () => {
 
   const filteredBookings = bookings.filter(b => {
     if (status === 'Pending') return b.status === 'pending';
-    if (status === 'Accepted') return b.status === 'accepted' || b.status === 'paid' || b.status === 'completed';
-    if (status === 'Rejected') return b.status === 'rejected';
+    if (status === 'Confirmed') return b.status === 'confirmed' || b.status === 'in_progress';
+    if (status === 'Completed') return b.status === 'completed';
+    if (status === 'Cancelled') return b.status === 'cancelled';
     return true;
   });
 
@@ -59,10 +60,10 @@ const AccountRequests = () => {
             </div>
 
             <nav className="sidebar-nav">
-              <div className="nav-item">
+              <Link to="/account/profile" className="nav-item">
                 <User size={20} />
                 <span>Profile</span>
-              </div>
+              </Link>
               
               <div className="nav-item active expandable">
                 <div className="nav-item-header">
@@ -78,31 +79,38 @@ const AccountRequests = () => {
                     <ChevronRight size={14} />
                   </div>
                   <div 
-                    className={`submenu-item ${status === 'Accepted' ? 'active' : ''}`}
-                    onClick={() => setStatus('Accepted')}
+                    className={`submenu-item ${status === 'Confirmed' ? 'active' : ''}`}
+                    onClick={() => setStatus('Confirmed')}
                   >
-                    <span>Accepted</span>
+                    <span>Confirmed</span>
                     <ChevronDown size={14} />
                   </div>
                   <div 
-                    className={`submenu-item ${status === 'Rejected' ? 'active' : ''}`}
-                    onClick={() => setStatus('Rejected')}
+                    className={`submenu-item ${status === 'Completed' ? 'active' : ''}`}
+                    onClick={() => setStatus('Completed')}
                   >
-                    <span>Rejected</span>
+                    <span>Completed</span>
+                    <ChevronDown size={14} />
+                  </div>
+                  <div
+                    className={`submenu-item ${status === 'Cancelled' ? 'active' : ''}`}
+                    onClick={() => setStatus('Cancelled')}
+                  >
+                    <span>Cancelled</span>
                     <ChevronDown size={14} />
                   </div>
                 </div>
               </div>
 
-              <div className="nav-item">
+              <Link to="/caregiver/apply/overview" className="nav-item">
                 <Briefcase size={20} />
                 <span>Start a job</span>
-              </div>
+              </Link>
               <div className="nav-item">
                 <Settings size={20} />
                 <span>Setting</span>
               </div>
-              <div className="nav-item">
+              <div className="nav-item" id="support">
                 <LifeBuoy size={20} />
                 <span>Support</span>
               </div>
@@ -155,12 +163,12 @@ const AccountRequests = () => {
                       
                       <div className="card-footer-layout">
                         <button className="btn-view-details">View Details</button>
-                        {booking.status === 'accepted' && (
+                        {booking.status === 'confirmed' && !booking.paymentProofUrl && (
                           <button 
                             className="btn-pay-action" 
                             onClick={() => navigate('/payment', { state: { bookingId: booking._id } })}
                           >
-                            Pay Now
+                            Upload Bill
                           </button>
                         )}
                         {booking.status === 'completed' && (

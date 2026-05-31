@@ -15,6 +15,12 @@ export interface IUser extends Document {
   phoneNumber?: string;
   avatar?: string;
   address?: string;
+  birthDate?: Date;
+  gender?: string;
+  identityNumber?: string;
+  identityName?: string;
+  identityIssuedAt?: Date;
+  identityImages?: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -28,6 +34,12 @@ const UserSchema: Schema = new Schema({
   phoneNumber: { type: String },
   avatar: { type: String },
   address: { type: String },
+  birthDate: { type: Date },
+  gender: { type: String },
+  identityNumber: { type: String },
+  identityName: { type: String },
+  identityIssuedAt: { type: Date },
+  identityImages: [{ type: String }],
 }, { timestamps: true });
 
 export default mongoose.model<IUser>('User', UserSchema);

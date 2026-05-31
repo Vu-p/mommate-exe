@@ -23,6 +23,8 @@ interface Booking {
   scheduledAt: string;
   address: string;
   totalPrice: number;
+  paymentProofUrl?: string;
+  paymentConfirmedAt?: string;
 }
 
 const AdminBookings = () => {
@@ -48,7 +50,10 @@ const AdminBookings = () => {
 
   const handleStatusChange = async (id: string, newStatus: string) => {
     try {
-      await api.patch(`/bookings/${id}/status`, { status: newStatus });
+      await api.patch(`/bookings/${id}/status`, {
+        status: newStatus,
+        paymentConfirmed: newStatus === 'confirmed',
+      });
       setBookings(bookings.map(b => b._id === id ? { ...b, status: newStatus } : b));
     } catch (error) {
       alert('Failed to update status');
@@ -58,10 +63,10 @@ const AdminBookings = () => {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'pending': return 'status-pending';
-      case 'accepted': return 'status-accepted';
-      case 'paid': return 'status-paid';
+      case 'confirmed': return 'status-accepted';
+      case 'in_progress': return 'status-paid';
       case 'completed': return 'status-completed';
-      case 'rejected': return 'status-rejected';
+      case 'cancelled': return 'status-rejected';
       default: return '';
     }
   };
@@ -105,6 +110,7 @@ const AdminBookings = () => {
                   <th>Caregiver</th>
                   <th>Date & Location</th>
                   <th>Amount</th>
+                  <th>Payment</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -129,7 +135,14 @@ const AdminBookings = () => {
                         <div className="icon-text text-muted"><MapPin size={14} /> {booking.address}</div>
                       </div>
                     </td>
-                    <td><span className="price-tag">${booking.totalPrice}</span></td>
+                    <td><span className="price-tag">{booking.totalPrice.toLocaleString()} VND</span></td>
+                    <td>
+                      {booking.paymentProofUrl ? (
+                        <a href={booking.paymentProofUrl} target="_blank" rel="noreferrer">View bill</a>
+                      ) : (
+                        <span className="text-muted">No bill</span>
+                      )}
+                    </td>
                     <td>
                       <select 
                         className={`status-select ${getStatusColor(booking.status)}`}
@@ -137,10 +150,10 @@ const AdminBookings = () => {
                         onChange={(e) => handleStatusChange(booking._id, e.target.value)}
                       >
                         <option value="pending">Pending</option>
-                        <option value="accepted">Accepted</option>
-                        <option value="paid">Paid</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="in_progress">In Progress</option>
                         <option value="completed">Completed</option>
-                        <option value="rejected">Rejected</option>
+                        <option value="cancelled">Cancelled</option>
                       </select>
                     </td>
                   </tr>

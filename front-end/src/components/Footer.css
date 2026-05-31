@@ -1,149 +1,137 @@
-.footer-figma {
-  background-color: var(--bg);
-  border-top: 1px solid rgba(167, 139, 250, 0.1);
-  padding: 100px 0 0 0;
+.site-footer {
+  background: var(--surface-lavender);
+  color: var(--primary-dark);
+  padding: 92px 0 32px;
 }
 
-.footer-container-figma {
+.footer-main {
   display: grid;
-  grid-template-columns: 1.2fr 2fr 1.2fr;
-  gap: 60px;
-  margin-bottom: 80px;
+  grid-template-columns: 1.7fr 1fr 1fr 1fr 1.2fr;
+  gap: 52px;
+  padding-bottom: 72px;
 }
 
-.footer-logo-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
+.footer-brand {
+  max-width: 300px;
 }
 
 .footer-logo-img {
-  height: 48px;
-  width: auto;
+  width: 96px;
+  height: 96px;
   object-fit: contain;
+  margin-bottom: 20px;
 }
 
-.footer-brand-figma h3 {
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: var(--secondary);
-  margin-bottom: 0;
+.footer-brand h3 {
+  color: #05050a;
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 26px;
 }
 
-.footer-brand-figma p {
+.footer-brand p {
   color: var(--text-muted);
-  line-height: 1.6;
-  margin-bottom: 24px;
+  line-height: 1.8;
+  margin-bottom: 28px;
 }
 
-.social-links-figma {
+.footer-social-links {
   display: flex;
-  gap: 16px;
+  align-items: center;
+  gap: 18px;
 }
 
-.social-links-figma a {
-  color: var(--text-muted);
-  transition: color 0.3s;
+.footer-social-links a {
+  color: var(--primary-dark);
+  opacity: 0.88;
+  transition: color var(--transition-fast), opacity var(--transition-fast);
 }
 
-.social-links-figma a:hover {
+.footer-social-links a:hover {
   color: var(--primary);
+  opacity: 1;
 }
 
-.footer-links-figma {
-  display: flex;
-  justify-content: space-between;
-}
-
-.link-group-figma h4, .footer-contact-figma h4 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--secondary);
-  margin-bottom: 24px;
-}
-
-.link-group-figma {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.link-group-figma a {
-  text-decoration: none;
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  transition: color 0.3s;
-}
-
-.link-group-figma a:hover {
-  color: var(--primary);
-}
-
-.footer-contact-figma {
+.footer-link-group,
+.footer-contact {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.contact-item-figma {
+.footer-link-group h4,
+.footer-contact h4 {
+  color: #141224;
+  font-size: 1.08rem;
+  font-weight: 900;
+  margin-bottom: 14px;
+}
+
+.footer-link-group a,
+.footer-contact a {
+  color: var(--text-muted);
+  font-size: 0.98rem;
+  line-height: 1.4;
+  transition: color var(--transition-fast);
+}
+
+.footer-link-group a:hover,
+.footer-contact a:hover {
+  color: var(--primary-dark);
+}
+
+.footer-contact a {
   display: flex;
   align-items: center;
-  gap: 12px;
-  color: var(--text-muted);
-  font-size: 0.95rem;
+  gap: 10px;
 }
 
-.footer-bottom-figma {
-  border-top: 1px solid rgba(0,0,0,0.1);
-  padding: 30px 0;
-}
-
-.bottom-content-figma {
+.footer-bottom {
+  border-top: 1px solid rgba(93, 90, 136, 0.14);
+  padding-top: 30px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  gap: 24px;
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: 0.92rem;
 }
 
-.bottom-links-figma a {
-  color: var(--secondary);
+.footer-bottom a {
+  color: var(--primary-dark);
   text-decoration: underline;
+  font-weight: 700;
 }
-@media (max-width: 968px) {
-  .footer-container-figma {
-    grid-template-columns: 1fr 1.5fr;
-    gap: 40px;
+
+@media (max-width: 1100px) {
+  .footer-main {
+    grid-template-columns: 1.5fr 1fr 1fr;
   }
 }
 
 @media (max-width: 768px) {
-  .footer-figma {
-    padding-top: 60px;
+  .site-footer {
+    padding-top: 64px;
   }
 
-  .footer-container-figma {
-    grid-template-columns: 1fr;
-    gap: 48px;
-    margin-bottom: 60px;
+  .footer-main {
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+    padding-bottom: 52px;
   }
 
-  .footer-links-figma {
-    flex-wrap: wrap;
-    gap: 32px;
+  .footer-brand {
+    grid-column: 1 / -1;
   }
 
-  .bottom-content-figma {
+  .footer-bottom {
     flex-direction: column;
-    gap: 16px;
-    text-align: center;
+    text-align: left;
   }
 }
 
-@media (max-width: 480px) {
-  .footer-links-figma {
-    flex-direction: column;
-    gap: 32px;
+@media (max-width: 520px) {
+  .footer-main {
+    grid-template-columns: 1fr;
   }
 }

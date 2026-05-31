@@ -1,23 +1,80 @@
 .service-detail-page {
-  background-color: var(--white);
-  padding-top: 80px;
+  background: var(--bg);
+  padding-top: 88px;
+}
+
+.service-detail-state {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .service-detail-content {
-  padding-top: 24px;
-  padding-bottom: 100px;
+  padding-top: 28px;
+  padding-bottom: 96px;
+}
+
+.service-detail-loading,
+.service-not-found {
+  flex: 1;
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.service-detail-loading {
+  color: var(--text-muted);
+}
+
+.service-not-found h2 {
+  font-size: 2rem;
+  color: var(--secondary);
+}
+
+.service-not-found p {
+  color: var(--text-muted);
+}
+
+.service-not-found .btn-primary {
+  margin-top: 8px;
+}
+
+.service-detail-breadcrumb {
+  margin-bottom: 28px;
 }
 
 .service-top-section {
-  margin-top: 40px;
-  margin-bottom: 80px;
+  margin-bottom: 88px;
+}
+
+.service-page-heading {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.section-eyebrow {
+  color: var(--primary-dark);
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.service-page-heading h1 {
+  font-size: clamp(2.1rem, 3vw, 3rem);
+  line-height: 1.1;
+  color: var(--secondary);
+  font-weight: 800;
 }
 
 .gallery-container {
   display: grid;
-  grid-template-columns: 100px 1fr 350px;
-  gap: 32px;
-  align-items: start;
+  grid-template-columns: 100px minmax(0, 1fr) 280px;
+  gap: 30px;
+  align-items: center;
 }
 
 .thumbnails {
@@ -29,253 +86,354 @@
 .thumb {
   width: 100px;
   height: 100px;
-  border-radius: 12px;
+  border-radius: 18px;
   overflow: hidden;
-  cursor: pointer;
-  border: 2px solid transparent;
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
 }
 
-.thumb.active {
-  border-color: var(--primary);
-}
-
-.thumb img {
+.thumb img,
+.main-image img,
+.step-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.placeholder-thumb {
-  background-color: var(--bg);
-  border: 1px dashed var(--primary-light);
+  display: block;
 }
 
 .main-image {
-  height: 500px;
+  min-height: 370px;
   border-radius: 24px;
   overflow: hidden;
-}
-
-.main-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  box-shadow: var(--shadow-lg);
+  background: var(--white);
 }
 
 .service-intro-card {
-  padding: 0;
+  background: var(--white);
+  border-radius: 28px;
+  padding: 28px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(167, 139, 250, 0.16);
+}
+
+.intro-category {
+  color: var(--primary-dark);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 12px;
 }
 
 .service-intro-card h2 {
-  font-size: 2.2rem;
+  color: var(--secondary);
+  font-size: 1.5rem;
+  line-height: 1.25;
+  margin-bottom: 18px;
   font-weight: 800;
-  color: var(--secondary);
-  margin-bottom: 24px;
-  line-height: 1.2;
 }
 
-.user-type {
+.intro-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(167, 139, 250, 0.12);
+  color: var(--secondary);
+  font-size: 0.88rem;
   font-weight: 700;
-  color: var(--secondary);
-  opacity: 0.8;
-  margin-bottom: 16px;
 }
 
-.service-intro-card p {
+.intro-description {
+  color: var(--text-muted);
+  line-height: 1.75;
+  margin-bottom: 22px;
+}
+
+.intro-price {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+
+.price-label {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.intro-price strong {
   color: var(--secondary);
-  opacity: 0.6;
-  line-height: 1.6;
-  margin-bottom: 32px;
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.btn-booking-primary,
+.btn-booking-secondary,
+.btn-consultation,
+.btn-book-now-large,
+.btn-explore {
+  min-height: 52px;
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  transition: transform var(--transition-fast), background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.btn-booking-primary,
+.btn-booking-secondary,
+.btn-book-now-large {
+  background: var(--primary);
+  color: var(--white);
+  padding: 0 26px;
 }
 
 .btn-booking-primary {
-  background-color: var(--primary-light);
-  color: var(--primary-dark);
-  padding: 12px 32px;
-  border-radius: 100px;
-  border: none;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
-.btn-booking-primary:hover {
-  background-color: var(--primary);
+.btn-booking-secondary {
+  min-width: 170px;
+}
+
+.btn-consultation {
+  min-width: 190px;
+  background: var(--secondary);
   color: var(--white);
+  padding: 0 26px;
 }
 
-/* Benefits Section */
-.service-benefits {
-  text-align: center;
-  max-width: 900px;
-  margin: 0 auto 100px;
-}
-
-.service-benefits h3 {
-  font-size: 1.8rem;
-  font-weight: 800;
+.btn-explore {
+  border: 1px solid rgba(92, 90, 128, 0.25);
   color: var(--secondary);
-  margin-bottom: 32px;
+  background: transparent;
+  padding: 0 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-booking-primary:hover,
+.btn-booking-secondary:hover,
+.btn-consultation:hover,
+.btn-book-now-large:hover,
+.btn-explore:hover {
+  transform: translateY(-1px);
+}
+
+.btn-booking-primary:hover,
+.btn-booking-secondary:hover,
+.btn-book-now-large:hover {
+  background: var(--primary-dark);
+}
+
+.btn-consultation:hover {
+  background: #4a4f68;
+}
+
+.btn-explore:hover {
+  border-color: var(--primary-dark);
+  color: var(--primary-dark);
+}
+
+.service-benefits {
+  max-width: 780px;
+  margin: 0 auto 92px;
+  text-align: center;
+}
+
+.service-benefits h3,
+.treatment-details h3 {
+  color: var(--secondary);
+  font-size: clamp(1.6rem, 2vw, 2.2rem);
+  font-weight: 800;
+  margin-bottom: 22px;
 }
 
 .service-benefits p {
-  color: var(--secondary);
-  opacity: 0.7;
+  color: var(--text-muted);
   line-height: 1.8;
-  margin-bottom: 48px;
+  margin-bottom: 34px;
 }
 
 .action-buttons {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 18px;
+  flex-wrap: wrap;
 }
 
-.btn-booking-secondary {
-  background-color: var(--primary-light);
-  color: var(--primary-dark);
-  padding: 14px 40px;
-  border-radius: 12px;
-  border: none;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.btn-consultation {
-  background-color: #5B617E;
-  color: var(--white);
-  padding: 14px 40px;
-  border-radius: 12px;
-  border: none;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-/* Treatment Details */
 .treatment-details {
-  margin-bottom: 100px;
+  margin-bottom: 92px;
 }
 
 .treatment-details h3 {
   text-align: center;
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: var(--secondary);
-  margin-bottom: 64px;
+  margin-bottom: 36px;
 }
 
 .steps-list {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 22px;
 }
 
 .treatment-step-card {
-  background: var(--white);
-  border-radius: 12px;
+  border-radius: 18px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  background: var(--white);
+  border: 1px solid rgba(92, 90, 128, 0.12);
+  box-shadow: var(--shadow-sm);
 }
 
 .step-header {
-  background-color: #F3F0FF;
-  padding: 12px 24px;
+  padding: 10px 22px;
+  background: linear-gradient(90deg, rgba(167, 139, 250, 0.14), rgba(235, 229, 255, 0.92));
+  border-bottom: 1px solid rgba(167, 139, 250, 0.12);
   text-align: center;
 }
 
 .step-header h4 {
+  color: var(--secondary);
   font-size: 1rem;
-  font-weight: 700;
-  color: var(--primary-dark);
-  text-transform: capitalize;
+  font-weight: 800;
   margin: 0;
 }
 
 .step-body {
   display: grid;
-  grid-template-columns: 200px 1fr;
-  gap: 40px;
-  padding: 32px;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 30px;
+  padding: 24px;
   align-items: center;
 }
 
-.step-img-placeholder {
-  width: 200px;
-  height: 140px;
-  background-color: var(--bg);
-  border-radius: 8px;
+.step-image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 14px;
   overflow: hidden;
+  background: var(--bg);
 }
 
-.step-img-placeholder img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.step-text h5 {
+  color: var(--secondary);
+  font-size: 1.02rem;
+  font-weight: 800;
+  margin-bottom: 10px;
 }
 
 .step-text p {
-  color: var(--secondary);
-  opacity: 0.7;
-  line-height: 1.6;
+  color: var(--text-muted);
+  line-height: 1.75;
 }
 
-/* Bottom CTA */
 .bottom-cta {
   display: flex;
   justify-content: center;
-  gap: 24px;
+  align-items: center;
+  gap: 18px;
 }
 
-.btn-book-now {
-  background-color: #5B617E;
-  color: var(--white);
-  padding: 14px 48px;
-  border-radius: 100px;
-  border: none;
-  font-weight: 700;
-  cursor: pointer;
+.book-now-section {
+  display: flex;
+  justify-content: center;
 }
 
-.btn-explore {
-  background-color: transparent;
-  color: var(--secondary);
-  padding: 14px 48px;
-  border-radius: 100px;
-  border: 1px solid rgba(0,0,0,0.2);
-  font-weight: 700;
-  cursor: pointer;
+.btn-book-now-large {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 170px;
+  padding: 0 30px;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1080px) {
   .gallery-container {
-    grid-template-columns: 80px 1fr;
+    grid-template-columns: 80px minmax(0, 1fr);
+    align-items: start;
   }
-  
+
   .service-intro-card {
-    grid-column: span 2;
-    margin-top: 32px;
+    grid-column: 1 / -1;
+  }
+
+  .main-image {
+    min-height: 320px;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 720px) {
+  .service-detail-page {
+    padding-top: 76px;
+  }
+
+  .service-detail-content {
+    padding-top: 20px;
+    padding-bottom: 76px;
+  }
+
+  .service-top-section {
+    margin-bottom: 64px;
+  }
+
   .gallery-container {
     grid-template-columns: 1fr;
+    gap: 18px;
   }
-  
+
   .thumbnails {
     flex-direction: row;
-    order: 2;
+    overflow-x: auto;
+    padding-bottom: 4px;
   }
-  
+
+  .thumb {
+    flex: 0 0 88px;
+    height: 88px;
+  }
+
   .main-image {
-    height: 300px;
+    min-height: 240px;
   }
-  
+
+  .service-intro-card {
+    padding: 22px;
+    border-radius: 22px;
+  }
+
+  .service-benefits,
+  .treatment-details {
+    margin-bottom: 64px;
+  }
+
+  .action-buttons,
+  .bottom-cta {
+    flex-direction: column;
+  }
+
+  .btn-booking-secondary,
+  .btn-consultation,
+  .btn-explore,
+  .btn-book-now-large {
+    width: 100%;
+    max-width: 320px;
+  }
+
   .step-body {
     grid-template-columns: 1fr;
-  }
-  
-  .step-img-placeholder {
-    width: 100%;
   }
 }

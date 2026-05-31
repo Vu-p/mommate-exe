@@ -1,78 +1,96 @@
 .find-service-page {
-  background-color: var(--white);
   min-height: 100vh;
-  padding-top: 80px; /* Offset for sticky navbar */
+  padding-top: 84px;
+  background: var(--white);
 }
 
 .main-content {
-  padding-top: 24px;
-  padding-bottom: 80px;
-}
-
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--secondary);
-  font-size: 0.85rem;
-  margin-bottom: 32px;
-}
-
-.breadcrumb a {
-  color: var(--secondary);
-  text-decoration: none;
-  opacity: 0.7;
-}
-
-.breadcrumb a:hover {
-  opacity: 1;
-}
-
-.breadcrumb span {
-  font-weight: 700;
+  padding-top: 30px;
+  padding-bottom: 180px;
 }
 
 .page-header {
+  max-width: 680px;
+  margin: 22px auto 84px;
   text-align: center;
-  max-width: 800px;
-  margin: 0 auto 48px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 12px;
+}
+
+.page-eyebrow {
+  color: var(--primary-dark);
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .page-header h1 {
-  font-size: 2.5rem;
-  font-weight: 800;
   color: var(--primary-dark);
-  margin-bottom: 16px;
+  font-size: 2.35rem;
+  font-weight: 900;
+  line-height: 1.18;
 }
 
 .page-header p {
-  color: var(--secondary);
-  opacity: 0.7;
-  line-height: 1.6;
+  color: var(--text-light);
+  font-size: 1.08rem;
+  line-height: 1.75;
+  max-width: 620px;
+  margin: 0 auto;
 }
 
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  margin-top: 48px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 26px;
+}
+
+.loading-state,
+.empty-state {
+  min-height: 280px;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 1024px) {
   .services-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 640px) {
-  .services-grid {
-    grid-template-columns: 1fr;
+  .find-service-page {
+    padding-top: 74px;
   }
-  
+
+  .main-content {
+    padding-bottom: 90px;
+  }
+
+  .page-header {
+    margin-bottom: 44px;
+  }
+
   .page-header h1 {
     font-size: 2rem;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
   }
 }

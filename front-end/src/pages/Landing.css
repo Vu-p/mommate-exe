@@ -4,6 +4,12 @@
   background-color: var(--bg);
 }
 
-main {
+.landing-page main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.landing-page section {
   width: 100%;
 }

@@ -1,14 +1,55 @@
 import type { Request, Response } from 'express';
 import Carer from '../models/Carer.js';
-import User from '../models/User.js';
+import User, { UserRole } from '../models/User.js';
 import bcrypt from 'bcryptjs';
+import type { AuthRequest } from '../middleware/auth.js';
+
+const calculateAge = (birthDate?: Date | string) => {
+  if (!birthDate) return undefined;
+
+  const date = new Date(birthDate);
+  const today = new Date();
+  let age = today.getFullYear() - date.getFullYear();
+  const monthDelta = today.getMonth() - date.getMonth();
+
+  if (monthDelta < 0 || (monthDelta === 0 && today.getDate() < date.getDate())) {
+    age -= 1;
+  }
+
+  return age;
+};
 
 // @desc    Get all carers
 // @route   GET /api/carers
 // @access  Public
 export const getCarers = async (req: Request, res: Response) => {
   try {
-    const carers = await Carer.find({ isDeleted: false }).populate('user', 'firstName lastName avatar');
+    const filter: Record<string, any> = { isDeleted: false };
+
+    if (req.query.admin !== 'true') {
+      filter.isVerified = true;
+    }
+
+    if (req.query.serviceId) {
+      filter.services = req.query.serviceId;
+    }
+
+    if (req.query.area) {
+      filter.location = { $regex: String(req.query.area), $options: 'i' };
+    }
+
+    if (req.query.maxPrice) {
+      filter.hourlyRate = { $lte: Number(req.query.maxPrice) };
+    }
+
+    if (req.query.minRating) {
+      filter.rating = { $gte: Number(req.query.minRating) };
+    }
+
+    const carers = await Carer.find(filter)
+      .populate('user', 'firstName lastName avatar')
+      .populate('services', 'title category');
+
     res.json(carers);
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
@@ -34,13 +75,145 @@ export const getCarerById = async (req: Request, res: Response) => {
   }
 };
 
+// @desc    Get logged-in caregiver profile draft/submission
+// @route   GET /api/carers/me
+// @access  Private
+export const getMyCarerProfile = async (req: AuthRequest, res: Response) => {
+  try {
+    const carer = await Carer.findOne({ user: req.user!._id, isDeleted: false })
+      .populate('user', '-password')
+      .populate('services');
+
+    if (!carer) {
+      const user = await User.findById(req.user!._id).select('-password');
+      return res.json({ user, carer: null, currentStep: 'overview' });
+    }
+
+    res.json({ user: carer.user, carer, currentStep: carer.applicationStatus === 'draft' ? 'job' : 'submitted' });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message || 'Server error' });
+  }
+};
+
+// @desc    Save caregiver application step 1: overview, identity and avatar
+// @route   POST /api/carers/apply/overview
+// @access  Private
+export const saveCarerOverview = async (req: AuthRequest, res: Response) => {
+  try {
+    const {
+      firstName,
+      lastName,
+      location,
+      birthDate,
+      gender,
+      identityNumber,
+      identityName,
+      identityIssuedAt,
+      identityImages,
+      avatar,
+      phoneNumber,
+    } = req.body;
+
+    const user = await User.findById(req.user!._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.firstName = firstName ?? user.firstName;
+    user.lastName = lastName ?? user.lastName;
+    user.address = location ?? user.address;
+    user.birthDate = birthDate ? new Date(birthDate) : user.birthDate;
+    user.gender = gender ?? user.gender;
+    user.identityNumber = identityNumber ?? user.identityNumber;
+    user.identityName = identityName ?? user.identityName;
+    user.identityIssuedAt = identityIssuedAt ? new Date(identityIssuedAt) : user.identityIssuedAt;
+    user.identityImages = identityImages ?? user.identityImages;
+    user.avatar = avatar ?? user.avatar;
+    user.phoneNumber = phoneNumber ?? user.phoneNumber;
+    user.role = UserRole.CARER;
+
+    await user.save();
+
+    const safeUser = await User.findById(user._id).select('-password');
+    res.json({ user: safeUser, nextStep: 'job' });
+  } catch (error: any) {
+    res.status(400).json({ message: error.message || 'Invalid caregiver overview data' });
+  }
+};
+
+// @desc    Save caregiver application step 2: job profile, certificates, pricing and availability
+// @route   POST /api/carers/apply/job
+// @access  Private
+export const saveCarerJobProfile = async (req: AuthRequest, res: Response) => {
+  try {
+    const {
+      bio,
+      experienceYears,
+      certifications,
+      certificationDetails,
+      services,
+      serviceIds,
+      pricingType,
+      hourlyRate,
+      fixedRate,
+      platformFeePercent,
+      availability,
+      submit,
+    } = req.body;
+
+    const user = await User.findById(req.user!._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const resolvedServices = serviceIds || services || [];
+    const resolvedCertifications =
+      certifications ||
+      (Array.isArray(certificationDetails) ? certificationDetails.map((cert) => cert.name).filter(Boolean) : []);
+    const age = calculateAge(user.birthDate) || 18;
+
+    const profileData = {
+      user: user._id,
+      bio,
+      experienceYears,
+      hourlyRate,
+      pricingType: pricingType || 'hourly',
+      fixedRate,
+      platformFeePercent: platformFeePercent ?? 10,
+      location: user.address || req.body.location,
+      age,
+      certifications: resolvedCertifications,
+      certificationDetails,
+      services: resolvedServices,
+      availability,
+      applicationStatus: submit ? 'submitted' : 'draft',
+      isVerified: false,
+    };
+
+    const carer = await Carer.findOneAndUpdate(
+      { user: user._id, isDeleted: false },
+      profileData,
+      { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
+    )
+      .populate('user', '-password')
+      .populate('services');
+
+    res.json({ carer, nextStep: submit ? 'admin_review' : 'job' });
+  } catch (error: any) {
+    res.status(400).json({ message: error.message || 'Invalid caregiver job profile data' });
+  }
+};
+
 // @desc    Create a carer
 // @route   POST /api/carers
 // @access  Private/Admin
 export const createCarer = async (req: Request, res: Response) => {
   const { 
     email, password, firstName, lastName, avatar, 
-    bio, experienceYears, hourlyRate, location, age, certifications, services, availability, isVerified 
+    bio, experienceYears, hourlyRate, pricingType, fixedRate, platformFeePercent, location, age,
+    certifications, certificationDetails, services, availability, isVerified, applicationStatus
   } = req.body;
 
   try {
@@ -77,12 +250,17 @@ export const createCarer = async (req: Request, res: Response) => {
       bio,
       experienceYears,
       hourlyRate,
+      pricingType,
+      fixedRate,
+      platformFeePercent,
       location,
       age,
       certifications,
+      certificationDetails,
       services,
       availability,
-      isVerified: isVerified || false
+      isVerified: isVerified || false,
+      applicationStatus: applicationStatus || (isVerified ? 'verified' : 'submitted')
     });
 
     const populatedCarer = await Carer.findById(carer._id).populate('user', 'firstName lastName avatar email');
@@ -98,7 +276,8 @@ export const createCarer = async (req: Request, res: Response) => {
 export const updateCarer = async (req: Request, res: Response) => {
   const { 
     firstName, lastName, avatar,
-    bio, experienceYears, hourlyRate, location, age, certifications, services, availability, isVerified 
+    bio, experienceYears, hourlyRate, pricingType, fixedRate, platformFeePercent, location, age,
+    certifications, certificationDetails, services, availability, isVerified, applicationStatus
   } = req.body;
 
   try {
@@ -117,12 +296,17 @@ export const updateCarer = async (req: Request, res: Response) => {
       carer.bio = bio || carer.bio;
       carer.experienceYears = experienceYears !== undefined ? experienceYears : carer.experienceYears;
       carer.hourlyRate = hourlyRate !== undefined ? hourlyRate : carer.hourlyRate;
+      carer.pricingType = pricingType || carer.pricingType;
+      carer.fixedRate = fixedRate !== undefined ? fixedRate : carer.fixedRate;
+      carer.platformFeePercent = platformFeePercent !== undefined ? platformFeePercent : carer.platformFeePercent;
       carer.location = location || carer.location;
       carer.age = age !== undefined ? age : carer.age;
       carer.certifications = certifications || carer.certifications;
+      carer.certificationDetails = certificationDetails || carer.certificationDetails;
       carer.services = services || carer.services;
       carer.availability = availability || carer.availability;
       carer.isVerified = isVerified !== undefined ? isVerified : carer.isVerified;
+      carer.applicationStatus = applicationStatus || (carer.isVerified ? 'verified' : carer.applicationStatus);
 
       const updatedCarer = await carer.save();
       const populatedCarer = await Carer.findById(updatedCarer._id).populate('user', 'firstName lastName avatar email');

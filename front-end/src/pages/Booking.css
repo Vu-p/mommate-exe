@@ -1,99 +1,93 @@
 .booking-page {
-  background-color: var(--white);
+  background-color: #F8F9FA; /* light background matching the design overall vibe */
+  min-height: 100vh;
   padding-top: 80px;
 }
 
 .booking-content {
   padding-top: 24px;
   padding-bottom: 100px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 .booking-content .breadcrumb {
-  align-self: flex-start;
-  margin-bottom: 48px;
+  margin-bottom: 32px;
 }
 
-.booking-form-header {
-  text-align: center;
-  margin-bottom: 64px;
+.booking-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 40px;
+  align-items: start;
+}
+
+.booking-empty-state {
+  min-height: 60vh;
+  background: white;
+  border-radius: 24px;
+  padding: 48px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
 }
 
-.booking-form-header h1 {
-  font-size: 2.5rem;
+.booking-empty-state h2 {
+  font-size: 1.8rem;
   font-weight: 800;
   color: var(--secondary);
 }
 
-.type-of-care-select {
-  min-width: 280px;
+.booking-empty-state p {
+  color: var(--secondary);
+  opacity: 0.75;
+  max-width: 560px;
 }
 
-.type-of-care-select select {
-  font-size: 1rem;
-  padding: 12px 24px;
-  color: #adb5bd;
+.booking-empty-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 12px;
 }
 
-/* Form Styles */
-.booking-main-form {
-  width: 100%;
-  max-width: 800px;
+/* Left Column */
+.booking-form-col {
   display: flex;
   flex-direction: column;
-  gap: 48px;
+  gap: 32px;
 }
 
-.form-card {
-  background-color: #F6F4FF;
-  border-radius: 32px;
-  padding: 64px;
-}
-
-.info-card {
+.booking-form-section {
+  background: white;
+  border-radius: 24px;
+  padding: 40px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  gap: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
 }
 
-.info-card h2 {
-  font-size: 2rem;
+.booking-form-section h2 {
+  font-size: 1.25rem;
   font-weight: 800;
   color: var(--primary-dark);
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
-.form-desc {
-  color: var(--secondary);
-  opacity: 0.6;
-  line-height: 1.6;
-  max-width: 600px;
-  margin-bottom: 48px;
-}
-
-.form-grid {
+.form-row-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  width: 100%;
-  gap: 24px 32px;
-  text-align: left;
+  gap: 24px;
 }
 
 .input-field {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.input-field.full-width {
-  grid-column: span 2;
 }
 
 .input-field label {
@@ -104,159 +98,202 @@
 }
 
 .input-field input, 
-.input-field textarea {
-  background: white;
-  border: none;
-  border-radius: 16px;
-  padding: 16px 24px;
+.input-field textarea,
+.select-wrapper select {
+  background: #F8F9FA;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 16px 20px;
   font-size: 0.95rem;
   color: var(--secondary);
   outline: none;
+  width: 100%;
+  transition: all 0.3s;
+}
+
+.select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.select-wrapper select {
+  appearance: none;
+  cursor: pointer;
+}
+
+.select-wrapper svg {
+  position: absolute;
+  right: 16px;
+  color: var(--secondary);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.input-field input:focus, 
+.input-field textarea:focus,
+.select-wrapper select:focus {
+  background: white;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1);
 }
 
 .input-field input::placeholder,
 .input-field textarea::placeholder {
   color: #adb5bd;
-  opacity: 0.8;
 }
 
 .input-field textarea {
-  min-height: 140px;
+  min-height: 120px;
   resize: none;
 }
 
-/* Selection Card */
-.selection-card {
-  background-color: white;
-  border: 1.5px solid rgba(0,0,0,0.1);
+/* Right Column (Summary) */
+.booking-summary-col {
+  position: sticky;
+  top: 100px;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.05);
   display: flex;
   flex-direction: column;
-  gap: 48px;
+}
+
+.summary-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
+  margin-bottom: 32px;
+  gap: 20px;
 }
 
-.selection-group h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--secondary);
-  margin-bottom: 24px;
+.summary-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: #F8F9FA;
 }
 
-.choice-container {
-  display: flex;
-  justify-content: center;
-  gap: 32px;
-  flex-wrap: wrap;
+.summary-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.choice-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--secondary);
-  cursor: pointer;
-}
-
-.choice-item input {
-  position: absolute;
-  opacity: 0;
-}
-
-.choice-circle {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background-color: #E2E2FC;
-  transition: all 0.3s;
-}
-
-.choice-item input:checked ~ .choice-circle {
-  background-color: var(--primary);
-  box-shadow: inset 0 0 0 4px white;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: 16px;
-}
-
-.btn-submit {
-  background-color: var(--secondary);
-  color: white;
-  padding: 16px 64px;
-  border-radius: 100px;
-  font-size: 1rem;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.btn-submit:hover {
-  background-color: var(--primary-dark);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(124, 58, 237, 0.2);
-}
-
-.session-info {
+.img-placeholder {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  font-size: 0.9rem;
-  color: var(--primary);
-  margin-top: -16px;
-  margin-bottom: 24px;
-  font-weight: 600;
 }
 
-.booking-summary-card {
-  background: white;
-  border: 1.5px solid rgba(0,0,0,0.1);
-  border-radius: 24px;
-  padding: 32px;
+.summary-title-wrapper h3 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--secondary);
+  margin-bottom: 8px;
+}
+
+.summary-title-wrapper .carer-name {
+  font-size: 0.95rem;
+  color: var(--secondary);
+  opacity: 0.6;
+}
+
+.summary-details {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  margin-bottom: 32px;
 }
 
 .summary-row {
   display: flex;
   justify-content: space-between;
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: var(--secondary);
-  opacity: 0.8;
+}
+
+.summary-row span:last-child {
+  font-weight: 600;
+}
+
+.summary-divider {
+  height: 1px;
+  background-color: rgba(0,0,0,0.05);
+  margin: 8px 0;
 }
 
 .summary-row.total {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px dashed rgba(0,0,0,0.1);
-  font-weight: 800;
-  font-size: 1.25rem;
-  color: var(--primary-dark);
-  opacity: 1;
+  margin-top: 8px;
+  align-items: center;
 }
 
-@media (max-width: 768px) {
-  .form-card {
-    padding: 32px;
-  }
-  
-  .form-grid {
+.summary-row.total span:first-child {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.summary-row.total .total-price {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+}
+
+.btn-booking-submit {
+  background-color: var(--primary-dark);
+  color: white;
+  padding: 18px;
+  border-radius: 100px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  width: 100%;
+}
+
+.btn-booking-submit:hover {
+  background-color: var(--secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.btn-booking-submit:disabled {
+  background-color: #adb5bd;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+@media (max-width: 1024px) {
+  .booking-layout {
     grid-template-columns: 1fr;
   }
   
-  .input-field.full-width {
-    grid-column: span 1;
+  .booking-summary-col {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .booking-form-section {
+    padding: 24px;
   }
   
-  .choice-container {
-    flex-direction: column;
-    align-items: flex-start;
-    padding-left: 20%;
+  .form-row-2 {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .summary-card {
+    padding: 24px;
   }
 }

@@ -2,61 +2,85 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: var(--white);
 }
 
 .auth-main {
   flex: 1;
-  padding-bottom: var(--spacing-xxl);
+  padding: 188px 0 128px;
 }
 
-.auth-card {
-  display: flex;
-  background-color: var(--white);
-  border-radius: var(--radius-lg);
+.auth-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 650px;
   overflow: hidden;
-  box-shadow: var(--shadow-lg);
-  margin-top: var(--spacing-md);
-  min-height: 600px;
+  border-radius: 22px;
+  background: var(--surface-lavender);
 }
 
 .auth-image-side {
-  flex: 1;
-  background-color: #DEDEE8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+  min-height: 650px;
   overflow: hidden;
 }
 
 .auth-hero-img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  padding: var(--spacing-xxl);
+  object-fit: cover;
+  display: block;
 }
 
 .auth-form-side {
-  flex: 1;
-  padding: var(--spacing-xxl);
+  min-height: 650px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
-  background-color: #F3F1F8;
+  justify-content: center;
+  padding: 64px 72px;
+  background: var(--surface-lavender);
 }
 
-@media (max-width: 968px) {
-  .auth-card {
-    flex-direction: column;
-    min-height: auto;
+.auth-form-motion {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (max-width: 1024px) {
+  .auth-main {
+    padding-top: 132px;
   }
-  
+
+  .auth-panel {
+    grid-template-columns: 1fr;
+  }
+
   .auth-image-side {
-    height: 250px;
+    min-height: 320px;
   }
-  
+
   .auth-form-side {
-    padding: var(--spacing-xl) var(--spacing-md);
+    min-height: auto;
+    padding: 56px 28px 64px;
+  }
+}
+
+@media (max-width: 560px) {
+  .auth-main {
+    padding: 110px 0 72px;
+  }
+
+  .auth-panel {
+    border-radius: 18px;
+  }
+
+  .auth-image-side {
+    min-height: 240px;
+  }
+
+  .auth-form-side {
+    padding: 42px 20px 50px;
   }
 }

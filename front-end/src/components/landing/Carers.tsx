@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ShieldCheck, Star } from 'lucide-react';
 import api from '../../utils/api';
+import defaultAvatar from '../../assets/images/service-1.png';
 import './Carers.css';
 
 const Carers = () => {
@@ -14,7 +15,7 @@ const Carers = () => {
       try {
         setLoading(true);
         const { data } = await api.get('/carers');
-        setCarers(data.slice(0, 4)); // Show top 4
+        setCarers(data.slice(0, 4));
       } catch (error) {
         console.error('Error fetching carers for landing:', error);
       } finally {
@@ -28,20 +29,25 @@ const Carers = () => {
   return (
     <section className="carers">
       <div className="container">
-        <h2 className="section-title">Meet our carers</h2>
+        <div className="carers-heading">
+          <span className="section-label">ĐỘI NGŨ CHUYÊN GIA ĐÁNG TIN CẬY</span>
+          <h2 className="section-title">Gặp gỡ các chuyên gia của chúng tôi</h2>
+          <p>Những bảo mẫu và chuyên gia chăm sóc được tuyển chọn để đồng hành cùng mẹ và bé trong từng giai đoạn.</p>
+        </div>
         
         {loading ? (
           <div className="landing-loading">
             <Loader2 className="spinner" />
-            <p>Loading our medical professionals...</p>
+            <p>Đang tải danh sách chuyên gia...</p>
           </div>
         ) : carers.length > 0 ? (
           <div className="carer-track">
             {carers.map((carer) => {
-              const firstName = carer.user?.firstName || 'Nurse';
+              const firstName = carer.user?.firstName || 'Chuyên gia';
               const lastName = carer.user?.lastName || '';
               const fullName = `${firstName} ${lastName}`;
-              const avatar = carer.user?.avatar || carer.avatar || '';
+              const avatar = carer.user?.avatar || carer.avatar || defaultAvatar;
+              const rating = carer.rating || 5;
 
               return (
                 <Link to={`/carers/${carer._id}`} key={carer._id} className="carer-link-wrapper">
@@ -52,8 +58,18 @@ const Carers = () => {
                   >
                     <img src={avatar} alt={fullName} className="carer-img" />
                     <div className="carer-info">
+                      <div className="carer-info-top">
+                        <span className="carer-badge">
+                          <ShieldCheck size={12} />
+                          Đã xác minh
+                        </span>
+                        <span className="carer-rating">
+                          <Star size={12} fill="currentColor" />
+                          {rating.toFixed(1)}
+                        </span>
+                      </div>
                       <h4>{fullName}</h4>
-                      <p>{carer.location || 'Specialist Care'}</p>
+                      <p>{carer.location || 'Chăm sóc đặc biệt'}</p>
                     </div>
                   </motion.div>
                 </Link>
@@ -62,7 +78,7 @@ const Carers = () => {
           </div>
         ) : (
           <div className="empty-state">
-            <p>Our carers are currently busy. Please check back later!</p>
+            <p>Hiện chưa có chuyên gia nào rảnh. Vui lòng quay lại sau!</p>
           </div>
         )}
       </div>

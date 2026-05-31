@@ -26,7 +26,7 @@ const SignUpForm = ({ onToggle }: SignUpFormProps) => {
     setError('');
 
     if (password !== confirmPassword) {
-      return setError('Passwords do not match');
+      return setError('Mật khẩu không khớp');
     }
 
     setIsSubmitting(true);
@@ -41,7 +41,7 @@ const SignUpForm = ({ onToggle }: SignUpFormProps) => {
       login(data);
       navigate('/');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      setError(err.response?.data?.message || 'Đăng kí thất bại. Vui lòng thử lại.');
     } finally {
       setIsSubmitting(false);
     }
@@ -49,65 +49,62 @@ const SignUpForm = ({ onToggle }: SignUpFormProps) => {
 
   return (
     <div className="signup-form-container">
-      <h2 className="form-title">Create your Account</h2>
-      
+      <h2 className="form-title">Đăng kí tài khoản</h2>
+
       <form className="signup-form" onSubmit={handleSubmit}>
-        {error && <p className="error-message" style={{ color: 'red', marginBottom: '1rem' }}>{error}</p>}
-        
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-          <Input 
-            label="First Name" 
-            placeholder="John" 
+        {error && <p className="auth-message error-message">{error}</p>}
+
+        <div className="signup-name-grid">
+          <Input
+            label="Tên"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             required
           />
-          <Input 
-            label="Last Name" 
-            placeholder="Doe" 
+          <Input
+            label="Họ"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             required
           />
         </div>
 
-        <Input 
-          label="Email" 
-          type="email" 
-          placeholder="example@email.com" 
+        <Input
+          label="Email"
+          type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <Input 
-          label="Password" 
-          type="password" 
-          placeholder="Min 8 characters" 
+        <Input
+          label="Mật khẩu"
+          type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <Input 
-          label="Confirm password" 
-          type="password" 
-          placeholder="Confirm your password" 
+        <Input
+          label="Confirm password"
+          type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
         />
-        
-        <motion.button 
-          className="submit-btn"
-          whileHover={{ scale: 1.02, backgroundColor: 'var(--primary-dark)' }}
-          whileTap={{ scale: 0.98 }}
-          type="submit"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Creating account...' : 'Sign up'}
-        </motion.button>
+
+        <div className="auth-submit-row">
+          <motion.button
+            className="submit-btn"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Đang tạo...' : 'Đăng kí'}
+          </motion.button>
+        </div>
 
         <p className="toggle-auth-text">
-          Already have an account? <button type="button" onClick={onToggle} className="toggle-btn">Log in</button>
+          Bạn đã có tài khoản? <button type="button" onClick={onToggle}>Đăng nhập</button>
         </p>
       </form>
     </div>

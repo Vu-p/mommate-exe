@@ -59,6 +59,7 @@
   cursor: pointer;
   border-radius: 12px;
   transition: all 0.3s;
+  width: 100%;
 }
 
 .nav-item:hover:not(.active) {
@@ -109,7 +110,8 @@
   color: var(--primary-dark);
 }
 
-.sidebar-nav > div:not(.expandable) {
+.sidebar-nav > div:not(.expandable),
+.sidebar-nav > a.nav-item {
   border-bottom: 1px solid rgba(0,0,0,0.05);
   border-radius: 0;
 }

@@ -7,6 +7,15 @@ interface User {
   email: string;
   role: string;
   token: string;
+  phoneNumber?: string;
+  avatar?: string;
+  address?: string;
+  birthDate?: string;
+  gender?: string;
+  identityNumber?: string;
+  identityName?: string;
+  identityIssuedAt?: string;
+  identityImages?: string[];
 }
 
 interface AuthContextType {

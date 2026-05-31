@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { ShieldCheck } from 'lucide-react';
 import './Newsletter.css';
 
 const Newsletter = () => {
@@ -6,18 +7,23 @@ const Newsletter = () => {
     <section className="newsletter-figma">
       <div className="container">
         <div className="newsletter-box-figma">
-          <h2>Subscribe for all needs!</h2>
-          <p>Stay updated with our latest services and expert care tips for your motherhood journey.</p>
+          <span className="newsletter-label">
+            <ShieldCheck size={14} />
+            Nhận thông tin chăm sóc mới nhất
+          </span>
+          <h2>Đăng ký để nhận tư vấn!</h2>
+          <p>Cập nhật các thông tin, ưu đãi mới nhất nhanh chóng và kiến thức phòng ngừa dịch bệnh cho bé.</p>
           <div className="subscribe-form-figma">
-            <input type="email" placeholder="Enter your email" aria-label="Email address" />
+            <input type="email" placeholder="Email của bạn" aria-label="Địa chỉ email" />
             <motion.button 
               className="btn-subscribe"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              Sign up
+              Đăng ký
             </motion.button>
           </div>
+          <small className="newsletter-note">Chúng tôi chỉ gửi nội dung hữu ích, không spam hộp thư của bạn.</small>
         </div>
       </div>
     </section>

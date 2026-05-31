@@ -2,10 +2,10 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export enum BookingStatus {
   PENDING = 'pending',
-  ACCEPTED = 'accepted',
-  REJECTED = 'rejected',
+  CONFIRMED = 'confirmed',
+  IN_PROGRESS = 'in_progress',
   COMPLETED = 'completed',
-  PAID = 'paid'
+  CANCELLED = 'cancelled'
 }
 
 export interface IBooking extends Document {
@@ -18,7 +18,11 @@ export interface IBooking extends Document {
   notes?: string;
   totalPrice: number;
   paymentId?: string;
+  paymentProofUrl?: string;
+  paymentNote?: string;
+  paymentConfirmedAt?: Date;
   numSessions: number;
+  hours: number;
   isDeleted: boolean;
 }
 
@@ -32,7 +36,11 @@ const BookingSchema: Schema = new Schema({
   notes: { type: String },
   totalPrice: { type: Number, required: true },
   paymentId: { type: String },
+  paymentProofUrl: { type: String },
+  paymentNote: { type: String },
+  paymentConfirmedAt: { type: Date },
   numSessions: { type: Number, default: 1 },
+  hours: { type: Number, default: 1 },
   isDeleted: { type: Boolean, default: false },
 }, { timestamps: true });
 

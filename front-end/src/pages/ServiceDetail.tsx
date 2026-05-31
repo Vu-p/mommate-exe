@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
-import { ChevronRight, Loader2 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { ArrowRight, ChevronRight, Clock3, Loader2, Sparkles } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
@@ -18,17 +18,19 @@ interface Service {
   description: string;
   image: string;
   price: number;
+  basePrice?: number;
   category: string;
   duration: string;
-  steps: ServiceStep[];
+  tags?: string[];
+  steps?: ServiceStep[];
 }
 
 const ServiceDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [service, setService] = useState<Service | null>(null);
   const [loading, setLoading] = useState(true);
-  const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
   const carerId = queryParams.get('carerId');
@@ -42,6 +44,7 @@ const ServiceDetail = () => {
         setService(data);
       } catch (error) {
         console.error('Error fetching service detail:', error);
+        setService(null);
       } finally {
         setLoading(false);
       }
@@ -50,20 +53,71 @@ const ServiceDetail = () => {
     if (id) fetchService();
   }, [id]);
 
+  const galleryImages = useMemo(() => {
+    if (!service) return [];
+
+    const images = [
+      service.image,
+      ...(service.steps || [])
+        .map((step) => step.image)
+        .filter((image): image is string => Boolean(image)),
+    ].filter(Boolean);
+
+    const uniqueImages = Array.from(new Set(images));
+
+    while (uniqueImages.length < 4 && service.image) {
+      uniqueImages.push(service.image);
+    }
+
+    return uniqueImages.slice(0, 4);
+  }, [service]);
+
+  const servicePrice = service?.price ?? service?.basePrice ?? 0;
+  const stepCards = service?.steps || [];
+
+  const handleBooking = () => {
+    if (!service) return;
+
+    if (carerId) {
+      navigate('/booking', {
+        state: {
+          serviceId: service._id,
+          serviceTitle: service.title,
+          carerId,
+          carerName,
+        },
+      });
+      return;
+    }
+
+    navigate(`/carers?serviceId=${service._id}&serviceTitle=${encodeURIComponent(service.title)}`);
+  };
+
   if (loading) {
     return (
-      <div className="service-detail-loading">
-        <Loader2 className="spinner" />
-        <p>Loading service details...</p>
+      <div className="service-detail-page service-detail-state">
+        <Navbar />
+        <div className="service-detail-loading">
+          <Loader2 className="spinner" />
+          <p>Đang tải chi tiết dịch vụ...</p>
+        </div>
+        <Footer />
       </div>
     );
   }
 
   if (!service) {
     return (
-      <div className="service-not-found">
-        <h2>Service not found</h2>
-        <Link to="/services">Back to services</Link>
+      <div className="service-detail-page service-detail-state">
+        <Navbar />
+        <div className="service-not-found">
+          <h2>Không tìm thấy dịch vụ</h2>
+          <p>Dịch vụ này có thể đã bị ẩn hoặc xóa khỏi hệ thống.</p>
+          <Link to="/services" className="btn-primary">
+            Quay lại danh sách dịch vụ
+          </Link>
+        </div>
+        <Footer />
       </div>
     );
   }
@@ -73,103 +127,95 @@ const ServiceDetail = () => {
       <Navbar />
 
       <main className="container service-detail-content">
-        <nav className="breadcrumb">
-          <Link to="/">Home</Link>
+        <nav className="breadcrumb service-detail-breadcrumb">
+          <Link to="/">Trang chủ</Link>
           <ChevronRight size={14} />
-          <Link to="/services">Find Service</Link>
+          <Link to="/services">Tìm dịch vụ</Link>
           <ChevronRight size={14} />
           <span>{service.title}</span>
         </nav>
 
         <section className="service-top-section">
+          <div className="service-page-heading">
+            <p className="section-eyebrow">Dịch vụ nổi bật</p>
+            <h1>{service.title}</h1>
+          </div>
+
           <div className="gallery-container">
             <div className="thumbnails">
-              <div className="thumb active"><img src={service.image} alt="Thumbnail 1" /></div>
-              {service.steps?.slice(0, 2).map((step, i) => (
-                <div key={i} className="thumb">
-                  {step.image ? <img src={step.image} alt={step.title} /> : <div className="placeholder-thumb" />}
+              {galleryImages.slice(1, 4).map((image, index) => (
+                <div key={`${image}-${index}`} className="thumb">
+                  <img src={image} alt={`${service.title} ${index + 2}`} />
                 </div>
               ))}
             </div>
+
             <div className="main-image">
               <img src={service.image} alt={service.title} />
             </div>
-            <div className="service-intro-card">
+
+            <aside className="service-intro-card">
+              <p className="intro-category">{service.category}</p>
               <h2>{service.title}</h2>
-              <div className="user-type">{service.category}</div>
-              <p>{service.description}</p>
-              <div className="service-meta-info">
-                <span className="info-price">{service.price.toLocaleString()} VND</span>
-                <span className="info-duration">{service.duration}</span>
+
+              <div className="intro-meta">
+                <span className="meta-chip">
+                  <Sparkles size={14} />
+                  {service.tags?.[0] || 'Dịch vụ chăm sóc'}
+                </span>
+                <span className="meta-chip">
+                  <Clock3 size={14} />
+                  {service.duration}
+                </span>
               </div>
-              <button 
-                onClick={() => {
-                  if (carerId) {
-                    navigate('/booking', {
-                      state: {
-                        serviceId: service._id,
-                        serviceTitle: service.title,
-                        carerId,
-                        carerName
-                      }
-                    });
-                  } else {
-                    navigate(`/carers?serviceId=${service._id}&serviceTitle=${encodeURIComponent(service.title)}`);
-                  }
-                }} 
-                className="btn-booking-primary"
-              >
-                {carerId ? 'Confirm Booking' : 'Booking Here'}
+
+              <p className="intro-description">{service.description}</p>
+
+              <div className="intro-price">
+                <span className="price-label">Giá từ</span>
+                <strong>{servicePrice ? `${servicePrice.toLocaleString('vi-VN')} VND` : 'Liên hệ'}</strong>
+              </div>
+
+              <button type="button" onClick={handleBooking} className="btn-booking-primary">
+                {carerId ? 'Xác nhận đặt' : 'Đặt ngay'}
+                <ArrowRight size={16} />
               </button>
-            </div>
+            </aside>
           </div>
         </section>
 
         <section className="service-benefits">
-          <h3>Description & Benefits</h3>
+          <h3>Lợi ích của gói dịch vụ</h3>
           <p>{service.description}</p>
           <div className="action-buttons">
-            <button
-              className="btn-book-top"
-              onClick={() => {
-                if (carerId) {
-                  navigate('/booking', {
-                    state: {
-                      serviceId: service._id,
-                      serviceTitle: service.title,
-                      carerId,
-                      carerName
-                    }
-                  });
-                } else {
-                  navigate(`/carers?serviceId=${service._id}&serviceTitle=${encodeURIComponent(service.title)}`);
-                }
-              }}
-            >
-              {carerId ? 'Confirm' : 'Booking Here'}
+            <button type="button" className="btn-booking-secondary" onClick={handleBooking}>
+              {carerId ? 'Xác nhận' : 'Đặt ngay'}
             </button>
-            <button className="btn-consultation">Request Consultation</button>
+            <button type="button" className="btn-consultation">
+              Yêu cầu tư vấn
+            </button>
           </div>
         </section>
 
-        {service.steps && service.steps.length > 0 && (
+        {stepCards.length > 0 && (
           <section className="treatment-details">
-            <h3>Treatment Details</h3>
+            <h3>Chi tiết liệu trình</h3>
             <div className="steps-list">
-              {service.steps.map((step, index) => (
-                <div key={index} className="treatment-step-card">
+              {stepCards.map((step, index) => (
+                <article key={`${step.title}-${index}`} className="treatment-step-card">
                   <div className="step-header">
-                    <h4>{step.title || `Step ${index + 1}`}</h4>
+                    <h4>Bước {index + 1}</h4>
                   </div>
                   <div className="step-body">
-                    <div className="step-img-placeholder">
-                      {step.image && <img src={step.image} alt={step.title} />}
+                    <div className="step-image">
+                      <img src={step.image || service.image} alt={step.title || `Bước ${index + 1}`} />
                     </div>
                     <div className="step-text">
+                      <h5>{step.title || `Bước ${index + 1}`}</h5>
                       <p>{step.text}</p>
                     </div>
                   </div>
-                </div>
+                </article>
               ))}
             </div>
           </section>
@@ -177,27 +223,13 @@ const ServiceDetail = () => {
 
         <section className="bottom-cta">
           <div className="book-now-section">
-            <button
-              className="btn-book-now-large"
-              onClick={() => {
-                if (carerId) {
-                  navigate('/booking', {
-                    state: {
-                      serviceId: service._id,
-                      serviceTitle: service.title,
-                      carerId,
-                      carerName
-                    }
-                  });
-                } else {
-                  navigate(`/carers?serviceId=${service._id}&serviceTitle=${encodeURIComponent(service.title)}`);
-                }
-              }}
-            >
-              {carerId ? 'Book Now' : 'Book now'}
+            <button type="button" className="btn-book-now-large" onClick={handleBooking}>
+              {carerId ? 'Đặt lịch' : 'Đặt ngay'}
             </button>
           </div>
-          <Link to="/services" className="btn-explore">Explore more</Link>
+          <Link to="/services" className="btn-explore">
+            Xem thêm
+          </Link>
         </section>
       </main>
 

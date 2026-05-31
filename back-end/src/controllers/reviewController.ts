@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import Review from '../models/Review.js';
-import Booking from '../models/Booking.js';
+import Booking, { BookingStatus } from '../models/Booking.js';
+import Carer from '../models/Carer.js';
 import type { AuthRequest } from '../middleware/auth.js';
 
 // @desc    Get latest public reviews
@@ -34,7 +35,23 @@ export const createReview = async (req: AuthRequest, res: Response) => {
   const { bookingId, carerId, rating, title, comment, tags, images } = req.body;
 
   try {
-    console.log('Creating review with data:', { bookingId, carerId, rating, title, comment });
+    const booking = await Booking.findOne({
+      _id: bookingId,
+      parent: req.user!._id,
+      carer: carerId,
+      status: BookingStatus.COMPLETED,
+      isDeleted: false,
+    });
+
+    if (!booking) {
+      return res.status(400).json({ message: 'Only completed bookings can be reviewed' });
+    }
+
+    const existingReview = await Review.findOne({ booking: bookingId, parent: req.user!._id });
+
+    if (existingReview) {
+      return res.status(400).json({ message: 'This booking has already been reviewed' });
+    }
     
     const review = await Review.create({
       booking: bookingId,
@@ -46,6 +63,18 @@ export const createReview = async (req: AuthRequest, res: Response) => {
       tags,
       images,
     });
+
+    const stats = await Review.aggregate([
+      { $match: { carer: review.carer } },
+      { $group: { _id: '$carer', averageRating: { $avg: '$score' }, reviewCount: { $sum: 1 } } },
+    ]);
+
+    if (stats[0]) {
+      await Carer.findByIdAndUpdate(review.carer, {
+        rating: Math.round(stats[0].averageRating * 10) / 10,
+        reviewCount: stats[0].reviewCount,
+      });
+    }
 
     res.status(201).json(review);
   } catch (error: any) {

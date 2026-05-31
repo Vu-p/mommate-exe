@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ChevronRight, Loader2 } from 'lucide-react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import FilterBar from '../components/services/FilterBar';
@@ -8,7 +8,7 @@ import ServiceCard from '../components/services/ServiceCard';
 import api from '../utils/api';
 import './FindService.css';
 
-// Mock data removed - fetching from API
+const fallbackImages = ['/src/assets/images/service-1.png', '/src/assets/images/service-2.png'];
 
 const FindService = () => {
   const [services, setServices] = useState<any[]>([]);
@@ -25,17 +25,15 @@ const FindService = () => {
       try {
         setLoading(true);
         const { data: allServices } = await api.get('/services');
-        
+
         if (carerId) {
-          // If we have a carer context, we should ideally show services that this carer provides
           try {
             const { data: carerData } = await api.get(`/carers/${carerId}`);
             const carerServiceIds = carerData.services.map((s: any) => s._id || s);
-            const filtered = allServices.filter((s: any) => carerServiceIds.includes(s._id));
-            setServices(filtered);
+            setServices(allServices.filter((service: any) => carerServiceIds.includes(service._id)));
           } catch (err) {
             console.error('Error fetching carer for filtering:', err);
-            setServices(allServices); // Fallback
+            setServices(allServices);
           }
         } else {
           setServices(allServices);
@@ -48,37 +46,54 @@ const FindService = () => {
     };
 
     fetchServices();
-  }, []);
+  }, [carerId]);
+
+  const displayServices = useMemo(
+    () => services.map((service, index) => ({
+      ...service,
+      image: service.image || fallbackImages[index % fallbackImages.length],
+    })),
+    [services]
+  );
 
   return (
     <div className="find-service-page">
       <Navbar />
-      
+
       <main className="container main-content">
         <nav className="breadcrumb">
-          <a href="/">Home</a>
+          <Link to="/">Trang chủ</Link>
           <ChevronRight size={14} />
-          <span>Find Service</span>
+          <span>Tìm dịch vụ</span>
         </nav>
 
         <FilterBar />
 
         <header className="page-header">
-          <h1>Postpartumcare</h1>
-          <p>Explore our premium selection of postpartum and family care services delivered by medical professionals.</p>
+          <span className="page-eyebrow">Tìm dịch vụ</span>
+          <h1>
+            {carerId && carerName
+              ? `Dịch vụ của chuyên gia ${carerName}`
+              : 'Dịch vụ cho mẹ sau sinh'}
+          </h1>
+          <p>
+            {carerId
+              ? 'Khám phá các dịch vụ mà chuyên gia này có thể hỗ trợ và tiếp tục đặt lịch nhanh chóng.'
+              : 'Khám phá các dịch vụ chăm sóc mẹ và bé được thiết kế theo từng giai đoạn phục hồi, từ hậu sản đến chăm sóc tại nhà.'}
+          </p>
         </header>
 
         {loading ? (
           <div className="loading-state">
             <Loader2 className="spinner" />
-            <p>Gathering services...</p>
+            <p>Đang tải dịch vụ...</p>
           </div>
         ) : (
           <div className="services-grid">
-            {services.map(service => (
-              <ServiceCard 
-                key={service._id} 
-                service={service} 
+            {displayServices.map((service) => (
+              <ServiceCard
+                key={service._id}
+                service={service}
                 carerId={carerId}
                 carerName={carerName}
                 onSelect={() => {
@@ -88,8 +103,8 @@ const FindService = () => {
                         carerId,
                         carerName,
                         serviceId: service._id,
-                        serviceTitle: service.title
-                      }
+                        serviceTitle: service.title,
+                      },
                     });
                   } else {
                     navigate(`/services/${service._id}`);
@@ -97,9 +112,9 @@ const FindService = () => {
                 }}
               />
             ))}
-            {services.length === 0 && (
+            {displayServices.length === 0 && (
               <div className="empty-state">
-                <p>No services found. Add some in the Admin Panel!</p>
+                <p>Không tìm thấy dịch vụ nào.</p>
               </div>
             )}
           </div>

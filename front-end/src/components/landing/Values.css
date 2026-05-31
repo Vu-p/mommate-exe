@@ -1,5 +1,5 @@
 .values-figma {
-  padding: 120px 0;
+  padding: 112px 0;
   background-color: var(--white);
 }
 
@@ -37,9 +37,9 @@
 
 .values-grid-figma {
   flex: 1;
-  display: flex;
-  justify-content: space-between;
-  gap: 40px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
 }
 
 .value-item-figma {
@@ -47,18 +47,22 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  flex: 1;
+  padding: 32px 28px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(241, 237, 249, 0.8) 0%, rgba(255,255,255,1) 100%);
+  border: 1px solid rgba(167, 139, 250, 0.12);
+  box-shadow: var(--shadow-sm);
 }
 
 .icon-box-figma {
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   background-color: var(--primary-light);
-  border-radius: 12px;
+  border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 
 .v-icon {
@@ -75,7 +79,7 @@
 .value-text-figma p {
   font-size: 0.95rem;
   color: var(--text-muted);
-  line-height: 1.4;
+  line-height: 1.6;
 }
 
 @media (max-width: 1024px) {
@@ -110,12 +114,12 @@
   }
 
   .values-grid-figma {
-    flex-direction: column;
-    gap: 48px;
+    grid-template-columns: 1fr;
+    gap: 18px;
   }
 
   .value-item-figma {
-    max-width: 320px;
+    max-width: 420px;
     margin: 0 auto;
   }
 }

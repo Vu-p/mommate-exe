@@ -1,4 +1,5 @@
 import { Fragment } from 'react';
+import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import './Breadcrumbs.css';
 
@@ -22,7 +23,7 @@ const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
               {index === items.length - 1 ? (
                 item.label
               ) : (
-                <a href={item.href}>{item.label}</a>
+                <Link to={item.href || '#'}>{item.label}</Link>
               )}
             </span>
           </Fragment>

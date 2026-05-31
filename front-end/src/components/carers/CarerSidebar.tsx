@@ -1,79 +1,138 @@
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, FilterX, Star } from 'lucide-react';
 import './CarerSidebar.css';
 
-const CarerSidebar = () => {
+const DAYS = [
+  { key: 'Monday', label: 'M' },
+  { key: 'Tuesday', label: 'T' },
+  { key: 'Wednesday', label: 'W' },
+  { key: 'Thursday', label: 'T' },
+  { key: 'Friday', label: 'F' },
+  { key: 'Saturday', label: 'S' },
+  { key: 'Sunday', label: 'S' },
+];
+
+const TIME_SLOTS = [
+  { value: '06:00-09:00', label: '6-9 am' },
+  { value: '09:00-12:00', label: '9-12 am' },
+  { value: '12:00-15:00', label: '12-3 pm' },
+  { value: '15:00-18:00', label: '3-6 pm' },
+  { value: '18:00-21:00', label: '6-9 pm' },
+  { value: '21:00-00:00', label: '9-12 pm' },
+  { value: '00:00-06:00', label: '12-6 am' },
+];
+
+interface CarerSidebarProps {
+  filters: {
+    area: string;
+    maxPrice: string;
+    minRating: string;
+    scheduleSlots: string[];
+    workType?: string;
+  };
+  onChange: (name: string, value: string) => void;
+  onToggleSchedule: (day: string, slot: string) => void;
+  onClear?: () => void;
+}
+
+const CarerSidebar = ({ filters, onChange, onToggleSchedule, onClear }: CarerSidebarProps) => {
   return (
-    <div className="carer-sidebar">
+    <aside className="carer-sidebar">
+      <div className="sidebar-header">
+        <span className="sidebar-eyebrow">Bộ lọc</span>
+        <h3>Chuyên gia chăm sóc</h3>
+        <p>Thu hẹp danh sách theo khu vực, ngân sách và mức đánh giá phù hợp.</p>
+      </div>
+
       <div className="sidebar-group">
-        <label>Type of Care</label>
+        <label>Khu vực</label>
         <div className="select-wrapper">
-          <select defaultValue="Breast/ Chest Feeding Su...">
-            <option>Breast/ Chest Feeding Su...</option>
-            <option>Postpartum Care</option>
-            <option>Pregnancy</option>
+          <select value={filters.area} onChange={(e) => onChange('area', e.target.value)}>
+            <option value="">Tất cả khu vực</option>
+            <option value="Hồ Chí Minh">Hồ Chí Minh</option>
+            <option value="Hà Nội">Hà Nội</option>
+            <option value="Đà Nẵng">Đà Nẵng</option>
           </select>
           <ChevronDown size={16} />
         </div>
       </div>
 
       <div className="sidebar-group">
-        <label>Area</label>
+        <label>Ngân sách tối đa</label>
         <div className="select-wrapper">
-          <select defaultValue="Ho Chi Minh">
-            <option>Ho Chi Minh</option>
-            <option>Ha Noi</option>
-            <option>Da Nang</option>
+          <select value={filters.maxPrice} onChange={(e) => onChange('maxPrice', e.target.value)}>
+            <option value="">Tất cả mức giá</option>
+            <option value="100000">Dưới 100.000đ/giờ</option>
+            <option value="150000">Dưới 150.000đ/giờ</option>
+            <option value="200000">Dưới 200.000đ/giờ</option>
+            <option value="300000">Dưới 300.000đ/giờ</option>
           </select>
           <ChevronDown size={16} />
         </div>
       </div>
 
       <div className="sidebar-group">
-        <label>Employment type</label>
-        <div className="checkbox-group">
-          <label className="checkbox-item">
-            <input type="radio" name="emp-type" defaultChecked />
-            <span className="checkmark"></span>
-            Full time employment
-          </label>
-          <label className="checkbox-item">
-            <input type="radio" name="emp-type" />
-            <span className="checkmark"></span>
-            Part time employment
-          </label>
-          <label className="checkbox-item">
-            <input type="radio" name="emp-type" />
-            <span className="checkmark"></span>
-            Casual employment
-          </label>
-          <label className="checkbox-item">
-            <input type="radio" name="emp-type" />
-            <span className="checkmark"></span>
-            Live-in
-          </label>
+        <label>Đánh giá tối thiểu</label>
+        <div className="rating-filter">
+          {[
+            { value: '', label: 'Tất cả' },
+            { value: '4.5', label: '4.5+', icon: 5 },
+            { value: '4', label: '4.0+', icon: 4 },
+            { value: '3', label: '3.0+', icon: 3 },
+          ].map((item) => (
+        <button
+          key={item.label}
+          type="button"
+          className={`rating-chip ${filters.minRating === item.value ? 'active' : ''}`}
+          onClick={() => onChange('minRating', item.value)}
+            >
+              {item.icon ? <Star size={14} fill="currentColor" /> : <FilterX size={14} />}
+              {item.label}
+            </button>
+          ))}
         </div>
       </div>
 
       <div className="sidebar-group">
+        <div className="section-label-row">
+          <label>Lịch làm việc</label>
+          <span className="schedule-count">{filters.scheduleSlots.length} ô đã chọn</span>
+        </div>
         <div className="availability-grid">
           <div className="grid-header">
-            <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+            <span />
+            {DAYS.map((day) => (
+              <span key={day.key}>{day.label}</span>
+            ))}
           </div>
-          {[
-            '6-9 am', '9-12 am', '12-3 pm', '3-6 pm', '6-9 pm', '9-12 pm', '12-6 am'
-          ].map((time, i) => (
-            <div key={i} className="grid-row">
-              <span className="time-label">{time}</span>
-              {[...Array(7)].map((_, j) => (
-                <div key={j} className={`cell ${j < 2 && i < 3 ? 'active' : ''}`}></div>
-              ))}
+
+          {TIME_SLOTS.map((slot) => (
+            <div key={slot.value} className="grid-row">
+              <span className="time-label">{slot.label}</span>
+              {DAYS.map((day) => {
+                const selectedKey = `${day.key}|${slot.value}`;
+                const active = filters.scheduleSlots.includes(selectedKey);
+
+                return (
+                  <button
+                    key={selectedKey}
+                    type="button"
+                    className={`cell-button ${active ? 'active' : ''}`}
+                    onClick={() => onToggleSchedule(day.key, slot.value)}
+                    aria-label={`${day.key} ${slot.label}`}
+                  />
+                );
+              })}
             </div>
           ))}
         </div>
       </div>
 
-      <button className="btn-search-sidebar">Search</button>
-    </div>
+      <div className="sidebar-actions">
+        <button type="button" className="btn-clear-filters" onClick={onClear}>
+          Xoá bộ lọc
+        </button>
+      </div>
+    </aside>
   );
 };
 

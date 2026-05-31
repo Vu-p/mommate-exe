@@ -22,6 +22,14 @@ body {
   overflow-x: hidden;
 }
 
+body,
+input,
+textarea,
+select,
+button {
+  letter-spacing: 0;
+}
+
 button {
   cursor: pointer;
   border: none;
@@ -29,7 +37,9 @@ button {
   font-family: inherit;
 }
 
-input {
+input,
+textarea,
+select {
   font-family: inherit;
 }
 
@@ -40,14 +50,70 @@ a {
 
 .container {
   width: 100%;
-  max-width: 1200px;
+  max-width: var(--container);
   margin: 0 auto;
-  padding: 0 var(--spacing-md);
+  padding: 0 28px;
+}
+
+.page-shell {
+  background: var(--bg);
+  min-height: 100vh;
+}
+
+.btn-primary,
+.btn-secondary {
+  min-height: 52px;
+  border-radius: var(--radius-pill);
+  padding: 0 32px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+.btn-secondary {
+  border: 1px solid var(--primary-dark);
+  color: var(--primary-dark);
+  background: var(--white);
+}
+
+.btn-secondary:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.breadcrumb a {
+  color: var(--text-muted);
+}
+
+.breadcrumb a:hover,
+.breadcrumb span:last-child {
+  color: var(--secondary);
+  font-weight: 800;
 }
 
 @media (max-width: 640px) {
   .container {
-    padding: 0 var(--spacing-sm);
+    padding: 0 18px;
   }
 }
 

@@ -4,18 +4,18 @@ import './Values.css';
 const valuesData = [
   {
     icon: <Shield size={24} className="v-icon" />,
-    title: 'Verification process',
-    desc: 'Each profile has its own level of verification.'
+    title: 'Quy trình xác minh',
+    desc: 'Xác minh hồ sơ nhân thân, bằng cấp, chứng chỉ và các kinh nghiệm để phụ huynh an tâm tuyệt đối.'
   },
   {
     icon: <Users size={24} className="v-icon" />,
-    title: 'Meet up with carers',
-    desc: 'Feel safe because we are in search of the best profiles.'
+    title: 'Kết nối an toàn',
+    desc: 'Dễ dàng gặp gỡ chuyên gia, trao đổi công việc chăm sóc mẹ và bé một cách thuận tiện, an toàn.'
   },
   {
     icon: <ThumbsUp size={24} className="v-icon" />,
-    title: 'Reviews from families',
-    desc: 'Read reviews from other families.'
+    title: 'Đánh giá thực tế',
+    desc: 'Đọc các đánh giá từ những gia đình khác để lựa chọn chuyên gia phù hợp.'
   }
 ];
 
@@ -24,9 +24,8 @@ const Values = () => {
     <section className="values-figma">
       <div className="container values-container-figma">
         <div className="values-intro-figma">
-           <span className="label">WHY TRUST US</span>
-           <h2>Top Values For You</h2>
-           <p>We are committed to providing the best profiles and certified support for every family.</p>
+           <span className="label">TẠI SAO BẠN CÓ THỂ AN TÂM?</span>
+           <h2>Giá trị cốt lõi của Mommate</h2>
         </div>
         
         <div className="values-grid-figma">

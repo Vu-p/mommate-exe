@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronRight, ChevronDown, Info } from 'lucide-react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -11,28 +11,32 @@ const Booking = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { serviceId, serviceTitle, carerId } = location.state || {};
+  const { serviceId, serviceTitle, carerId, carerName } = location.state || {};
+  const hasRequiredBookingData = Boolean(serviceId && carerId);
 
   const [formData, setFormData] = useState({
-    name: user ? `${user.firstName} ${user.lastName}` : '',
-    email: user?.email || '',
+    name: user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : '',
     phone: '',
+    area: 'Hồ Chí Minh',
     date: '',
-    address: '',
-    interest: serviceTitle || '',
-    firstPregnancy: 'Yes',
-    numSessions: 1
+    time: '08:00',
+    notes: '',
+    numSessions: 1,
+    hours: 4
   });
   const [service, setService] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (!hasRequiredBookingData) {
+      return;
+    }
+
     // Re-fill if user session loads after component mount
     if (user && !formData.name) {
       setFormData(prev => ({
         ...prev,
-        name: `${user.firstName} ${user.lastName}`,
-        email: user.email
+        name: `${user.firstName || ''} ${user.lastName || ''}`.trim()
       }));
     }
 
@@ -41,41 +45,79 @@ const Booking = () => {
         try {
           const { data } = await api.get(`/services/${serviceId}`);
           setService(data);
-          if (data.sessionOptions && data.sessionOptions.length > 0) {
-            setFormData(prev => ({ ...prev, numSessions: data.sessionOptions[0] }));
-          }
+          // Don't auto-set session to 10 if we want default to 1 for simplicity, 
+          // but we can respect service.sessionOptions if we want.
         } catch (error) {
           console.error('Error fetching service:', error);
         }
       }
     };
     fetchService();
-  }, [serviceId]);
+  }, [hasRequiredBookingData, serviceId, user]);
 
-  const pricePerSession = service?.price || 0;
-  const totalPrice = pricePerSession * formData.numSessions;
+  const pricePerHour = service?.price || 150000; // default 150k if missing
+  const serviceFee = 5000;
+  const subTotal = pricePerHour * formData.hours * formData.numSessions;
+  const totalPrice = subTotal + serviceFee;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.date || !formData.time) {
+      alert("Vui lòng chọn ngày và giờ hẹn.");
+      return;
+    }
+
     setLoading(true);
     try {
-      await api.post('/bookings', {
-        carerId: carerId || '65f1a2b3c4d5e6f7a8b9c0d1', // Fallback for testing if no carer selected
-        serviceId: serviceId || '65f1a2b3c4d5e6f7a8b9c0d2', // Fallback
-        scheduledAt: new Date(formData.date),
-        address: formData.address,
-        notes: `Interest: ${formData.interest}. First Pregnancy: ${formData.firstPregnancy}. Phone: ${formData.phone}`,
+      const scheduledAt = new Date(`${formData.date}T${formData.time}`);
+      
+      if (!hasRequiredBookingData) {
+        alert('Thiếu thông tin dịch vụ hoặc chuyên gia để đặt lịch.');
+        return;
+      }
+
+      const payload = {
+        carerId,
+        serviceId,
+        scheduledAt: scheduledAt,
+        address: formData.area,
+        notes: `Phone: ${formData.phone}. Notes: ${formData.notes}`,
         numSessions: formData.numSessions,
+        hours: formData.hours,
         totalPrice: totalPrice
-      });
+      };
+      
+      await api.post('/bookings', payload);
+      // Navigate to request page or payment page depending on flow
+      // MVP says we should go to /account/request or /payment. 
+      // Actually we will navigate to /payment if booking is confirmed, but MVP says booking is pending first.
       navigate('/account/request');
     } catch (error) {
       console.error('Booking failed:', error);
-      alert('Booking failed. Please check your data.');
+      alert('Đặt lịch thất bại. Vui lòng kiểm tra lại thông tin.');
     } finally {
       setLoading(false);
     }
   };
+
+  if (!hasRequiredBookingData) {
+    return (
+      <div className="booking-page">
+        <Navbar />
+        <main className="container booking-content">
+          <div className="empty-state booking-empty-state">
+            <h2>Không đủ thông tin để đặt lịch</h2>
+            <p>Vui lòng chọn một dịch vụ và một chuyên gia trước khi tiếp tục.</p>
+            <div className="booking-empty-actions">
+              <Link to="/services" className="btn-primary">Chọn dịch vụ</Link>
+              <Link to="/carers" className="btn-secondary">Chọn chuyên gia</Link>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="booking-page">
@@ -83,190 +125,183 @@ const Booking = () => {
 
       <main className="container booking-content">
         <nav className="breadcrumb">
-          <Link to="/">Home</Link>
+          <Link to="/">Trang chủ</Link>
           <ChevronRight size={14} />
-          <Link to="/find-carer">Find Carer</Link>
+          <span>Đặt lịch</span>
         </nav>
 
-        <section className="booking-form-header">
-          <h1>Register Form</h1>
-          <div className="select-wrapper type-of-care-select">
-            <select defaultValue="Type of care">
-              <option disabled>Type of care</option>
-              <option>Newborn Care</option>
-              <option>Postpartum Care</option>
-              <option>Pregnancy Care</option>
-            </select>
-            <ChevronDown size={18} />
-          </div>
-        </section>
-
-        <form className="booking-main-form" onSubmit={handleSubmit}>
-          <div className="form-card info-card">
-            <h2>I can't wait to meet you</h2>
-            <p className="form-desc">Lorem ipsum dolor sit amet consectetur adipiscing elit tortor eu dolorol egestas morbi sem vulputate etiam facilisis pellentesque ut quis.</p>
-            
-            <div className="form-grid">
-              <div className="input-field">
-                <label>Name</label>
-                <input 
-                  type="text" required
-                  placeholder="John Carter" 
-                  value={formData.name}
-                  onChange={e => setFormData({...formData, name: e.target.value})}
-                />
-              </div>
-              <div className="input-field">
-                <label>Email</label>
-                <input 
-                  type="email" required
-                  placeholder="example@email.com" 
-                  value={formData.email}
-                  onChange={e => setFormData({...formData, email: e.target.value})}
-                />
-              </div>
-              <div className="input-field">
-                <label>Phone</label>
-                <input 
-                  type="tel" required
-                  placeholder="(123) 456 - 789" 
-                  value={formData.phone}
-                  onChange={e => setFormData({...formData, phone: e.target.value})}
-                />
-              </div>
-              <div className="input-field">
-                <label>Date and Time</label>
-                <input 
-                  type="datetime-local" required
-                  value={formData.date}
-                  onChange={e => setFormData({...formData, date: e.target.value})}
-                />
-              </div>
-              <div className="input-field full-width">
-                <label>Adress</label>
-                <textarea 
-                  required
-                  placeholder="Please type your location here..."
-                  value={formData.address}
-                  onChange={e => setFormData({...formData, address: e.target.value})}
-                ></textarea>
-              </div>
-            </div>
-          </div>
-
-          <div className="form-card selection-card">
-            <div className="selection-group">
-              <h3>Which service are you interested in ?</h3>
-              <div className="choice-container">
-                <label className="choice-item">
+        <div className="booking-layout">
+          {/* Left Form Column */}
+          <form className="booking-form-col" onSubmit={handleSubmit}>
+            <div className="booking-form-section">
+              <h2>Thông tin người đặt</h2>
+              <div className="form-row-2">
+                <div className="input-field">
+                  <label>Họ và Tên</label>
                   <input 
-                    type="radio" name="interest" 
-                    checked={formData.interest === 'Birth'}
-                    onChange={() => setFormData({...formData, interest: 'Birth'})}
+                    type="text" required
+                    placeholder="Nguyễn Văn A" 
+                    value={formData.name}
+                    onChange={e => setFormData({...formData, name: e.target.value})}
                   />
-                  <span className="choice-circle"></span>
-                  Birth
-                </label>
-                <label className="choice-item">
+                </div>
+                <div className="input-field">
+                  <label>Số điện thoại</label>
                   <input 
-                    type="radio" name="interest" 
-                    checked={formData.interest === 'Postpartum'}
-                    onChange={() => setFormData({...formData, interest: 'Postpartum'})}
+                    type="tel" required
+                    placeholder="0123 456 789" 
+                    value={formData.phone}
+                    onChange={e => setFormData({...formData, phone: e.target.value})}
                   />
-                  <span className="choice-circle"></span>
-                  Postpartum
-                </label>
-                <label className="choice-item">
-                  <input 
-                    type="radio" name="interest" 
-                    checked={formData.interest === 'Childbirth education'}
-                    onChange={() => setFormData({...formData, interest: 'Childbirth education'})}
-                  />
-                  <span className="choice-circle"></span>
-                  Childbirth education
-                </label>
-              </div>
-            </div>
-
-            <div className="selection-group">
-              <h3>Is this your first pregnancy ?</h3>
-              <div className="choice-container">
-                <label className="choice-item">
-                  <input 
-                    type="radio" name="pregnancy" 
-                    checked={formData.firstPregnancy === 'Yes'}
-                    onChange={() => setFormData({...formData, firstPregnancy: 'Yes'})}
-                  />
-                  <span className="choice-circle"></span>
-                  Yes
-                </label>
-                <label className="choice-item">
-                  <input 
-                    type="radio" name="pregnancy" 
-                    checked={formData.firstPregnancy === 'No'}
-                    onChange={() => setFormData({...formData, firstPregnancy: 'No'})}
-                  />
-                  <span className="choice-circle"></span>
-                  No
-                </label>
-                <label className="choice-item">
-                  <input 
-                    type="radio" name="pregnancy" 
-                    checked={formData.firstPregnancy === 'First baby'}
-                    onChange={() => setFormData({...formData, firstPregnancy: 'First baby'})}
-                  />
-                  <span className="choice-circle"></span>
-                  First baby
-                </label>
-              </div>
-            </div>
-          </div>
-
-          {service?.sessionOptions && service.sessionOptions.length > 0 && (
-            <div className="form-card selection-card">
-              <div className="selection-group">
-                <h3>Select your package</h3>
-                <p className="session-info">
-                  <Info size={14} /> Price: {pricePerSession.toLocaleString()} VND / session
-                </p>
-                <div className="choice-container session-options">
-                  {service.sessionOptions.map((opt: number) => (
-                    <label key={opt} className="choice-item">
-                      <input 
-                        type="radio" name="numSessions" 
-                        checked={formData.numSessions === opt}
-                        onChange={() => setFormData({...formData, numSessions: opt})}
-                      />
-                      <span className="choice-circle"></span>
-                      {opt} Sessions
-                    </label>
-                  ))}
                 </div>
               </div>
             </div>
-          )}
 
-          <div className="booking-summary-card">
-            <div className="summary-row">
-              <span>Service:</span>
-              <span>{service?.title || serviceTitle}</span>
-            </div>
-            <div className="summary-row">
-              <span>Sessions:</span>
-              <span>{formData.numSessions}</span>
-            </div>
-            <div className="summary-row total">
-              <span>Total Price:</span>
-              <span>{totalPrice.toLocaleString()} VND</span>
-            </div>
-          </div>
+            <div className="booking-form-section">
+              <h2>Thông tin lịch hẹn</h2>
+              <div className="input-field">
+                <label>Khu vực</label>
+                <div className="select-wrapper">
+                  <select 
+                    value={formData.area}
+                    onChange={e => setFormData({...formData, area: e.target.value})}
+                  >
+                    <option value="Hồ Chí Minh">Hồ Chí Minh</option>
+                    <option value="Hà Nội">Hà Nội</option>
+                    <option value="Đà Nẵng">Đà Nẵng</option>
+                  </select>
+                  <ChevronDown size={18} />
+                </div>
+              </div>
 
-          <div className="form-actions">
-            <button type="submit" className="btn-submit" disabled={loading}>
-              {loading ? 'Submitting...' : 'Submit'}
-            </button>
-          </div>
-        </form>
+              <div className="form-row-2">
+                <div className="input-field">
+                  <label>Ngày hẹn</label>
+                  <input 
+                    type="date" required
+                    value={formData.date}
+                    onChange={e => setFormData({...formData, date: e.target.value})}
+                  />
+                </div>
+                <div className="input-field">
+                  <label>Giờ hẹn</label>
+                  <div className="select-wrapper">
+                    <select 
+                      value={formData.time}
+                      onChange={e => setFormData({...formData, time: e.target.value})}
+                    >
+                      <option value="07:00">07:00</option>
+                      <option value="08:00">08:00</option>
+                      <option value="09:00">09:00</option>
+                      <option value="10:00">10:00</option>
+                      <option value="14:00">14:00</option>
+                      <option value="15:00">15:00</option>
+                    </select>
+                    <ChevronDown size={18} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-row-2">
+                <div className="input-field">
+                  <label>Số buổi</label>
+                  <div className="select-wrapper">
+                    <select 
+                      value={formData.numSessions}
+                      onChange={e => setFormData({...formData, numSessions: parseInt(e.target.value)})}
+                    >
+                      <option value="1">1 Buổi</option>
+                      <option value="5">5 Buổi</option>
+                      <option value="10">10 Buổi</option>
+                    </select>
+                    <ChevronDown size={18} />
+                  </div>
+                </div>
+                <div className="input-field">
+                  <label>Số giờ / buổi</label>
+                  <div className="select-wrapper">
+                    <select 
+                      value={formData.hours}
+                      onChange={e => setFormData({...formData, hours: parseInt(e.target.value)})}
+                    >
+                      <option value="2">2 Giờ</option>
+                      <option value="4">4 Giờ</option>
+                      <option value="8">8 Giờ</option>
+                    </select>
+                    <ChevronDown size={18} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="input-field">
+                <label>Lời nhắn</label>
+                <textarea 
+                  placeholder="Ghi chú thêm cho chuyên gia..."
+                  value={formData.notes}
+                  onChange={e => setFormData({...formData, notes: e.target.value})}
+                ></textarea>
+              </div>
+            </div>
+          </form>
+
+          {/* Right Summary Column */}
+          <aside className="booking-summary-col">
+            <div className="summary-card">
+              <div className="summary-header">
+                <div className="summary-image">
+                  {service?.image ? (
+                    <img src={service.image} alt="Service" />
+                  ) : (
+                    <div className="img-placeholder">
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                        <path d="M21 19V5C21 3.9 20.1 3 19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19ZM8.5 13.5L11 16.51L14.5 12L19 18H5L8.5 13.5Z" fill="#A4A8B4" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+                <div className="summary-title-wrapper">
+                  <h3>{serviceTitle || service?.title || 'Tên dịch vụ'}</h3>
+                  <p className="carer-name">Chuyên gia: {carerName || 'Đang cập nhật'}</p>
+                </div>
+              </div>
+
+              <div className="summary-details">
+                <div className="summary-row">
+                  <span>Giá dịch vụ</span>
+                  <span>{pricePerHour.toLocaleString()} VNĐ / giờ</span>
+                </div>
+                <div className="summary-row">
+                  <span>Thời lượng</span>
+                  <span>{formData.numSessions} buổi x {formData.hours} giờ</span>
+                </div>
+                <div className="summary-row">
+                  <span>Tạm tính</span>
+                  <span>{subTotal.toLocaleString()} VNĐ</span>
+                </div>
+                <div className="summary-row">
+                  <span>Phí dịch vụ</span>
+                  <span>{serviceFee.toLocaleString()} VNĐ</span>
+                </div>
+                
+                <div className="summary-divider"></div>
+
+                <div className="summary-row total">
+                  <span>Tổng thanh toán</span>
+                  <span className="total-price">{totalPrice.toLocaleString()} VNĐ</span>
+                </div>
+              </div>
+
+              <button 
+                type="submit" 
+                className="btn-booking-submit" 
+                disabled={loading}
+                onClick={handleSubmit}
+              >
+                {loading ? 'Đang xử lý...' : 'Thanh toán'}
+              </button>
+            </div>
+          </aside>
+        </div>
       </main>
 
       <Footer />

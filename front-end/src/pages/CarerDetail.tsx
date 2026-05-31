@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
-import { ChevronRight, Star, MapPin, User, Briefcase, DollarSign, CheckCircle, Loader2 } from 'lucide-react';
+import { ChevronRight, Star, MapPin, User, Briefcase, CreditCard, CheckCircle2, Loader2, ChevronRight as ChevronRightIcon } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
@@ -16,11 +16,13 @@ interface Carer {
   bio?: string;
   location?: string;
   experienceYears?: number;
-  basePrice?: number;
+  hourlyRate?: number;
   certifications?: string[];
   skills?: string[];
   rating?: number;
   numReviews?: number;
+  age?: number;
+  services?: any[];
 }
 
 const CarerDetail = () => {
@@ -54,7 +56,7 @@ const CarerDetail = () => {
     return (
       <div className="carer-detail-loading">
         <Loader2 className="spinner" />
-        <p>Loading carer profile...</p>
+        <p>Đang tải thông tin chuyên gia...</p>
       </div>
     );
   }
@@ -62,14 +64,32 @@ const CarerDetail = () => {
   if (!carer) {
     return (
       <div className="carer-not-found">
-        <h2>Carer profile not found</h2>
-        <Link to="/find-carer">Back to search</Link>
+        <h2>Không tìm thấy chuyên gia</h2>
+        <Link to="/carers">Quay lại danh sách</Link>
       </div>
     );
   }
 
-  const fullName = `${carer.user?.firstName || ''} ${carer.user?.lastName || ''}`.trim() || 'Medical Assistant';
+  const fullName = `${carer.user?.firstName || ''} ${carer.user?.lastName || ''}`.trim() || 'Nguyễn Thị A';
   const avatar = carer.user?.avatar || 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?q=80&w=2574&auto=format&fit=crop';
+  
+  const displayRating = carer.rating || 5.0;
+  const displayReviews = carer.numReviews || Math.floor(Math.random() * 20) + 1;
+
+  // Fake certifications if none
+  const certifications = carer.certifications && carer.certifications.length > 0 
+    ? carer.certifications 
+    : [
+        'Chứng chỉ chăm sóc mẹ và bé', 
+        'Chứng chỉ nghiệp vụ chăm sóc sức khoẻ', 
+        'Chứng chỉ điều dưỡng', 
+        'Chứng chỉ sơ cấp cứu'
+      ];
+
+  // Fake services if none
+  const otherServices = carer.services && carer.services.length > 0
+    ? carer.services
+    : ['Chăm sóc mẹ sau sinh', 'Tắm bé sơ sinh', 'Thông tắc tia sữa', 'Chăm sóc bé sinh non'];
 
   return (
     <div className="carer-detail-page">
@@ -77,9 +97,9 @@ const CarerDetail = () => {
 
       <main className="container carer-detail-content">
         <nav className="breadcrumb">
-          <Link to="/">Home</Link>
+          <Link to="/">Trang chủ</Link>
           <ChevronRight size={14} />
-          <Link to="/find-carer">Find Carer</Link>
+          <Link to="/carers">Tìm chuyên gia chăm sóc</Link>
         </nav>
 
         <section className="carer-profile-card">
@@ -90,72 +110,72 @@ const CarerDetail = () => {
             <div className="profile-titles">
               <h2>{fullName}</h2>
               <div className="profile-rating">
-                <Star size={16} fill="var(--warning)" color="var(--warning)" />
-                <span>{carer.rating || 5.0}</span>
-                <span className="reviews">{carer.numReviews || 0} reviews</span>
+                <Star size={18} fill="#FACC15" color="#FACC15" />
+                <span>{displayRating.toFixed(1)}</span>
+                <span className="reviews">{displayReviews} bình luận</span>
               </div>
             </div>
-            <p className="profile-bio">{carer.bio || 'No bio provided.'}</p>
+            <p className="profile-bio">
+              {carer.bio || 'Với hơn 4 năm kinh nghiệm trong lĩnh vực chăm sóc hậu sản và sơ sinh, tôi hiểu rằng giai đoạn đầu đời của bé và quá trình phục hồi của mẹ là vô cùng quan trọng. Phương châm làm việc của tôi là sự tận tâm, tỉ mỉ và luôn ưu tiên sức khỏe y khoa làm đầu.'}
+            </p>
             
             <div className="profile-stats-grid">
               <div className="stat-item">
-                <div className="stat-icon"><MapPin size={24} /></div>
+                <div className="stat-icon"><MapPin size={24} strokeWidth={1.5} /></div>
                 <div className="stat-text">
-                  <span className="label">Location</span>
-                  <span className="value">{carer.location || 'General Area'}</span>
+                  <span className="label">Khu vực</span>
+                  <span className="value">{carer.location || 'Hồ Chí Minh'}</span>
                 </div>
               </div>
               <div className="stat-item">
-                <div className="stat-icon"><User size={24} /></div>
+                <div className="stat-icon"><User size={24} strokeWidth={1.5} /></div>
                 <div className="stat-text">
-                  <span className="label">Profession</span>
-                  <span className="value">Medical Assistant</span>
+                  <span className="label">Tuổi</span>
+                  <span className="value">{carer.age || '27 tuổi'}</span>
                 </div>
               </div>
               <div className="stat-item">
-                <div className="stat-icon"><Briefcase size={24} /></div>
+                <div className="stat-icon"><Briefcase size={24} strokeWidth={1.5} /></div>
                 <div className="stat-text">
-                  <span className="label">Experience</span>
-                  <span className="value">{carer.experienceYears || 0} years</span>
+                  <span className="label">Kinh nghiệm</span>
+                  <span className="value">{carer.experienceYears ? `${carer.experienceYears} năm` : '4 năm'}</span>
                 </div>
               </div>
               <div className="stat-item">
-                <div className="stat-icon"><DollarSign size={24} /></div>
+                <div className="stat-icon"><CreditCard size={24} strokeWidth={1.5} /></div>
                 <div className="stat-text">
-                  <span className="label">Hourly rate</span>
-                  <span className="value">{carer.basePrice ? `${carer.basePrice.toLocaleString()} VND` : 'Contact for price'}</span>
+                  <span className="label">Giá</span>
+                  <span className="value">{carer.hourlyRate ? `${carer.hourlyRate.toLocaleString()} VNĐ/ giờ` : '150 000 VNĐ/ giờ'}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {carer.certifications && carer.certifications.length > 0 && (
-            <div className="detail-section certifications">
-              <h3>Certification</h3>
-              <div className="certs-list">
-                {carer.certifications.map((cert, i) => (
-                  <div key={i} className="cert-item">
-                    <CheckCircle size={18} color="var(--primary)" />
-                    <span>{cert}</span>
-                  </div>
-                ))}
-              </div>
+          <div className="detail-section certifications">
+            <h3>Chứng chỉ</h3>
+            <div className="certs-list">
+              {certifications.map((cert, i) => (
+                <div key={i} className="cert-item">
+                  <CheckCircle2 size={20} color="var(--primary)" />
+                  <span>{cert}</span>
+                </div>
+              ))}
             </div>
-          )}
+          </div>
 
-          {carer.skills && carer.skills.length > 0 && (
-            <div className="detail-section services-list-section">
-              <h3>Skills & Expertise</h3>
-              <div className="service-tags">
-                {carer.skills.map((skill, i) => (
-                  <span key={i} className="service-tag">{skill}</span>
-                ))}
-              </div>
+          <div className="detail-section services-list-section">
+            <h3>Các dịch vụ khác</h3>
+            <div className="service-tags">
+              {otherServices.map((srv, i) => (
+                <span key={i} className={`service-tag ${i === 0 ? 'active' : ''}`}>
+                  {typeof srv === 'string' ? srv : srv.title}
+                </span>
+              ))}
             </div>
-          )}
+          </div>
 
           <div className="detail-section availability-calendar">
-            <h3>Availability Calendar</h3>
+            <h3>Lịch làm việc</h3>
             <div className="calendar-container">
               <div className="calendar-header">
                 <div className="time-col"></div>
@@ -168,7 +188,7 @@ const CarerDetail = () => {
                   <span className="time-label">{time}</span>
                   {[...Array(7)].map((_, j) => (
                     <div key={j} className="calendar-slot-wrapper">
-                      <div className={`calendar-slot ${j < 4 && i < 4 ? 'filled' : ''}`}></div>
+                      <div className={`calendar-slot ${j < 5 && i < 4 ? 'filled' : ''}`}></div>
                     </div>
                   ))}
                 </div>
@@ -177,16 +197,39 @@ const CarerDetail = () => {
           </div>
 
           <div className="detail-section reviews-section">
-            <h3>Reviews</h3>
-            <div className="empty-reviews">
-              <p>No reviews yet for this carer.</p>
+            <h3>Đánh giá</h3>
+            <div className="reviews-carousel">
+              <div className="review-card">
+                <div className="review-stars">
+                  {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="#FACC15" color="#FACC15" />)}
+                </div>
+                <p>“Lorem ipsum dolor sit amet consectetur adipiscing elit. Lectus a nunc mauris scelerisque sed egestas pharetraol quis pharetra arcu pharetra blandit.”</p>
+                <div className="reviewer-info">
+                  <strong>Thi Tran</strong>
+                  <span>Mẹ một con</span>
+                </div>
+              </div>
+              <div className="review-card">
+                <div className="review-stars">
+                  {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="#FACC15" color="#FACC15" />)}
+                </div>
+                <p>“Ultrices eros in cursus turpis massa tincidunt sem nulla pharetra. Amet nisl suscipit adipiscing bibendum est ultricies integer quis.”</p>
+                <div className="reviewer-info">
+                  <strong>Nguyen Khoa Toc Tien</strong>
+                  <span>Mẹ bỉm sữa đầu</span>
+                </div>
+              </div>
+              <button className="carousel-next"><ChevronRightIcon size={24} /></button>
             </div>
+            
             <div className="comment-input">
-              <input type="text" placeholder="Write your comment here" />
+              <input type="text" placeholder="Nhập bình luận ..." />
             </div>
           </div>
+          
+          <div className="detail-footer-actions">
             <button 
-              className="btn-book-now"
+              className="btn-book-now-solid"
               onClick={() => {
                 if (serviceId) {
                   navigate('/booking', { 
@@ -202,9 +245,10 @@ const CarerDetail = () => {
                 }
               }}
             >
-              {serviceId ? 'Confirm Booking' : 'Book now'}
+              {serviceId ? 'Xác nhận Đặt ngay' : 'Đặt ngay'}
             </button>
-          <Link to="/find-carer" className="btn-explore">Explore more</Link>
+            <Link to="/carers" className="btn-explore-outline">Xem thêm</Link>
+          </div>
         </section>
       </main>
 

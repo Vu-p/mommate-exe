@@ -8,21 +8,13 @@ interface SocialLoginsProps {
 const SocialLogins = ({ isLogin }: SocialLoginsProps) => {
   return (
     <div className="social-logins">
-      <p className="social-text">{isLogin ? 'Or log in with' : 'Or sign up with'}</p>
+      <p className="social-text">{isLogin ? 'Hoặc đăng nhập với' : 'Bạn đã có tài khoản?'}</p>
       <div className="social-buttons">
-        <motion.button
-          className="social-btn google"
-          whileHover={{ y: -2 }}
-          whileTap={{ scale: 0.98 }}
-        >
+        <motion.button className="social-btn google" whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
           Google
         </motion.button>
-        <motion.button
-          className="social-btn facebook"
-          whileHover={{ y: -2 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          Facebook
+        <motion.button className="social-btn facebook" whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+          facebook
         </motion.button>
       </div>
     </div>

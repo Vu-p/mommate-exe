@@ -14,6 +14,7 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setNotice('');
     setIsSubmitting(true);
 
     try {
@@ -28,30 +30,42 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
       login(data);
       navigate('/');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      setError(err.response?.data?.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const handleForgotPassword = async () => {
+    setError('');
+    setNotice('');
+
+    try {
+      await api.post('/auth/forgot-password', { email });
+      setNotice('Nếu email tồn tại, MomMate sẽ gửi hướng dẫn đặt lại mật khẩu.');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Không thể gửi yêu cầu đặt lại mật khẩu.');
+    }
+  };
+
   return (
     <div className="login-form-container">
-      <h2 className="form-title">Log in to your Account</h2>
-      
+      <h2 className="form-title">Đăng nhập tài khoản</h2>
+
       <form className="login-form" onSubmit={handleSubmit}>
-        {error && <p className="error-message" style={{ color: 'red', marginBottom: '1rem' }}>{error}</p>}
-        <Input 
-          label="Email" 
-          type="email" 
-          placeholder="example@email.com" 
+        {error && <p className="auth-message error-message">{error}</p>}
+        {notice && <p className="auth-message success-message">{notice}</p>}
+
+        <Input
+          label="Email"
+          type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <Input 
-          label="Password" 
-          type="password" 
-          placeholder="Enter your password" 
+        <Input
+          label="Mật khẩu"
+          type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -61,23 +75,27 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
           <label className="checkbox-container">
             <input type="checkbox" />
             <span className="checkmark"></span>
-            Remember me
+            Nhớ mật khẩu
           </label>
-          <a href="#" className="forgot-password">Forgot password?</a>
+          <button type="button" className="forgot-password" onClick={handleForgotPassword}>
+            Quên mật khẩu?
+          </button>
         </div>
-        
-        <motion.button 
-          className="submit-btn"
-          whileHover={{ scale: 1.02, backgroundColor: 'var(--primary-dark)' }}
-          whileTap={{ scale: 0.98 }}
-          type="submit"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Logging in...' : 'Log in'}
-        </motion.button>
+
+        <div className="auth-submit-row">
+          <motion.button
+            className="submit-btn"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Đang đăng nhập...' : 'Log in'}
+          </motion.button>
+        </div>
 
         <p className="toggle-auth-text">
-          Don't have an account? <button type="button" onClick={onToggle} className="toggle-btn">Sign up</button>
+          Chưa có tài khoản? <button type="button" onClick={onToggle}>Đăng kí</button>
         </p>
       </form>
     </div>
