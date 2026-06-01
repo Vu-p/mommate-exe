@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import Input from '../common/Input.js';
 import './LoginForm.css';
 import { useAuth } from '../../context/AuthContext.js';
@@ -16,6 +17,7 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -65,10 +67,21 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
         />
         <Input
           label="Mật khẩu"
-          type="password"
+          type={showPassword ? 'text' : 'password'}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          endAdornment={
+            <button
+              type="button"
+              className="input-icon-button"
+              onClick={() => setShowPassword((value) => !value)}
+              aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+              title={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          }
         />
 
         <div className="form-options">

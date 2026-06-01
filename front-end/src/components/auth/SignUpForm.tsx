@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import Input from '../common/Input.js';
 import './SignUpForm.css';
 import { useAuth } from '../../context/AuthContext.js';
@@ -18,6 +19,8 @@ const SignUpForm = ({ onToggle }: SignUpFormProps) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -78,17 +81,39 @@ const SignUpForm = ({ onToggle }: SignUpFormProps) => {
         />
         <Input
           label="Mật khẩu"
-          type="password"
+          type={showPassword ? 'text' : 'password'}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          endAdornment={
+            <button
+              type="button"
+              className="input-icon-button"
+              onClick={() => setShowPassword((value) => !value)}
+              aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+              title={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          }
         />
         <Input
           label="Confirm password"
-          type="password"
+          type={showConfirmPassword ? 'text' : 'password'}
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
+          endAdornment={
+            <button
+              type="button"
+              className="input-icon-button"
+              onClick={() => setShowConfirmPassword((value) => !value)}
+              aria-label={showConfirmPassword ? 'Ẩn mật khẩu xác nhận' : 'Hiện mật khẩu xác nhận'}
+              title={showConfirmPassword ? 'Ẩn mật khẩu xác nhận' : 'Hiện mật khẩu xác nhận'}
+            >
+              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          }
         />
 
         <div className="auth-submit-row">

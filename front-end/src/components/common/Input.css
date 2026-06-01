@@ -13,6 +13,11 @@
   padding-left: 28px;
 }
 
+.input-control-wrapper {
+  position: relative;
+  width: 100%;
+}
+
 .input-control {
   min-height: 54px;
   padding: 0 28px;
@@ -24,6 +29,41 @@
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
   width: 100%;
   box-shadow: none;
+}
+
+.input-control.has-end-adornment {
+  padding-right: 58px;
+}
+
+.input-end-adornment {
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+}
+
+.input-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.input-icon-button:hover,
+.input-icon-button:focus-visible {
+  color: var(--primary);
+  background-color: rgba(201, 155, 211, 0.12);
+  outline: none;
 }
 
 .input-control:focus {
