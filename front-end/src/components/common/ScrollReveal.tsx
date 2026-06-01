@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 interface ScrollRevealProps {
   children: ReactNode;
@@ -8,22 +8,27 @@ interface ScrollRevealProps {
 }
 
 const ScrollReveal = ({ children, delay = 0, className }: ScrollRevealProps) => {
+  const reduceMotion = useReducedMotion();
+
+  if (reduceMotion) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: 30, scale: 0.95 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      initial={{ opacity: 0, y: 14 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{
         once: true,
-        amount: 0.1,
-        margin: '0px 0px -50px 0px', // Triggers slightly before/as element enters
+        amount: 0.18,
+        margin: '0px 0px -24px 0px',
       }}
       transition={{
-        duration: 0.7,
+        duration: 0.35,
         delay,
-        ease: "easeOut",
+        ease: 'easeOut',
       }}
-      style={{ willChange: 'transform, opacity' }}
     >
       {children}
     </motion.div>

@@ -73,10 +73,10 @@ const Services = () => {
                 <motion.div 
                   key={activeTab}
                   className="image-stack-figma"
-                  initial={{ opacity: 0, x: -20 }}
+                  initial={{ opacity: 0, x: -8 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ duration: 0.5 }}
+                  exit={{ opacity: 0, x: 8 }}
+                  transition={{ duration: 0.28, ease: 'easeOut' }}
                 >
                   <div className="sub-img-figma">
                      <img src={subService?.image || subService?.img || serviceImg1} alt="" />
@@ -92,9 +92,9 @@ const Services = () => {
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeTab}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.4 }}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.24, ease: 'easeOut' }}
                 >
                   <h3>{activeService?.title || 'Tên dịch vụ'}</h3>
                   <div className="service-meta-row">

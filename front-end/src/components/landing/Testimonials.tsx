@@ -73,11 +73,11 @@ const Testimonials = () => {
             <motion.div 
               key={t.id || i} 
               className="test-card-figma"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-              whileHover={{ y: -10 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.28, delay: i * 0.04, ease: 'easeOut' }}
+              whileHover={{ y: -4 }}
             >
               <Quote size={20} className="quote-icon" />
               <div className="star-row">
