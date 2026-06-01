@@ -36,7 +36,7 @@ export const getServiceById = async (req: Request, res: Response) => {
 // @route   POST /api/services
 // @access  Private/Admin
 export const createService = async (req: Request, res: Response) => {
-  const { title, description, basePrice, price, category, duration, image, tags, icon } = req.body;
+  const { title, description, basePrice, price, category, duration, image, tags, icon, steps } = req.body;
 
   try {
     const service = await Service.create({
@@ -48,7 +48,8 @@ export const createService = async (req: Request, res: Response) => {
       duration,
       image,
       tags,
-      icon
+      icon,
+      steps: steps || []
     });
     res.status(201).json(service);
   } catch (error) {
@@ -60,7 +61,7 @@ export const createService = async (req: Request, res: Response) => {
 // @route   PUT /api/services/:id
 // @access  Private/Admin
 export const updateService = async (req: Request, res: Response) => {
-  const { title, description, basePrice, price, category, duration, image, tags, icon } = req.body;
+  const { title, description, basePrice, price, category, duration, image, tags, icon, steps } = req.body;
 
   try {
     const service = await Service.findById(req.params.id);
@@ -75,6 +76,7 @@ export const updateService = async (req: Request, res: Response) => {
       service.image = image || service.image;
       service.tags = tags || service.tags;
       service.icon = icon || service.icon;
+      service.steps = steps !== undefined ? steps : service.steps;
 
       const updatedService = await service.save();
       res.json(updatedService);
