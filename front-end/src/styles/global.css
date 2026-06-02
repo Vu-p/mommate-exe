@@ -115,6 +115,20 @@ a {
   .container {
     padding: 0 18px;
   }
+
+  .breadcrumb {
+    overflow-x: auto;
+    padding-bottom: 4px;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    min-height: 50px;
+    padding: 0 22px;
+  }
 }
 
 /* ===== Back to Top Button ===== */

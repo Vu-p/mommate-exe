@@ -110,12 +110,20 @@
 @media (max-width: 768px) {
   .carer-main-info {
     flex-direction: column;
-    align-items: center;
-    text-align: center;
+    align-items: flex-start;
+    gap: 18px;
+    padding: 22px 20px;
+    text-align: left;
+  }
+
+  .carer-avatar {
+    width: 100%;
+    height: 220px;
+    border-radius: 14px;
   }
   
   .name-rating {
-    align-items: center;
+    align-items: flex-start;
   }
   
   .carer-info-blocks {
@@ -129,5 +137,23 @@
   .info-block:nth-child(2),
   .info-block:nth-child(4) {
     border-right: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .carer-info-blocks {
+    grid-template-columns: 1fr;
+  }
+
+  .info-block {
+    min-height: 58px;
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 16px 20px;
+    border-right: none;
+  }
+
+  .info-block:nth-child(4) {
+    border-bottom: none;
   }
 }

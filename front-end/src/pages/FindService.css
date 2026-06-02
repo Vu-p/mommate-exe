@@ -68,8 +68,17 @@
 }
 
 @media (max-width: 1024px) {
+  .main-content {
+    padding-bottom: 120px;
+  }
+
+  .page-header {
+    margin-bottom: 56px;
+  }
+
   .services-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
   }
 }
 
@@ -79,18 +88,27 @@
   }
 
   .main-content {
+    padding-top: 22px;
     padding-bottom: 90px;
   }
 
   .page-header {
-    margin-bottom: 44px;
+    margin: 18px auto 38px;
+    align-items: flex-start;
+    text-align: left;
   }
 
   .page-header h1 {
-    font-size: 2rem;
+    font-size: 1.86rem;
+  }
+
+  .page-header p {
+    font-size: 1rem;
+    line-height: 1.62;
   }
 
   .services-grid {
     grid-template-columns: 1fr;
+    gap: 18px;
   }
 }

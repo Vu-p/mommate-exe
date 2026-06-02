@@ -172,13 +172,19 @@
 }
 
 @media (max-width: 1024px) {
+  .find-carer-content {
+    padding-bottom: 72px;
+  }
+
   .carer-browser-main {
     grid-template-columns: 1fr;
+    gap: 24px;
   }
 
   .carer-hero-card {
     flex-direction: column;
     align-items: flex-start;
+    padding: 34px;
   }
 
   .carer-hero-stats {
@@ -193,17 +199,55 @@
 }
 
 @media (max-width: 768px) {
+  .find-carer-page {
+    padding-top: 68px;
+  }
+
+  .find-carer-content {
+    padding-top: 20px;
+    padding-bottom: 56px;
+  }
+
   .carer-hero-card {
+    margin-top: 20px;
+    margin-bottom: 28px;
     padding: 28px 22px;
     border-radius: 24px;
   }
 
   .carer-hero-copy h1 {
-    font-size: 2rem;
+    font-size: 1.86rem;
+  }
+
+  .carer-hero-copy p {
+    font-size: 1rem;
+    line-height: 1.62;
   }
 
   .carer-results-toolbar {
     flex-direction: column;
     align-items: flex-start;
+    gap: 8px;
+  }
+
+  .pagination {
+    gap: 8px;
+    margin-top: 40px;
+  }
+}
+
+@media (max-width: 520px) {
+  .carer-hero-stats {
+    flex-direction: column;
+  }
+
+  .carer-stat {
+    width: 100%;
+  }
+
+  .pagination .dots,
+  .pagination .page-btn:nth-of-type(4),
+  .pagination .page-btn:nth-of-type(5) {
+    display: none;
   }
 }

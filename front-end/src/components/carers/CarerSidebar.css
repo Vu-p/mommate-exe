@@ -202,11 +202,21 @@
 @media (max-width: 1024px) {
   .carer-sidebar {
     position: static;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .sidebar-header,
+  .sidebar-actions,
+  .availability-grid {
+    grid-column: 1 / -1;
   }
 }
 
 @media (max-width: 768px) {
   .carer-sidebar {
+    display: flex;
     padding: 22px;
     border-radius: 22px;
   }
@@ -214,5 +224,17 @@
   .grid-header,
   .grid-row {
     grid-template-columns: 52px repeat(7, minmax(30px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .rating-chip {
+    min-height: 42px;
+    padding: 0 14px;
+  }
+
+  .grid-header,
+  .grid-row {
+    min-width: 390px;
   }
 }

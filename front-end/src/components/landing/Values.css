@@ -83,9 +83,13 @@
 }
 
 @media (max-width: 1024px) {
+  .values-figma {
+    padding: 88px 0;
+  }
+
   .values-container-figma {
     flex-direction: column;
-    gap: 60px;
+    gap: 42px;
   }
 
   .values-intro-figma {
@@ -101,12 +105,18 @@
 
   .values-grid-figma {
     width: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .value-item-figma {
+    padding: 28px 20px;
   }
 }
 
 @media (max-width: 768px) {
   .values-figma {
-    padding: 80px 0;
+    padding: 64px 0;
   }
 
   .values-intro-figma h2 {
@@ -121,6 +131,9 @@
   .value-item-figma {
     max-width: 420px;
     margin: 0 auto;
+    width: 100%;
+    align-items: flex-start;
+    text-align: left;
   }
 }
 

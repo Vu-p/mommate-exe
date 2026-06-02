@@ -93,15 +93,27 @@
 
 @media (max-width: 640px) {
   .service-card-premium {
-    min-height: 430px;
+    min-height: 0;
+    border-radius: 16px;
   }
 
   .card-image {
-    height: 200px;
+    height: 190px;
+    margin: 16px 16px 0;
+  }
+
+  .card-content {
+    padding: 22px 18px 24px;
   }
 
   .card-content h3 {
     min-height: auto;
-    font-size: 1.35rem;
+    font-size: 1.28rem;
+    margin-bottom: 18px;
+  }
+
+  .card-content .price {
+    margin-bottom: 24px;
+    font-size: 1rem;
   }
 }
