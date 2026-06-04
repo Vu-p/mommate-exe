@@ -41,7 +41,8 @@
 
 .form-group input:focus, 
 .form-group textarea:focus, 
-.form-group select:focus {
+.form-group select:focus,
+.form-group select:open {
   outline: none;
   border-color: var(--primary);
   background: var(--white);

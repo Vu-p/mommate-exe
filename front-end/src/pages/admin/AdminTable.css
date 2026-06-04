@@ -134,6 +134,49 @@
   font-size: 1.1rem;
 }
 
+.status-select {
+  min-width: 148px;
+  min-height: 38px;
+  padding: 0 34px 0 12px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 10px;
+  color: var(--secondary);
+  background-color: #f8fafc;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.status-select:focus,
+.status-select:open {
+  border-color: rgba(201, 155, 211, 0.72);
+  box-shadow: 0 0 0 4px rgba(201, 155, 211, 0.16);
+}
+
+.status-select.status-pending {
+  color: #a16207;
+  background-color: #fefce8;
+  border-color: #fde68a;
+}
+
+.status-select.status-accepted,
+.status-select.status-completed {
+  color: #047857;
+  background-color: #ecfdf5;
+  border-color: #a7f3d0;
+}
+
+.status-select.status-paid {
+  color: #1d4ed8;
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.status-select.status-rejected {
+  color: #b91c1c;
+  background-color: #fef2f2;
+  border-color: #fecaca;
+}
+
 .text-right {
   text-align: right;
 }

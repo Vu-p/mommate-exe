@@ -197,7 +197,8 @@
 }
 
 .input-group input:focus,
-.input-group select:focus {
+.input-group select:focus,
+.input-group select:open {
   background: var(--white);
   border-color: rgba(167, 139, 250, 0.6);
   box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.12);

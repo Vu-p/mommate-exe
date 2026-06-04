@@ -64,38 +64,98 @@
   white-space: nowrap;
 }
 
-.select-wrapper {
+.carer-select {
   position: relative;
-  display: flex;
-  align-items: center;
+  z-index: 1;
 }
 
-.select-wrapper select {
+.carer-select.is-open {
+  z-index: 30;
+}
+
+.carer-select-trigger {
   width: 100%;
-  appearance: none;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   background: #faf8fd;
   border: 1px solid rgba(92, 90, 128, 0.10);
-  padding: 14px 18px;
-  padding-right: 46px;
+  padding: 0 16px 0 18px;
   border-radius: 18px;
   font-size: 0.95rem;
+  font-weight: 800;
   color: var(--secondary);
-  cursor: pointer;
-  outline: none;
   transition: border-color var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.select-wrapper select:focus {
+.carer-select-trigger span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.carer-select-trigger svg {
+  color: var(--text-light);
+  flex-shrink: 0;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.carer-select-trigger:hover,
+.carer-select.is-open .carer-select-trigger {
   border-color: rgba(167, 139, 250, 0.6);
   background: var(--white);
   box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.12);
 }
 
-.select-wrapper svg {
+.carer-select.is-open .carer-select-trigger svg {
+  color: var(--primary-dark);
+  transform: rotate(180deg);
+}
+
+.carer-select-menu {
   position: absolute;
-  right: 16px;
-  color: var(--text-light);
-  pointer-events: none;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid rgba(92, 90, 128, 0.10);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 18px 45px rgba(93, 90, 136, 0.16);
+  backdrop-filter: blur(14px);
+  overflow: hidden;
+}
+
+.carer-select-option {
+  width: 100%;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  border-radius: 14px;
+  color: var(--secondary);
+  background: transparent;
+  font-size: 0.92rem;
+  font-weight: 800;
+  text-align: left;
+  transition: background-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+}
+
+.carer-select-option:hover {
+  background: #f7f4fb;
+  color: var(--primary-dark);
+  transform: translateX(2px);
+}
+
+.carer-select-option.selected {
+  background: var(--primary-light);
+  color: var(--primary-dark);
 }
 
 .rating-filter {

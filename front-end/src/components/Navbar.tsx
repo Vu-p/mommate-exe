@@ -29,6 +29,7 @@ const Navbar = ({ currentMode }: NavbarProps) => {
   const { user, logout } = useAuth();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const lastScrollY = useRef(0);
+  const isLanding = location.pathname === '/';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,6 +40,12 @@ const Navbar = ({ currentMode }: NavbarProps) => {
       const hasScrolled = currentScrollY > 24;
 
       setIsScrolled(hasScrolled);
+
+      if (isLanding) {
+        setIsVisible(true);
+        lastScrollY.current = currentScrollY;
+        return;
+      }
 
       if (scrollDelta > 8 && currentScrollY > 120) {
         setIsVisible(false);
@@ -62,16 +69,16 @@ const Navbar = ({ currentMode }: NavbarProps) => {
       window.removeEventListener('scroll', handleScroll);
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isMobileMenuOpen]);
+  }, [isLanding, isMobileMenuOpen]);
 
   useEffect(() => {
+    setIsVisible(true);
     setIsMobileMenuOpen(false);
     setIsUserDropdownOpen(false);
   }, [location.pathname, location.search]);
 
   const searchParams = new URLSearchParams(location.search);
   const activeMode = currentMode || (searchParams.get('mode') as 'login' | 'signup');
-  const isLanding = location.pathname === '/';
   const navbarTone = isLanding ? (isScrolled ? 'scrolled' : 'transparent') : 'scrolled';
 
   const toggleAuth = (mode: 'login' | 'signup') => {

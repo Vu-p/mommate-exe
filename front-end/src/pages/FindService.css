@@ -42,6 +42,54 @@
   margin: 0 auto;
 }
 
+.listing-search-row {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 42px;
+}
+
+.listing-search-box {
+  width: min(100%, 560px);
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px;
+  border: 1px solid rgba(92, 90, 128, 0.12);
+  border-radius: var(--radius-pill);
+  background: #fbf9ff;
+  color: var(--text-light);
+  transition: border-color var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.listing-search-box:focus-within {
+  border-color: rgba(201, 155, 211, 0.72);
+  background: var(--white);
+  box-shadow: 0 0 0 4px rgba(201, 155, 211, 0.16);
+}
+
+.listing-search-box input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--secondary);
+  font-size: 0.98rem;
+  font-weight: 650;
+}
+
+.listing-search-box input::placeholder {
+  color: var(--text-light);
+}
+
+.listing-results-summary {
+  margin-bottom: 20px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 750;
+}
+
 .services-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -59,6 +107,50 @@
 
 .spinner {
   animation: spin 1s linear infinite;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 64px;
+}
+
+.page-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: transparent;
+  color: var(--secondary);
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast);
+}
+
+.page-btn.active {
+  color: var(--primary-dark);
+  background: rgba(201, 155, 211, 0.16);
+}
+
+.page-btn:hover:not(:disabled):not(.active):not(.arrow) {
+  background-color: #f8f9fa;
+}
+
+.page-btn.arrow {
+  background-color: var(--secondary);
+  color: var(--white);
+}
+
+.page-btn.arrow:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+}
+
+.page-btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
 }
 
 @keyframes spin {
@@ -98,6 +190,11 @@
     text-align: left;
   }
 
+  .listing-search-row {
+    justify-content: stretch;
+    margin-bottom: 30px;
+  }
+
   .page-header h1 {
     font-size: 1.86rem;
   }
@@ -110,5 +207,10 @@
   .services-grid {
     grid-template-columns: 1fr;
     gap: 18px;
+  }
+
+  .pagination {
+    gap: 8px;
+    margin-top: 40px;
   }
 }

@@ -99,7 +99,7 @@
 
 .input-field input, 
 .input-field textarea,
-.select-wrapper select {
+.booking-page .select-wrapper select {
   background: #F8F9FA;
   border: 1px solid transparent;
   border-radius: 12px;
@@ -111,18 +111,18 @@
   transition: all 0.3s;
 }
 
-.select-wrapper {
+.booking-page .select-wrapper {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.select-wrapper select {
+.booking-page .select-wrapper select {
   appearance: none;
   cursor: pointer;
 }
 
-.select-wrapper svg {
+.booking-page .select-wrapper svg {
   position: absolute;
   right: 16px;
   color: var(--secondary);
@@ -132,7 +132,8 @@
 
 .input-field input:focus, 
 .input-field textarea:focus,
-.select-wrapper select:focus {
+.booking-page .select-wrapper select:focus,
+.booking-page .select-wrapper select:open {
   background: white;
   border-color: var(--primary-light);
   box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1);

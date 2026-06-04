@@ -221,7 +221,8 @@
 }
 
 .profile-form-block input:focus,
-.profile-form-block select:focus {
+.profile-form-block select:focus,
+.profile-form-block select:open {
   border-color: rgba(167, 139, 250, 0.6);
   background: var(--white);
   box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.12);

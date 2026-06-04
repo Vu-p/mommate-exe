@@ -38,3 +38,5 @@ Thumbs.db
 # === Vite / TypeScript ===
 *.local
 tsconfig.tsbuildinfo
+# Added by code-review-graph
+.code-review-graph/

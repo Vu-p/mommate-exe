@@ -43,6 +43,48 @@ select {
   font-family: inherit;
 }
 
+select {
+  min-height: 44px;
+  color: var(--secondary);
+  cursor: pointer;
+}
+
+select option {
+  background: var(--white);
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+select:focus,
+select:focus-visible,
+select:open {
+  border-color: rgba(201, 155, 211, 0.72);
+  background-color: var(--white);
+  box-shadow: 0 0 0 4px rgba(201, 155, 211, 0.16);
+  outline: none;
+}
+
+select:disabled {
+  color: var(--text-muted);
+  background-color: #f4f1f8;
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.select-wrapper {
+  position: relative;
+}
+
+.select-wrapper svg {
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.select-wrapper:focus-within svg,
+.select-wrapper:has(select:open) svg {
+  color: var(--primary-dark);
+  transform: rotate(180deg);
+}
+
 a {
   text-decoration: none;
   color: inherit;

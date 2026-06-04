@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, FilterX, Star } from 'lucide-react';
 import './CarerSidebar.css';
 
@@ -21,6 +23,11 @@ const TIME_SLOTS = [
   { value: '00:00-06:00', label: '12-6 am' },
 ];
 
+type SelectOption = {
+  label: string;
+  value: string;
+};
+
 interface CarerSidebarProps {
   filters: {
     area: string;
@@ -34,6 +41,94 @@ interface CarerSidebarProps {
   onClear?: () => void;
 }
 
+const getOptionLabel = (options: SelectOption[], value: string) =>
+  options.find((option) => option.value === value)?.label || options[0]?.label || '';
+
+const CarerFilterSelect = ({
+  value,
+  options,
+  onChange,
+}: {
+  value: string;
+  options: SelectOption[];
+  onChange: (value: string) => void;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSelect = (nextValue: string) => {
+    onChange(nextValue);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className={`carer-select ${isOpen ? 'is-open' : ''}`} ref={wrapperRef}>
+      <button
+        type="button"
+        className="carer-select-trigger"
+        onClick={() => setIsOpen((current) => !current)}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+      >
+        <span>{getOptionLabel(options, value)}</span>
+        <ChevronDown size={16} />
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className="carer-select-menu"
+            role="listbox"
+            initial={{ opacity: 0, y: -8, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.98 }}
+            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {options.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                role="option"
+                aria-selected={value === option.value}
+                className={`carer-select-option ${value === option.value ? 'selected' : ''}`}
+                onClick={() => handleSelect(option.value)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+const areaOptions = [
+  { value: '', label: 'Tất cả khu vực' },
+  { value: 'Hồ Chí Minh', label: 'Hồ Chí Minh' },
+  { value: 'Hà Nội', label: 'Hà Nội' },
+  { value: 'Đà Nẵng', label: 'Đà Nẵng' },
+];
+
+const priceOptions = [
+  { value: '', label: 'Tất cả mức giá' },
+  { value: '100000', label: 'Dưới 100.000đ/giờ' },
+  { value: '150000', label: 'Dưới 150.000đ/giờ' },
+  { value: '200000', label: 'Dưới 200.000đ/giờ' },
+  { value: '300000', label: 'Dưới 300.000đ/giờ' },
+];
+
 const CarerSidebar = ({ filters, onChange, onToggleSchedule, onClear }: CarerSidebarProps) => {
   return (
     <aside className="carer-sidebar">
@@ -45,29 +140,20 @@ const CarerSidebar = ({ filters, onChange, onToggleSchedule, onClear }: CarerSid
 
       <div className="sidebar-group">
         <label>Khu vực</label>
-        <div className="select-wrapper">
-          <select value={filters.area} onChange={(e) => onChange('area', e.target.value)}>
-            <option value="">Tất cả khu vực</option>
-            <option value="Hồ Chí Minh">Hồ Chí Minh</option>
-            <option value="Hà Nội">Hà Nội</option>
-            <option value="Đà Nẵng">Đà Nẵng</option>
-          </select>
-          <ChevronDown size={16} />
-        </div>
+        <CarerFilterSelect
+          value={filters.area}
+          options={areaOptions}
+          onChange={(value) => onChange('area', value)}
+        />
       </div>
 
       <div className="sidebar-group">
         <label>Ngân sách tối đa</label>
-        <div className="select-wrapper">
-          <select value={filters.maxPrice} onChange={(e) => onChange('maxPrice', e.target.value)}>
-            <option value="">Tất cả mức giá</option>
-            <option value="100000">Dưới 100.000đ/giờ</option>
-            <option value="150000">Dưới 150.000đ/giờ</option>
-            <option value="200000">Dưới 200.000đ/giờ</option>
-            <option value="300000">Dưới 300.000đ/giờ</option>
-          </select>
-          <ChevronDown size={16} />
-        </div>
+        <CarerFilterSelect
+          value={filters.maxPrice}
+          options={priceOptions}
+          onChange={(value) => onChange('maxPrice', value)}
+        />
       </div>
 
       <div className="sidebar-group">
@@ -79,11 +165,11 @@ const CarerSidebar = ({ filters, onChange, onToggleSchedule, onClear }: CarerSid
             { value: '4', label: '4.0+', icon: 4 },
             { value: '3', label: '3.0+', icon: 3 },
           ].map((item) => (
-        <button
-          key={item.label}
-          type="button"
-          className={`rating-chip ${filters.minRating === item.value ? 'active' : ''}`}
-          onClick={() => onChange('minRating', item.value)}
+            <button
+              key={item.label}
+              type="button"
+              className={`rating-chip ${filters.minRating === item.value ? 'active' : ''}`}
+              onClick={() => onChange('minRating', item.value)}
             >
               {item.icon ? <Star size={14} fill="currentColor" /> : <FilterX size={14} />}
               {item.label}
@@ -129,7 +215,7 @@ const CarerSidebar = ({ filters, onChange, onToggleSchedule, onClear }: CarerSid
 
       <div className="sidebar-actions">
         <button type="button" className="btn-clear-filters" onClick={onClear}>
-          Xoá bộ lọc
+          Xóa bộ lọc
         </button>
       </div>
     </aside>

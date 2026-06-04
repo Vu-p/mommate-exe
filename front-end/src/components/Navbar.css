@@ -8,11 +8,16 @@
   transition: background-color 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease, backdrop-filter 0.28s ease;
 }
 
+.navbar.has-secondary {
+  position: sticky;
+  top: 0;
+}
+
 .navbar.transparent {
-  background: rgba(255, 255, 255, 0.74);
-  border-bottom-color: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.98);
+  border-bottom-color: rgba(231, 226, 238, 0.82);
   box-shadow: 0 10px 30px rgba(31, 33, 48, 0.04);
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(12px);
 }
 
 .navbar.scrolled {
@@ -129,8 +134,8 @@
 
 .navbar-secondary {
   height: 66px;
-  background: rgba(255, 255, 255, 0.18);
-  border-top: 1px solid rgba(255, 255, 255, 0.34);
+  background: rgba(255, 255, 255, 0.86);
+  border-top: 1px solid rgba(231, 226, 238, 0.86);
 }
 
 .navbar.scrolled .navbar-secondary {

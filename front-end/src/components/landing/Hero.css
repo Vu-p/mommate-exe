@@ -27,7 +27,7 @@
   min-height: 900px;
   display: flex;
   align-items: flex-start;
-  padding-top: 214px;
+  padding-top: 72px;
 }
 
 .hero-content {
@@ -122,7 +122,7 @@
 @media (max-width: 1100px) {
   .hero-main-container {
     min-height: 760px;
-    padding-top: 176px;
+    padding-top: 62px;
   }
 
   .hero-copy {
@@ -137,7 +137,7 @@
 
   .hero-main-container {
     min-height: 650px;
-    padding-top: 138px;
+    padding-top: 56px;
   }
 
   .hero-copy {
@@ -182,7 +182,7 @@
 @media (max-width: 480px) {
   .hero-main-container {
     min-height: 600px;
-    padding-top: 116px;
+    padding-top: 42px;
   }
 
   .hero-copy h1 {
