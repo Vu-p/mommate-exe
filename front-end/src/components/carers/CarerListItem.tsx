@@ -14,10 +14,10 @@ const CarerListItem = ({ carer, onSelect, serviceId, serviceTitle }: CarerListIt
   const firstName = carer.user?.firstName || carer.name?.split(' ')[0] || 'Chuyên gia';
   const lastName = carer.user?.lastName || carer.name?.split(' ').slice(1).join(' ') || '';
   const fullName = `${firstName} ${lastName}`.trim();
-  const avatar = carer.user?.avatar || carer.avatar || carer.img || 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?q=80&w=2574&auto=format&fit=crop';
+  const avatar = carer.user?.avatar || carer.avatar || carer.img || 'https://images.pexels.com/photos/15752232/pexels-photo-15752232.jpeg?auto=compress&cs=tinysrgb&w=800';
   
   const displayRating = carer.rating || 5.0;
-  const displayReviews = carer.numReviews || Math.floor(Math.random() * 20) + 1; // Fake reviews if not provided
+  const displayReviews = Number(carer.reviewCount || carer.numReviews || 0);
   const displayLoc = carer.location || carer.loc || 'Hồ Chí Minh';
   const displayAge = carer.age ? `${carer.age} tuổi` : '27 tuổi';
   const displayExp = carer.experienceYears ? `${carer.experienceYears} năm kinh nghiệm` : (carer.exp || '4 năm kinh nghiệm');

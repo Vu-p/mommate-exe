@@ -12,7 +12,7 @@ interface NavbarProps {
 }
 
 const secondaryLinks = [
-  { label: 'Về chúng tôi', href: '/#about' },
+  { label: 'Về chúng tôi', href: '/about' },
   { label: 'Tìm dịch vụ', href: '/services' },
   { label: 'Tìm chuyên gia chăm sóc', href: '/carers' },
   { label: 'Cộng đồng', href: '/#community' },
@@ -213,6 +213,7 @@ const Navbar = ({ currentMode }: NavbarProps) => {
             <div className="mobile-menu-content">
               <div className="mobile-nav-links">
                 <Link to="/" className="mobile-nav-link">Trang chủ</Link>
+                <Link to="/about" className="mobile-nav-link">Về chúng tôi</Link>
                 <Link to="/services" className="mobile-nav-link">Tìm dịch vụ</Link>
                 <Link to="/carers" className="mobile-nav-link">Tìm chuyên gia</Link>
                 <a href="#contact" className="mobile-nav-link">Liên hệ</a>

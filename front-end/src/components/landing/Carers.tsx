@@ -3,8 +3,9 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Loader2, ShieldCheck, Star } from 'lucide-react';
 import api from '../../utils/api';
-import defaultAvatar from '../../assets/images/service-1.png';
 import './Carers.css';
+
+const defaultAvatar = 'https://images.pexels.com/photos/15752232/pexels-photo-15752232.jpeg?auto=compress&cs=tinysrgb&w=800';
 
 const Carers = () => {
   const [carers, setCarers] = useState<any[]>([]);

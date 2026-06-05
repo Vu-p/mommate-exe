@@ -10,8 +10,13 @@ import type { AuthRequest } from '../middleware/auth.js';
 export const getReviews = async (req: Request, res: Response) => {
   try {
     const limit = Number(req.query.limit) || 6;
+    const filter: Record<string, any> = {};
 
-    const reviews = await Review.find()
+    if (req.query.carerId) {
+      filter.carer = req.query.carerId;
+    }
+
+    const reviews = await Review.find(filter)
       .sort({ createdAt: -1 })
       .limit(limit)
       .populate({ path: 'parent', select: 'firstName lastName avatar' })
@@ -58,8 +63,8 @@ export const createReview = async (req: AuthRequest, res: Response) => {
       parent: req.user!._id,
       carer: carerId,
       score: rating,
-      title,
-      content: comment,
+      title: title || 'Đánh giá dịch vụ',
+      content: comment || title || 'Khách hàng chưa để lại nội dung đánh giá.',
       tags,
       images,
     });

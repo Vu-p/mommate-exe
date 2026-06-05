@@ -30,7 +30,7 @@ const Footer = () => {
 
         <div className="footer-link-group">
           <h4>Công ty</h4>
-          <a href="/#about">Về chúng tôi</a>
+          <a href="/about">Về chúng tôi</a>
           <a href="#contact">Liên hệ</a>
           <a href="/#careers">Tuyển dụng</a>
           <a href="/#culture">Văn hóa</a>

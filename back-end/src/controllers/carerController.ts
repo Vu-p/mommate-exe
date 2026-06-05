@@ -19,6 +19,19 @@ const calculateAge = (birthDate?: Date | string) => {
   return age;
 };
 
+const parseScheduleSlots = (value: unknown) => {
+  const rawSlots = Array.isArray(value) ? value : String(value || '').split(',');
+
+  return rawSlots
+    .map((rawSlot) => String(rawSlot).trim())
+    .filter(Boolean)
+    .map((rawSlot) => {
+      const [day, slot] = rawSlot.split('|');
+      return { day, slot };
+    })
+    .filter((item) => item.day && item.slot);
+};
+
 // @desc    Get all carers
 // @route   GET /api/carers
 // @access  Public
@@ -44,6 +57,18 @@ export const getCarers = async (req: Request, res: Response) => {
 
     if (req.query.minRating) {
       filter.rating = { $gte: Number(req.query.minRating) };
+    }
+
+    const scheduleSlots = parseScheduleSlots(req.query.scheduleSlots);
+    if (scheduleSlots.length > 0) {
+      filter.$and = scheduleSlots.map(({ day, slot }) => ({
+        availability: {
+          $elemMatch: {
+            day,
+            slots: slot,
+          },
+        },
+      }));
     }
 
     const carers = await Carer.find(filter)

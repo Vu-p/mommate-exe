@@ -15,6 +15,24 @@ const normalizeText = (value: unknown) => String(value || '').toLowerCase().trim
 const getCarerName = (carer: any) =>
   `${carer.user?.firstName || carer.name?.split(' ')[0] || ''} ${carer.user?.lastName || carer.name?.split(' ').slice(1).join(' ') || ''}`.trim();
 
+const normalizeScheduleValue = (value: unknown) => String(value || '').trim();
+const carerMatchesSchedule = (
+  availability: { day: string; slots: string[] }[] | undefined,
+  selectedSlots: string[]
+) => {
+  if (selectedSlots.length === 0) return true;
+
+  const availableKeys = new Set(
+    (availability || []).flatMap((dayAvailability) =>
+      (dayAvailability.slots || []).map((slot) =>
+        `${normalizeScheduleValue(dayAvailability.day)}|${normalizeScheduleValue(slot)}`
+      )
+    )
+  );
+
+  return selectedSlots.every((selectedSlot) => availableKeys.has(normalizeScheduleValue(selectedSlot)));
+};
+
 const sortOptions = [
   { label: 'Phù hợp nhất', value: 'default' },
   { label: 'Đánh giá cao nhất', value: 'rating-desc' },
@@ -110,17 +128,16 @@ const FindCarer = () => {
     const fetchCarers = async () => {
       try {
         setLoading(true);
-        const { data } = await api.get('/carers');
-        if (serviceId) {
-          const filtered = data.filter((carer: any) =>
-            carer.services && carer.services.some((service: any) =>
-              (typeof service === 'string' ? service : service._id) === serviceId
-            )
-          );
-          setCarers(filtered);
-        } else {
-          setCarers(data);
-        }
+        const { data } = await api.get('/carers', {
+          params: {
+            serviceId: serviceId || undefined,
+            area: filters.area || undefined,
+            maxPrice: filters.maxPrice || undefined,
+            minRating: filters.minRating || undefined,
+            scheduleSlots: filters.scheduleSlots.length > 0 ? filters.scheduleSlots.join(',') : undefined,
+          },
+        });
+        setCarers(data);
       } catch (error) {
         console.error('Error fetching carers:', error);
       } finally {
@@ -129,7 +146,7 @@ const FindCarer = () => {
     };
 
     fetchCarers();
-  }, [serviceId]);
+  }, [filters.area, filters.maxPrice, filters.minRating, filters.scheduleSlots, serviceId]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -152,13 +169,7 @@ const FindCarer = () => {
       const matchesArea = !filters.area || normalizeText(carer.location).includes(normalizeText(filters.area));
       const matchesPrice = !filters.maxPrice || Number(carer.hourlyRate || 0) <= Number(filters.maxPrice);
       const matchesRating = !filters.minRating || Number(carer.rating || 0) >= Number(filters.minRating);
-      const matchesSchedule =
-        filters.scheduleSlots.length === 0 ||
-        carer.availability?.some((dayAvailability: { day: string; slots: string[] }) =>
-          dayAvailability.slots?.some((slot) =>
-            filters.scheduleSlots.includes(`${dayAvailability.day}|${slot}`)
-          )
-        );
+      const matchesSchedule = carerMatchesSchedule(carer.availability, filters.scheduleSlots);
 
       return matchesSearch && matchesArea && matchesPrice && matchesRating && matchesSchedule;
     });

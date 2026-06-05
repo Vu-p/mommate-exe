@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
-import { ChevronRight, Star, MapPin, User, Briefcase, CreditCard, CheckCircle2, Loader2, ChevronRight as ChevronRightIcon } from 'lucide-react';
+import { ChevronRight, Star, MapPin, User, Briefcase, CreditCard, CheckCircle2, Loader2 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
@@ -20,15 +20,61 @@ interface Carer {
   certifications?: string[];
   skills?: string[];
   rating?: number;
+  reviewCount?: number;
   numReviews?: number;
   age?: number;
   services?: any[];
+  availability?: {
+    day: string;
+    slots: string[];
+  }[];
 }
+
+interface ReviewItem {
+  _id: string;
+  score: number;
+  title?: string;
+  content?: string;
+  parent?: {
+    firstName?: string;
+    lastName?: string;
+    avatar?: string;
+  };
+  createdAt?: string;
+}
+
+const DAYS = [
+  { key: 'Monday', label: 'T2' },
+  { key: 'Tuesday', label: 'T3' },
+  { key: 'Wednesday', label: 'T4' },
+  { key: 'Thursday', label: 'T5' },
+  { key: 'Friday', label: 'T6' },
+  { key: 'Saturday', label: 'T7' },
+  { key: 'Sunday', label: 'CN' },
+];
+
+const TIME_SLOTS = [
+  { value: '06:00-09:00', label: '6-9 am' },
+  { value: '09:00-12:00', label: '9-12 am' },
+  { value: '12:00-15:00', label: '12-3 pm' },
+  { value: '15:00-18:00', label: '3-6 pm' },
+  { value: '18:00-21:00', label: '6-9 pm' },
+  { value: '21:00-00:00', label: '9-12 pm' },
+  { value: '00:00-06:00', label: '12-6 am' },
+];
+
+const buildAvailabilitySet = (availability?: Carer['availability']) =>
+  new Set(
+    (availability || []).flatMap((dayAvailability) =>
+      (dayAvailability.slots || []).map((slot) => `${dayAvailability.day}|${slot}`)
+    )
+  );
 
 const CarerDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [carer, setCarer] = useState<Carer | null>(null);
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
 
@@ -40,8 +86,12 @@ const CarerDetail = () => {
     const fetchCarer = async () => {
       try {
         setLoading(true);
-        const { data } = await api.get(`/carers/${id}`);
-        setCarer(data);
+        const [carerRes, reviewsRes] = await Promise.all([
+          api.get(`/carers/${id}`),
+          api.get('/reviews', { params: { carerId: id, limit: 10 } }),
+        ]);
+        setCarer(carerRes.data);
+        setReviews(reviewsRes.data);
       } catch (error) {
         console.error('Error fetching carer detail:', error);
       } finally {
@@ -71,10 +121,11 @@ const CarerDetail = () => {
   }
 
   const fullName = `${carer.user?.firstName || ''} ${carer.user?.lastName || ''}`.trim() || 'Nguyễn Thị A';
-  const avatar = carer.user?.avatar || 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?q=80&w=2574&auto=format&fit=crop';
+  const avatar = carer.user?.avatar || 'https://images.pexels.com/photos/15752232/pexels-photo-15752232.jpeg?auto=compress&cs=tinysrgb&w=800';
   
   const displayRating = carer.rating || 5.0;
-  const displayReviews = carer.numReviews || Math.floor(Math.random() * 20) + 1;
+  const displayReviews = Number(carer.reviewCount ?? carer.numReviews ?? reviews.length);
+  const availabilitySet = buildAvailabilitySet(carer.availability);
 
   // Fake certifications if none
   const certifications = carer.certifications && carer.certifications.length > 0 
@@ -179,52 +230,69 @@ const CarerDetail = () => {
             <div className="calendar-container">
               <div className="calendar-header">
                 <div className="time-col"></div>
-                <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+                {DAYS.map((day) => (
+                  <span key={day.key}>{day.label}</span>
+                ))}
               </div>
-              {[
-                '6-9 am', '9-12 am', '12-3 pm', '3-6 pm', '6-9 pm', '9-12 pm', '12-6 am'
-              ].map((time, i) => (
-                <div key={i} className="calendar-row">
-                  <span className="time-label">{time}</span>
-                  {[...Array(7)].map((_, j) => (
-                    <div key={j} className="calendar-slot-wrapper">
-                      <div className={`calendar-slot ${j < 5 && i < 4 ? 'filled' : ''}`}></div>
-                    </div>
-                  ))}
+              {TIME_SLOTS.map((slot) => (
+                <div key={slot.value} className="calendar-row">
+                  <span className="time-label">{slot.label}</span>
+                  {DAYS.map((day) => {
+                    const isAvailable = availabilitySet.has(`${day.key}|${slot.value}`);
+
+                    return (
+                      <div key={`${day.key}-${slot.value}`} className="calendar-slot-wrapper">
+                        <div
+                          className={`calendar-slot ${isAvailable ? 'filled' : ''}`}
+                          aria-label={`${day.label} ${slot.label}${isAvailable ? ' có lịch' : ' không có lịch'}`}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
               ))}
+              {availabilitySet.size === 0 && (
+                <div className="availability-empty">
+                  Chuyên gia chưa cập nhật lịch làm việc.
+                </div>
+              )}
             </div>
           </div>
 
           <div className="detail-section reviews-section">
             <h3>Đánh giá</h3>
-            <div className="reviews-carousel">
-              <div className="review-card">
-                <div className="review-stars">
-                  {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="#FACC15" color="#FACC15" />)}
-                </div>
-                <p>“Lorem ipsum dolor sit amet consectetur adipiscing elit. Lectus a nunc mauris scelerisque sed egestas pharetraol quis pharetra arcu pharetra blandit.”</p>
-                <div className="reviewer-info">
-                  <strong>Thi Tran</strong>
-                  <span>Mẹ một con</span>
-                </div>
+            {reviews.length > 0 ? (
+              <div className="reviews-carousel">
+                {reviews.map((review) => {
+                  const reviewerName = [review.parent?.firstName, review.parent?.lastName].filter(Boolean).join(' ') || 'Khách hàng';
+                  const reviewDate = review.createdAt
+                    ? new Date(review.createdAt).toLocaleDateString('vi-VN')
+                    : 'Đã đánh giá';
+
+                  return (
+                    <div className="review-card" key={review._id}>
+                      <div className="review-stars">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            size={16}
+                            fill={i < Math.round(review.score || 0) ? '#FACC15' : 'transparent'}
+                            color={i < Math.round(review.score || 0) ? '#FACC15' : '#D1D5DB'}
+                          />
+                        ))}
+                      </div>
+                      <p>{review.content || review.title || 'Khách hàng chưa để lại nội dung đánh giá.'}</p>
+                      <div className="reviewer-info">
+                        <strong>{reviewerName}</strong>
+                        <span>{reviewDate}</span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-              <div className="review-card">
-                <div className="review-stars">
-                  {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="#FACC15" color="#FACC15" />)}
-                </div>
-                <p>“Ultrices eros in cursus turpis massa tincidunt sem nulla pharetra. Amet nisl suscipit adipiscing bibendum est ultricies integer quis.”</p>
-                <div className="reviewer-info">
-                  <strong>Nguyen Khoa Toc Tien</strong>
-                  <span>Mẹ bỉm sữa đầu</span>
-                </div>
-              </div>
-              <button className="carousel-next"><ChevronRightIcon size={24} /></button>
-            </div>
-            
-            <div className="comment-input">
-              <input type="text" placeholder="Nhập bình luận ..." />
-            </div>
+            ) : (
+              <p className="reviews-empty">Chuyên gia chưa có đánh giá nào.</p>
+            )}
           </div>
           
           <div className="detail-footer-actions">

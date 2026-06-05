@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Landing from './pages/Landing';
+import About from './pages/About';
 import Auth from './pages/Auth';
 import FindService from './pages/FindService';
 import ServiceDetail from './pages/ServiceDetail';
@@ -26,6 +27,7 @@ const TitleUpdater = () => {
 
   const title =
     pathname === '/' ? 'Home' :
+    pathname.startsWith('/about') ? 'About' :
     pathname.startsWith('/services') ? 'Services' :
     pathname.startsWith('/carers') ? 'Carers' :
     pathname.startsWith('/booking') ? 'Booking' :
@@ -48,6 +50,7 @@ function App() {
       <TitleUpdater />
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="/about" element={<About />} />
         <Route path="/services" element={<FindService />} />
         <Route path="/services/:id" element={<ServiceDetail />} />
         <Route path="/carers" element={<FindCarer />} />
