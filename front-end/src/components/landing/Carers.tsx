@@ -1,11 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Loader2, ShieldCheck, Star } from 'lucide-react';
 import api from '../../utils/api';
+import {
+  formatLocation,
+  formatReviewLabel,
+  getCarerAvatar,
+  getCarerFullName,
+  getDisplayRating,
+} from '../../utils/carerDisplay';
 import './Carers.css';
-
-const defaultAvatar = 'https://images.pexels.com/photos/15752232/pexels-photo-15752232.jpeg?auto=compress&cs=tinysrgb&w=800';
 
 const Carers = () => {
   const [carers, setCarers] = useState<any[]>([]);
@@ -33,7 +38,7 @@ const Carers = () => {
         <div className="carers-heading">
           <span className="section-label">ĐỘI NGŨ CHUYÊN GIA ĐÁNG TIN CẬY</span>
           <h2 className="section-title">Gặp gỡ các chuyên gia của chúng tôi</h2>
-          <p>Những bảo mẫu và chuyên gia chăm sóc được tuyển chọn để đồng hành cùng mẹ và bé trong từng giai đoạn.</p>
+          <p>Những bảo mẫu và chuyên gia chăm sóc được tuyển chọn để đồng hành cùng mẹ và bé.</p>
         </div>
         
         {loading ? (
@@ -44,18 +49,16 @@ const Carers = () => {
         ) : carers.length > 0 ? (
           <div className="carer-track">
             {carers.map((carer) => {
-              const firstName = carer.user?.firstName || 'Chuyên gia';
-              const lastName = carer.user?.lastName || '';
-              const fullName = `${firstName} ${lastName}`;
-              const avatar = carer.user?.avatar || carer.avatar || defaultAvatar;
-              const rating = carer.rating || 5;
+              const fullName = getCarerFullName(carer);
+              const avatar = getCarerAvatar(carer);
+              const rating = getDisplayRating(carer);
 
               return (
                 <Link to={`/carers/${carer._id}`} key={carer._id} className="carer-link-wrapper">
                   <motion.div 
                     className="carer-card"
                     whileHover={{ y: -15, scale: 1.02 }}
-                    transition={{ type: "spring", stiffness: 300 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
                   >
                     <img src={avatar} alt={fullName} className="carer-img" />
                     <div className="carer-info">
@@ -65,12 +68,18 @@ const Carers = () => {
                           Đã xác minh
                         </span>
                         <span className="carer-rating">
-                          <Star size={12} fill="currentColor" />
-                          {rating.toFixed(1)}
+                          {rating ? (
+                            <>
+                              <Star size={12} fill="currentColor" />
+                              {rating}
+                            </>
+                          ) : (
+                            formatReviewLabel(carer)
+                          )}
                         </span>
                       </div>
                       <h4>{fullName}</h4>
-                      <p>{carer.location || 'Chăm sóc đặc biệt'}</p>
+                      <p>{formatLocation(carer.location)}</p>
                     </div>
                   </motion.div>
                 </Link>

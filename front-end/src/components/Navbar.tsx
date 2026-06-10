@@ -15,8 +15,6 @@ const secondaryLinks = [
   { label: 'Về chúng tôi', href: '/about' },
   { label: 'Tìm dịch vụ', href: '/services' },
   { label: 'Tìm chuyên gia chăm sóc', href: '/carers' },
-  { label: 'Cộng đồng', href: '/#community' },
-  { label: 'Tin tức & Sự kiện', href: '/#news' },
 ];
 
 const Navbar = ({ currentMode }: NavbarProps) => {

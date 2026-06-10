@@ -1,9 +1,19 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
-import { ChevronRight, Star, MapPin, User, Briefcase, CreditCard, CheckCircle2, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Briefcase, CheckCircle2, ChevronRight, CreditCard, Loader2, MapPin, Star, User } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
+import {
+  formatAge,
+  formatExperienceShort,
+  formatHourlyRate,
+  formatLocation,
+  formatReviewLabel,
+  getCarerAvatar,
+  getCarerFullName,
+  getDisplayRating,
+} from '../utils/carerDisplay';
 import './CarerDetail.css';
 
 interface Carer {
@@ -73,10 +83,10 @@ const buildAvailabilitySet = (availability?: Carer['availability']) =>
 const CarerDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [carer, setCarer] = useState<Carer | null>(null);
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
   const serviceId = queryParams.get('serviceId');
@@ -120,27 +130,13 @@ const CarerDetail = () => {
     );
   }
 
-  const fullName = `${carer.user?.firstName || ''} ${carer.user?.lastName || ''}`.trim() || 'Nguyễn Thị A';
-  const avatar = carer.user?.avatar || 'https://images.pexels.com/photos/15752232/pexels-photo-15752232.jpeg?auto=compress&cs=tinysrgb&w=800';
-  
-  const displayRating = carer.rating || 5.0;
-  const displayReviews = Number(carer.reviewCount ?? carer.numReviews ?? reviews.length);
+  const fullName = getCarerFullName(carer);
+  const avatar = getCarerAvatar(carer);
+  const displayRating = getDisplayRating(carer);
+  const displayReviews = formatReviewLabel(carer);
   const availabilitySet = buildAvailabilitySet(carer.availability);
-
-  // Fake certifications if none
-  const certifications = carer.certifications && carer.certifications.length > 0 
-    ? carer.certifications 
-    : [
-        'Chứng chỉ chăm sóc mẹ và bé', 
-        'Chứng chỉ nghiệp vụ chăm sóc sức khoẻ', 
-        'Chứng chỉ điều dưỡng', 
-        'Chứng chỉ sơ cấp cứu'
-      ];
-
-  // Fake services if none
-  const otherServices = carer.services && carer.services.length > 0
-    ? carer.services
-    : ['Chăm sóc mẹ sau sinh', 'Tắm bé sơ sinh', 'Thông tắc tia sữa', 'Chăm sóc bé sinh non'];
+  const certifications = carer.certifications || [];
+  const otherServices = carer.services || [];
 
   return (
     <div className="carer-detail-page">
@@ -161,13 +157,17 @@ const CarerDetail = () => {
             <div className="profile-titles">
               <h2>{fullName}</h2>
               <div className="profile-rating">
-                <Star size={18} fill="#FACC15" color="#FACC15" />
-                <span>{displayRating.toFixed(1)}</span>
-                <span className="reviews">{displayReviews} bình luận</span>
+                {displayRating && (
+                  <>
+                    <Star size={18} fill="#FACC15" color="#FACC15" />
+                    <span>{displayRating}</span>
+                  </>
+                )}
+                <span className="reviews">{displayReviews}</span>
               </div>
             </div>
             <p className="profile-bio">
-              {carer.bio || 'Với hơn 4 năm kinh nghiệm trong lĩnh vực chăm sóc hậu sản và sơ sinh, tôi hiểu rằng giai đoạn đầu đời của bé và quá trình phục hồi của mẹ là vô cùng quan trọng. Phương châm làm việc của tôi là sự tận tâm, tỉ mỉ và luôn ưu tiên sức khỏe y khoa làm đầu.'}
+              {carer.bio || 'Chuyên gia chưa cập nhật giới thiệu cá nhân.'}
             </p>
             
             <div className="profile-stats-grid">
@@ -175,28 +175,28 @@ const CarerDetail = () => {
                 <div className="stat-icon"><MapPin size={24} strokeWidth={1.5} /></div>
                 <div className="stat-text">
                   <span className="label">Khu vực</span>
-                  <span className="value">{carer.location || 'Hồ Chí Minh'}</span>
+                  <span className="value">{formatLocation(carer.location)}</span>
                 </div>
               </div>
               <div className="stat-item">
                 <div className="stat-icon"><User size={24} strokeWidth={1.5} /></div>
                 <div className="stat-text">
                   <span className="label">Tuổi</span>
-                  <span className="value">{carer.age || '27 tuổi'}</span>
+                  <span className="value">{formatAge(carer.age)}</span>
                 </div>
               </div>
               <div className="stat-item">
                 <div className="stat-icon"><Briefcase size={24} strokeWidth={1.5} /></div>
                 <div className="stat-text">
                   <span className="label">Kinh nghiệm</span>
-                  <span className="value">{carer.experienceYears ? `${carer.experienceYears} năm` : '4 năm'}</span>
+                  <span className="value">{formatExperienceShort(carer.experienceYears)}</span>
                 </div>
               </div>
               <div className="stat-item">
                 <div className="stat-icon"><CreditCard size={24} strokeWidth={1.5} /></div>
                 <div className="stat-text">
                   <span className="label">Giá</span>
-                  <span className="value">{carer.hourlyRate ? `${carer.hourlyRate.toLocaleString()} VNĐ/ giờ` : '150 000 VNĐ/ giờ'}</span>
+                  <span className="value">{formatHourlyRate(carer.hourlyRate)}</span>
                 </div>
               </div>
             </div>
@@ -204,25 +204,33 @@ const CarerDetail = () => {
 
           <div className="detail-section certifications">
             <h3>Chứng chỉ</h3>
-            <div className="certs-list">
-              {certifications.map((cert, i) => (
-                <div key={i} className="cert-item">
-                  <CheckCircle2 size={20} color="var(--primary)" />
-                  <span>{cert}</span>
-                </div>
-              ))}
-            </div>
+            {certifications.length > 0 ? (
+              <div className="certs-list">
+                {certifications.map((cert, i) => (
+                  <div key={i} className="cert-item">
+                    <CheckCircle2 size={20} color="var(--primary)" />
+                    <span>{cert}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="reviews-empty">Chuyên gia chưa cập nhật chứng chỉ.</p>
+            )}
           </div>
 
           <div className="detail-section services-list-section">
             <h3>Các dịch vụ khác</h3>
-            <div className="service-tags">
-              {otherServices.map((srv, i) => (
-                <span key={i} className={`service-tag ${i === 0 ? 'active' : ''}`}>
-                  {typeof srv === 'string' ? srv : srv.title}
-                </span>
-              ))}
-            </div>
+            {otherServices.length > 0 ? (
+              <div className="service-tags">
+                {otherServices.map((srv, i) => (
+                  <span key={srv._id || i} className={`service-tag ${i === 0 ? 'active' : ''}`}>
+                    {typeof srv === 'string' ? srv : srv.title}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="reviews-empty">Chuyên gia chưa cập nhật dịch vụ.</p>
+            )}
           </div>
 
           <div className="detail-section availability-calendar">
@@ -313,7 +321,7 @@ const CarerDetail = () => {
                 }
               }}
             >
-              {serviceId ? 'Xác nhận Đặt ngay' : 'Đặt ngay'}
+              {serviceId ? 'Xác nhận đặt ngay' : 'Đặt ngay'}
             </button>
             <Link to="/carers" className="btn-explore-outline">Xem thêm</Link>
           </div>

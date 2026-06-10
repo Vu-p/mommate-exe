@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import Carer from '../models/Carer.js';
+import Review from '../models/Review.js';
 import User, { UserRole } from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import type { AuthRequest } from '../middleware/auth.js';
@@ -30,6 +31,39 @@ const parseScheduleSlots = (value: unknown) => {
       return { day, slot };
     })
     .filter((item) => item.day && item.slot);
+};
+
+const applyReviewStats = async (carers: any[]) => {
+  const carerIds = carers.map((carer) => carer._id);
+
+  if (carerIds.length === 0) {
+    return carers;
+  }
+
+  const stats = await Review.aggregate([
+    { $match: { carer: { $in: carerIds } } },
+    { $group: { _id: '$carer', averageRating: { $avg: '$score' }, reviewCount: { $sum: 1 } } },
+  ]);
+
+  const statsByCarerId = new Map(
+    stats.map((item) => [
+      String(item._id),
+      {
+        rating: Math.round(item.averageRating * 10) / 10,
+        reviewCount: item.reviewCount,
+      },
+    ])
+  );
+
+  return carers.map((carer) => {
+    const reviewStats = statsByCarerId.get(String(carer._id));
+
+    return {
+      ...carer,
+      rating: reviewStats?.rating ?? 0,
+      reviewCount: reviewStats?.reviewCount ?? 0,
+    };
+  });
 };
 
 // @desc    Get all carers
@@ -73,9 +107,10 @@ export const getCarers = async (req: Request, res: Response) => {
 
     const carers = await Carer.find(filter)
       .populate('user', 'firstName lastName avatar')
-      .populate('services', 'title category');
+      .populate('services', 'title category')
+      .lean();
 
-    res.json(carers);
+    res.json(await applyReviewStats(carers));
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -88,10 +123,12 @@ export const getCarerById = async (req: Request, res: Response) => {
   try {
     const carer = await Carer.findOne({ _id: req.params.id, isDeleted: false })
       .populate('user', 'firstName lastName avatar')
-      .populate('services');
+      .populate('services')
+      .lean();
     
     if (carer) {
-      res.json(carer);
+      const [carerWithReviewStats] = await applyReviewStats([carer]);
+      res.json(carerWithReviewStats);
     } else {
       res.status(404).json({ message: 'Carer not found' });
     }
