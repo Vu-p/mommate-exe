@@ -30,6 +30,10 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
     try {
       const { data } = await api.post('/auth/login', { email, password });
       login(data);
+      if (data.role === 'carer' && data.mustChangePassword) {
+        navigate('/change-password');
+        return;
+      }
       navigate('/');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Đăng nhập thất bại. Vui lòng thử lại.');

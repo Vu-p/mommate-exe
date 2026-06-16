@@ -9,6 +9,7 @@ import Footer from '../components/Footer.tsx';
 import signupImg from '../assets/images/signup-mock.png';
 import './Auth.css';
 import { useAuth } from '../context/AuthContext.tsx';
+import { isAdminApp } from '../config/appMode.ts';
 
 interface AuthProps {
   defaultMode?: 'login' | 'signup';
@@ -17,21 +18,34 @@ interface AuthProps {
 const Auth = ({ defaultMode = 'signup' }: AuthProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const mode = searchParams.get('mode') || defaultMode;
   const isLogin = mode === 'login';
 
   useEffect(() => {
     if (!loading && user) {
+      if (isAdminApp) {
+        if (user.role === 'admin') {
+          navigate('/admin/dashboard');
+        } else {
+          logout();
+          navigate('/auth?mode=login');
+        }
+        return;
+      }
+      if (user.role === 'carer' && user.mustChangePassword) {
+        navigate('/change-password');
+        return;
+      }
       navigate('/');
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, logout]);
 
   const toggleToLogin = () => navigate('/login');
   const toggleToSignup = () => navigate('/signup');
 
   return (
-    <div className="auth-page">
+    <div className={`auth-page ${isAdminApp ? 'admin-auth-page' : ''}`}>
       <Navbar currentMode={isLogin ? 'login' : 'signup'} />
       
       <main className="auth-main">

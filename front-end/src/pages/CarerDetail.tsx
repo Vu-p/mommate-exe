@@ -33,6 +33,9 @@ interface Carer {
   reviewCount?: number;
   numReviews?: number;
   age?: number;
+  verificationStatus?: string;
+  workplaceName?: string;
+  position?: string;
   services?: any[];
   availability?: {
     day: string;
@@ -165,6 +168,12 @@ const CarerDetail = () => {
                 )}
                 <span className="reviews">{displayReviews}</span>
               </div>
+              {carer.verificationStatus === 'verified' && (
+                <div className="profile-rating">
+                  <CheckCircle2 size={18} color="var(--primary)" />
+                  <span>Đã xác minh nơi làm việc{carer.workplaceName ? `: ${carer.workplaceName}` : ''}</span>
+                </div>
+              )}
             </div>
             <p className="profile-bio">
               {carer.bio || 'Chuyên gia chưa cập nhật giới thiệu cá nhân.'}

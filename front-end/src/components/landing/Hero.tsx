@@ -1,9 +1,20 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Search } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import heroBg from '../../assets/images/hero-bg.png';
 import './Hero.css';
 
 const Hero = () => {
+  const navigate = useNavigate();
+  const [keyword, setKeyword] = useState('');
+
+  const handleSearch = (event: React.FormEvent) => {
+    event.preventDefault();
+    const query = keyword.trim();
+    navigate(query ? `/services?search=${encodeURIComponent(query)}` : '/services');
+  };
+
   return (
     <section className="hero">
       <div className="hero-main-container">
@@ -27,20 +38,22 @@ const Hero = () => {
               trải qua hành trình hậu sản khoa học và an toàn.
             </p>
 
-            <div className="search-bar">
+            <form className="search-bar" onSubmit={handleSearch}>
               <div className="search-input-wrapper">
                 <Search className="search-icon" size={20} />
                 <input
                   type="text"
+                  value={keyword}
+                  onChange={(event) => setKeyword(event.target.value)}
                   placeholder="Loại hình hỗ trợ"
                   aria-label="Tìm loại hình hỗ trợ"
                 />
               </div>
-              <motion.button className="btn-signup" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
-                Đăng kí
+              <motion.button className="btn-signup" type="submit" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+                Tìm dịch vụ
                 <ArrowRight size={16} />
               </motion.button>
-            </div>
+            </form>
           </motion.div>
         </div>
       </div>

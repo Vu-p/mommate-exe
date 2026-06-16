@@ -18,6 +18,13 @@ export interface ICarer extends Document {
     issuer?: string;
     fileUrl?: string;
   }[];
+  workplaceName?: string;
+  workplaceType?: 'hospital' | 'clinic' | 'private_practice' | 'other';
+  department?: string;
+  position?: string;
+  employeeIdOrLicenseNote?: string;
+  workplaceProofImages: string[];
+  verificationStatus: 'pending' | 'verified' | 'rejected';
   services: mongoose.Types.ObjectId[];
   availability: {
     day: string;
@@ -46,6 +53,21 @@ const CarerSchema: Schema = new Schema({
     issuer: { type: String },
     fileUrl: { type: String }
   }],
+  workplaceName: { type: String },
+  workplaceType: {
+    type: String,
+    enum: ['hospital', 'clinic', 'private_practice', 'other'],
+    default: 'hospital'
+  },
+  department: { type: String },
+  position: { type: String },
+  employeeIdOrLicenseNote: { type: String },
+  workplaceProofImages: [{ type: String }],
+  verificationStatus: {
+    type: String,
+    enum: ['pending', 'verified', 'rejected'],
+    default: 'pending'
+  },
   services: [{ type: Schema.Types.ObjectId, ref: 'Service' }],
   availability: [{
     day: { type: String },

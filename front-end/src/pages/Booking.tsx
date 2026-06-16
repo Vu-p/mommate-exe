@@ -16,10 +16,21 @@ const Booking = () => {
 
   const [formData, setFormData] = useState({
     name: user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : '',
-    phone: '',
-    area: 'Hồ Chí Minh',
+    contactPhone: user?.phoneNumber || '',
+    city: 'Hồ Chí Minh',
+    district: '',
+    fullAddress: '',
     date: '',
     time: '08:00',
+    careFor: 'mom_and_baby',
+    pregnancyWeek: '',
+    expectedBirthDate: '',
+    babyBirthDate: '',
+    birthMethod: 'unknown',
+    motherCondition: '',
+    babyCondition: '',
+    allergies: '',
+    medicalNotes: '',
     notes: '',
     numSessions: 1,
     hours: 4
@@ -67,6 +78,11 @@ const Booking = () => {
       return;
     }
 
+    if (!formData.contactPhone.trim() || !formData.fullAddress.trim()) {
+      alert('Vui lòng nhập số điện thoại liên hệ và địa chỉ chăm sóc chi tiết.');
+      return;
+    }
+
     setLoading(true);
     try {
       const scheduledAt = new Date(`${formData.date}T${formData.time}`);
@@ -80,17 +96,28 @@ const Booking = () => {
         carerId,
         serviceId,
         scheduledAt: scheduledAt,
-        address: formData.area,
-        notes: `Phone: ${formData.phone}. Notes: ${formData.notes}`,
+        contactName: formData.name,
+        contactPhone: formData.contactPhone,
+        city: formData.city,
+        district: formData.district,
+        fullAddress: formData.fullAddress,
+        address: formData.fullAddress,
+        careFor: formData.careFor,
+        pregnancyWeek: formData.pregnancyWeek ? Number(formData.pregnancyWeek) : undefined,
+        expectedBirthDate: formData.expectedBirthDate || undefined,
+        babyBirthDate: formData.babyBirthDate || undefined,
+        birthMethod: formData.birthMethod,
+        motherCondition: formData.motherCondition,
+        babyCondition: formData.babyCondition,
+        allergies: formData.allergies,
+        medicalNotes: formData.medicalNotes,
+        notes: formData.notes,
         numSessions: formData.numSessions,
         hours: formData.hours,
         totalPrice: totalPrice
       };
       
       await api.post('/bookings', payload);
-      // Navigate to request page or payment page depending on flow
-      // MVP says we should go to /account/request or /payment. 
-      // Actually we will navigate to /payment if booking is confirmed, but MVP says booking is pending first.
       navigate('/account/request');
     } catch (error) {
       console.error('Booking failed:', error);
@@ -146,29 +173,69 @@ const Booking = () => {
                   />
                 </div>
                 <div className="input-field">
-                  <label>Số điện thoại</label>
+                  <label>Số điện thoại liên hệ</label>
                   <input 
                     type="tel" required
                     placeholder="0123 456 789" 
-                    value={formData.phone}
-                    onChange={e => setFormData({...formData, phone: e.target.value})}
+                    value={formData.contactPhone}
+                    onChange={e => setFormData({...formData, contactPhone: e.target.value})}
                   />
                 </div>
               </div>
             </div>
 
             <div className="booking-form-section">
+              <h2>Địa chỉ chăm sóc</h2>
+              <div className="form-row-2">
+                <div className="input-field">
+                  <label>Thành phố</label>
+                  <div className="select-wrapper">
+                    <select
+                      value={formData.city}
+                      onChange={e => setFormData({...formData, city: e.target.value})}
+                    >
+                      <option value="Hồ Chí Minh">Hồ Chí Minh</option>
+                      <option value="Hà Nội">Hà Nội</option>
+                      <option value="Đà Nẵng">Đà Nẵng</option>
+                    </select>
+                    <ChevronDown size={18} />
+                  </div>
+                </div>
+                <div className="input-field">
+                  <label>Quận / huyện</label>
+                  <input
+                    type="text"
+                    placeholder="Ví dụ: Quận 7"
+                    value={formData.district}
+                    onChange={e => setFormData({...formData, district: e.target.value})}
+                  />
+                </div>
+              </div>
+              <div className="input-field">
+                <label>Địa chỉ chi tiết</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Số nhà, tên đường, tòa nhà, căn hộ..."
+                  value={formData.fullAddress}
+                  onChange={e => setFormData({...formData, fullAddress: e.target.value})}
+                />
+              </div>
+            </div>
+
+            <div className="booking-form-section">
               <h2>Thông tin lịch hẹn</h2>
               <div className="input-field">
-                <label>Khu vực</label>
+                <label>Nhu cầu chăm sóc</label>
                 <div className="select-wrapper">
                   <select 
-                    value={formData.area}
-                    onChange={e => setFormData({...formData, area: e.target.value})}
+                    value={formData.careFor}
+                    onChange={e => setFormData({...formData, careFor: e.target.value})}
                   >
-                    <option value="Hồ Chí Minh">Hồ Chí Minh</option>
-                    <option value="Hà Nội">Hà Nội</option>
-                    <option value="Đà Nẵng">Đà Nẵng</option>
+                    <option value="pregnant_mom">Mẹ đang mang thai</option>
+                    <option value="postpartum_mom">Mẹ sau sinh</option>
+                    <option value="baby">Chăm bé</option>
+                    <option value="mom_and_baby">Mẹ và bé</option>
                   </select>
                   <ChevronDown size={18} />
                 </div>
@@ -230,6 +297,91 @@ const Booking = () => {
                     </select>
                     <ChevronDown size={18} />
                   </div>
+                </div>
+              </div>
+
+              <div className="form-row-2">
+                <div className="input-field">
+                  <label>Tuần thai</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="42"
+                    placeholder="Nếu đang mang thai"
+                    value={formData.pregnancyWeek}
+                    onChange={e => setFormData({...formData, pregnancyWeek: e.target.value})}
+                  />
+                </div>
+                <div className="input-field">
+                  <label>Ngày dự sinh</label>
+                  <input
+                    type="date"
+                    value={formData.expectedBirthDate}
+                    onChange={e => setFormData({...formData, expectedBirthDate: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row-2">
+                <div className="input-field">
+                  <label>Ngày sinh của bé</label>
+                  <input
+                    type="date"
+                    value={formData.babyBirthDate}
+                    onChange={e => setFormData({...formData, babyBirthDate: e.target.value})}
+                  />
+                </div>
+                <div className="input-field">
+                  <label>Hình thức sinh</label>
+                  <div className="select-wrapper">
+                    <select
+                      value={formData.birthMethod}
+                      onChange={e => setFormData({...formData, birthMethod: e.target.value})}
+                    >
+                      <option value="unknown">Chưa cập nhật</option>
+                      <option value="vaginal">Sinh thường</option>
+                      <option value="c_section">Sinh mổ</option>
+                    </select>
+                    <ChevronDown size={18} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-row-2">
+                <div className="input-field">
+                  <label>Tình trạng mẹ</label>
+                  <textarea
+                    placeholder="Ví dụ: đau vết mổ, tắc tia sữa, cần hỗ trợ vận động..."
+                    value={formData.motherCondition}
+                    onChange={e => setFormData({...formData, motherCondition: e.target.value})}
+                  />
+                </div>
+                <div className="input-field">
+                  <label>Tình trạng bé</label>
+                  <textarea
+                    placeholder="Ví dụ: tuổi bé, lịch ăn/ngủ, vàng da, quấy đêm..."
+                    value={formData.babyCondition}
+                    onChange={e => setFormData({...formData, babyCondition: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row-2">
+                <div className="input-field">
+                  <label>Dị ứng / lưu ý đặc biệt</label>
+                  <textarea
+                    placeholder="Dị ứng thuốc, thực phẩm, lưu ý trong nhà..."
+                    value={formData.allergies}
+                    onChange={e => setFormData({...formData, allergies: e.target.value})}
+                  />
+                </div>
+                <div className="input-field">
+                  <label>Lưu ý y tế</label>
+                  <textarea
+                    placeholder="Chẩn đoán, chỉ định bác sĩ, giới hạn cần tránh..."
+                    value={formData.medicalNotes}
+                    onChange={e => setFormData({...formData, medicalNotes: e.target.value})}
+                  />
                 </div>
               </div>
 
@@ -297,7 +449,7 @@ const Booking = () => {
                 disabled={loading}
                 onClick={handleSubmit}
               >
-                {loading ? 'Đang xử lý...' : 'Thanh toán'}
+                {loading ? 'Đang xử lý...' : 'Gửi yêu cầu cho carer'}
               </button>
             </div>
           </aside>

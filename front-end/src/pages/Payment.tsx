@@ -1,81 +1,113 @@
-import { useState, useEffect } from 'react';
-import { ChevronRight, Upload, X } from 'lucide-react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ChevronRight, Loader2 } from 'lucide-react';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
-import ImageUpload from '../components/common/ImageUpload';
 import './Payment.css';
-import './Booking.css'; // Re-use summary card styles
+import './Booking.css';
+
+const formatCurrency = (value: number) => `${Number(value || 0).toLocaleString('vi-VN')} VNĐ`;
 
 const Payment = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { bookingId } = location.state || {};
+  const [searchParams] = useSearchParams();
+  const stateBookingId = location.state?.bookingId;
+  const bookingId = stateBookingId || searchParams.get('bookingId');
+  const paymentResult = searchParams.get('payment');
   const [booking, setBooking] = useState<any>(null);
-  const [paymentProofUrl, setPaymentProofUrl] = useState('');
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('vietqr');
+  const [loading, setLoading] = useState(true);
+  const [creatingLink, setCreatingLink] = useState(false);
+  const [error, setError] = useState('');
+  const [isWaitingForWebhook, setIsWaitingForWebhook] = useState(false);
 
-  useEffect(() => {
-    if (bookingId) {
-      fetchBookingDetails();
+  const fetchBookingDetails = useCallback(async (showLoader = true) => {
+    if (!bookingId) {
+      setLoading(false);
+      setError('Không tìm thấy mã đặt lịch.');
+      return null;
+    }
+
+    try {
+      if (showLoader) setLoading(true);
+      const { data } = await api.get(`/bookings/${bookingId}`);
+      setBooking(data);
+      return data;
+    } catch (err: any) {
+      console.error('Error fetching booking details:', err);
+      setError(err.response?.data?.message || 'Không thể tải thông tin thanh toán.');
+      return null;
+    } finally {
+      if (showLoader) setLoading(false);
     }
   }, [bookingId]);
 
-  const fetchBookingDetails = async () => {
-    try {
-      const { data } = await api.get(`/bookings/my`); // Simplified; ideally should be GET /bookings/:id
-      const currentBooking = data.find((b: any) => b._id === bookingId);
-      setBooking(currentBooking);
-    } catch (error) {
-      console.error('Error fetching booking details:', error);
-    }
-  };
+  useEffect(() => {
+    fetchBookingDetails();
+  }, [fetchBookingDetails]);
 
-  // Fake booking data if not found (for MVP testing without going through full flow)
-  const displayBooking = booking || {
-    service: { title: 'Mẹ và bé y khoa (Combo)', price: 150000, image: '' },
-    carer: { user: { firstName: 'Nguyễn Thị', lastName: 'A' } },
-    hours: 4,
-    numSessions: 1,
-    totalPrice: 150000 * 4 + 5000
-  };
+  const carerName = useMemo(() => {
+    const carerUser = booking?.carer?.user || {};
+    return [carerUser.firstName, carerUser.lastName].filter(Boolean).join(' ') || 'Chuyên gia';
+  }, [booking]);
 
-  const serviceTitle = displayBooking.service?.title;
-  const carerName = `${displayBooking.carer?.user?.firstName || ''} ${displayBooking.carer?.user?.lastName || ''}`.trim() || 'Nguyễn Thị A';
-  const pricePerHour = displayBooking.service?.price || 150000;
-  const hours = displayBooking.hours || 4;
-  const numSessions = displayBooking.numSessions || 1;
-  const subTotal = pricePerHour * hours * numSessions;
-  const serviceFee = 5000;
-  const totalPrice = subTotal + serviceFee;
+  const canPay = booking?.status === 'accepted_pending_payment';
+  const isPaid = booking?.status === 'paid_confirmed' || booking?.status === 'confirmed';
 
-  const handleSubmitProof = async () => {
-    if (!termsAccepted) {
-      alert("Vui lòng đồng ý với điều khoản và chính sách.");
-      return;
-    }
-    
-    // Allow submitting even if no proof (as per design "không bắt buộc" - optional)
-    setLoading(true);
-    try {
-      if (booking) {
-        await api.patch(`/bookings/${booking._id}/payment-proof`, {
-          paymentProofUrl,
-          paymentNote: 'Thanh toán qua VietQR'
-        });
+  useEffect(() => {
+    if (paymentResult !== 'success' || !bookingId || isPaid) return;
+
+    let attempts = 0;
+    setIsWaitingForWebhook(true);
+
+    const intervalId = window.setInterval(async () => {
+      attempts += 1;
+      const latestBooking = await fetchBookingDetails(false);
+      if (['paid_confirmed', 'confirmed'].includes(latestBooking?.status) || attempts >= 15) {
+        setIsWaitingForWebhook(false);
+        window.clearInterval(intervalId);
       }
-      // Navigate to success or request page
-      navigate('/account/request');
-    } catch (error) {
-      console.error('Payment proof upload failed:', error);
-      alert('Không thể xác nhận thanh toán. Vui lòng thử lại.');
+    }, 3000);
+
+    return () => window.clearInterval(intervalId);
+  }, [bookingId, fetchBookingDetails, isPaid, paymentResult]);
+
+  const handleCreatePaymentLink = async () => {
+    if (!booking?._id) return;
+
+    setCreatingLink(true);
+    setError('');
+
+    try {
+      const { data } = await api.post(`/bookings/${booking._id}/payment-link`);
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+        return;
+      }
+      setError('payOS chưa trả về đường dẫn thanh toán.');
+    } catch (err: any) {
+      console.error('payOS payment link failed:', err);
+      setError(err.response?.data?.message || 'Không thể tạo link thanh toán payOS.');
     } finally {
-      setLoading(false);
+      setCreatingLink(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="payment-page">
+        <Navbar />
+        <main className="container payment-content">
+          <div className="loading-state">
+            <Loader2 className="spinner" />
+            <p>Đang tải thông tin thanh toán...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="payment-page">
@@ -85,153 +117,118 @@ const Payment = () => {
         <nav className="breadcrumb">
           <Link to="/">Trang chủ</Link>
           <ChevronRight size={14} />
-          <Link to="/booking">Đặt lịch</Link>
+          <Link to="/account/request">Lịch đặt</Link>
           <ChevronRight size={14} />
           <span>Thanh toán</span>
         </nav>
 
-        <div className="payment-layout">
-          {/* Left Form Column */}
-          <section className="payment-methods-col">
-            <h2>Thanh toán</h2>
-            
-            <div className="payment-options">
-              <label className={`payment-radio-item ${paymentMethod === 'vietqr' ? 'active' : ''}`}>
-                <input 
-                  type="radio" 
-                  name="paymentMethod" 
-                  value="vietqr"
-                  checked={paymentMethod === 'vietqr'}
-                  onChange={() => setPaymentMethod('vietqr')}
-                />
-                <span className="radio-circle"></span>
-                Chuyển khoản (VietQR)
-              </label>
+        {paymentResult === 'success' && (
+          <div className="form-success">
+            {isPaid
+              ? 'Thanh toán đã được xác nhận.'
+              : isWaitingForWebhook
+                ? 'payOS đã chuyển bạn về MomMate. Hệ thống đang chờ webhook ngân hàng xác nhận thanh toán.'
+                : 'MomMate đang chờ ngân hàng xác nhận thanh toán. Bạn có thể quay lại lịch đặt để kiểm tra trạng thái sau.'}
+          </div>
+        )}
+        {paymentResult === 'cancelled' && (
+          <div className="form-alert">
+            Bạn đã hủy phiên thanh toán payOS. Booking vẫn được giữ ở trạng thái chờ thanh toán.
+          </div>
+        )}
+        {error && <div className="form-alert">{error}</div>}
 
-              {paymentMethod === 'vietqr' && (
-                <div className="vietqr-details-card">
-                  <div className="bank-details-row">
-                    <div className="bank-info-grid">
-                      <div className="info-item">
-                        <span className="label">Ngân hàng</span>
-                        <div className="bank-logo-name">
-                          <img src="https://upload.wikimedia.org/wikipedia/commons/4/47/Logo_ACB.png" alt="ACB" className="acb-logo" />
-                          <strong>Ngân hàng Á Châu (ACB)</strong>
-                        </div>
-                      </div>
-                      <div className="info-item">
-                        <span className="label">Tên tài khoản</span>
-                        <strong>NGUYỄN VĂN A</strong>
-                      </div>
-                      <div className="info-item">
-                        <span className="label">Số tài khoản</span>
-                        <strong>123456789</strong>
-                      </div>
-                      <div className="info-item full-width">
-                        <span className="label">Nội dung chuyển khoản</span>
-                        <strong>Thanh toán dịch vụ cho {carerName}</strong>
-                      </div>
-                    </div>
-                    
-                    <div className="qr-code-box">
-                      <div className="qr-image">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=example_qr" alt="QR Code" />
-                      </div>
-                    </div>
+        {!booking ? (
+          <div className="empty-state">
+            <p>Không tìm thấy booking cần thanh toán.</p>
+            <Link to="/account/request" className="btn-primary">Quay lại lịch đặt</Link>
+          </div>
+        ) : (
+          <div className="payment-layout">
+            <section className="payment-methods-col">
+              <h2>Thanh toán qua payOS</h2>
+              <p>
+                Booking chỉ có thể thanh toán sau khi carer đã xác nhận nhận lịch. payOS sẽ tạo mã VietQR
+                và ghi nhận giao dịch tự động qua webhook.
+              </p>
+
+              <div className="vietqr-details-card">
+                <div className="bank-info-grid">
+                  <div className="info-item">
+                    <span className="label">Trạng thái booking</span>
+                    <strong>{booking.status}</strong>
                   </div>
-
-                  <div className="upload-proof-section">
-                    <p className="upload-title">Tải biên lai lên (không bắt buộc)</p>
-                    <div className="upload-box-wrapper">
-                      <ImageUpload
-                        label=""
-                        onUploadSuccess={setPaymentProofUrl}
-                        defaultImage={paymentProofUrl}
-                      />
-                    </div>
+                  <div className="info-item">
+                    <span className="label">payOS orderCode</span>
+                    <strong>{booking.payosOrderCode || 'Chưa tạo'}</strong>
+                  </div>
+                  <div className="info-item full-width">
+                    <span className="label">Ghi chú</span>
+                    <strong>Webhook payOS là nguồn xác nhận thanh toán chính.</strong>
                   </div>
                 </div>
+              </div>
+
+              {isPaid ? (
+                <button className="btn-confirm-payment" onClick={() => navigate('/account/request')}>
+                  Đã thanh toán - quay lại lịch đặt
+                </button>
+              ) : (
+                <button 
+                  className="btn-confirm-payment"
+                  onClick={handleCreatePaymentLink}
+                  disabled={!canPay || creatingLink}
+                >
+                  {creatingLink ? 'Đang tạo link payOS...' : 'Thanh toán qua payOS'}
+                </button>
               )}
 
-              <label className={`payment-radio-item ${paymentMethod === 'napas' ? 'active' : ''}`}>
-                <input 
-                  type="radio" 
-                  name="paymentMethod" 
-                  value="napas"
-                  checked={paymentMethod === 'napas'}
-                  onChange={() => setPaymentMethod('napas')}
-                />
-                <span className="radio-circle"></span>
-                Thanh toán bằng thẻ (Napas)
-              </label>
-            </div>
+              {!canPay && !isPaid && (
+                <p className="empty-text">
+                  Booking này chưa được carer xác nhận nên chưa thể thanh toán.
+                </p>
+              )}
+            </section>
 
-            <div className="terms-checkbox">
-              <label>
-                <input 
-                  type="checkbox" 
-                  checked={termsAccepted}
-                  onChange={(e) => setTermsAccepted(e.target.checked)}
-                />
-                <span className="custom-checkbox"></span>
-                Tôi đã đọc và đồng ý với điều khoản cũng như chính sách bảo mật
-              </label>
-            </div>
-
-            <button 
-              className="btn-confirm-payment"
-              onClick={handleSubmitProof}
-              disabled={loading}
-            >
-              {loading ? 'Đang xử lý...' : 'Xác nhận đã chuyển'}
-            </button>
-          </section>
-
-          {/* Right Summary Column - Reusing booking-summary styles */}
-          <aside className="booking-summary-col">
-            <div className="summary-card">
-              <div className="summary-header">
-                <div className="summary-image">
-                  {displayBooking.service?.image ? (
-                    <img src={displayBooking.service.image} alt="Service" />
-                  ) : (
-                    <div className="img-placeholder">
-                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-                        <path d="M21 19V5C21 3.9 20.1 3 19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19ZM8.5 13.5L11 16.51L14.5 12L19 18H5L8.5 13.5Z" fill="#A4A8B4" />
-                      </svg>
-                    </div>
-                  )}
+            <aside className="booking-summary-col">
+              <div className="summary-card">
+                <div className="summary-header">
+                  <div className="summary-image">
+                    {booking.service?.image ? (
+                      <img src={booking.service.image} alt={booking.service?.title || 'Service'} />
+                    ) : (
+                      <div className="img-placeholder" />
+                    )}
+                  </div>
+                  <div className="summary-title-wrapper">
+                    <h3>{booking.service?.title || 'Dịch vụ MomMate'}</h3>
+                    <p className="carer-name">Chuyên gia: {carerName}</p>
+                  </div>
                 </div>
-                <div className="summary-title-wrapper">
-                  <h3>{serviceTitle}</h3>
-                  <p className="carer-name">Chuyên gia: {carerName}</p>
+
+                <div className="summary-details">
+                  <div className="summary-row">
+                    <span>Lịch hẹn</span>
+                    <span>{new Date(booking.scheduledAt).toLocaleString('vi-VN')}</span>
+                  </div>
+                  <div className="summary-row">
+                    <span>Thời lượng</span>
+                    <span>{booking.numSessions || 1} buổi x {booking.hours || 1} giờ</span>
+                  </div>
+                  <div className="summary-row">
+                    <span>Địa chỉ</span>
+                    <span>{booking.fullAddress || booking.address}</span>
+                  </div>
+                  <div className="summary-divider"></div>
+                  <div className="summary-row total">
+                    <span>Tổng thanh toán</span>
+                    <span className="total-price">{formatCurrency(booking.totalPrice)}</span>
+                  </div>
                 </div>
               </div>
-
-              <div className="summary-details">
-                <div className="summary-row">
-                  <span>Giá dịch vụ</span>
-                  <span>{pricePerHour.toLocaleString()} VNĐ / giờ</span>
-                </div>
-                <div className="summary-row">
-                  <span>Tạm tính</span>
-                  <span>{subTotal.toLocaleString()} VNĐ</span>
-                </div>
-                <div className="summary-row">
-                  <span>Phí dịch vụ</span>
-                  <span>{serviceFee.toLocaleString()} VNĐ</span>
-                </div>
-                
-                <div className="summary-divider"></div>
-
-                <div className="summary-row total">
-                  <span>Tổng thanh toán</span>
-                  <span className="total-price">{totalPrice.toLocaleString()} VNĐ</span>
-                </div>
-              </div>
-            </div>
-          </aside>
-        </div>
+            </aside>
+          </div>
+        )}
       </main>
 
       <Footer />

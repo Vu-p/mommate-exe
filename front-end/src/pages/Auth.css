@@ -5,6 +5,10 @@
   background: var(--white);
 }
 
+.admin-auth-page .toggle-auth-text {
+  display: none;
+}
+
 .auth-main {
   flex: 1;
   padding: 188px 0 128px;

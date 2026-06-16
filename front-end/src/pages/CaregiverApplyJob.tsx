@@ -81,6 +81,12 @@ const CaregiverApplyJob = () => {
     fixedRate: '',
     platformFeePercent: '10',
     serviceIds: [] as string[],
+    workplaceName: '',
+    workplaceType: 'hospital',
+    department: '',
+    position: '',
+    employeeIdOrLicenseNote: '',
+    workplaceProofImages: [] as string[],
     certificationDetails: [createEmptyCertificate()],
     availability: createEmptyAvailability(),
   });
@@ -117,6 +123,12 @@ const CaregiverApplyJob = () => {
               serviceIds: (carer.services || []).map((service: ServiceOption | string) =>
                 typeof service === 'string' ? service : service._id
               ),
+              workplaceName: carer.workplaceName || '',
+              workplaceType: carer.workplaceType || 'hospital',
+              department: carer.department || '',
+              position: carer.position || '',
+              employeeIdOrLicenseNote: carer.employeeIdOrLicenseNote || '',
+              workplaceProofImages: carer.workplaceProofImages || [],
               certificationDetails:
                 carer.certificationDetails?.length > 0
                   ? carer.certificationDetails.map((cert: any) => ({
@@ -216,6 +228,14 @@ const CaregiverApplyJob = () => {
     });
   };
 
+  const updateWorkplaceProofImage = (index: number, url: string) => {
+    setFormData((prev) => {
+      const workplaceProofImages = [...prev.workplaceProofImages];
+      workplaceProofImages[index] = url;
+      return { ...prev, workplaceProofImages };
+    });
+  };
+
   const handleSubmit = async (submit: boolean) => {
     setSaving(true);
     setError('');
@@ -241,6 +261,12 @@ const CaregiverApplyJob = () => {
         if (!formData.experienceYears.trim()) {
           throw new Error('Vui lòng nhập số năm kinh nghiệm.');
         }
+        if (!formData.workplaceName.trim()) {
+          throw new Error('Vui lòng nhập bệnh viện/phòng khám hoặc nơi làm việc.');
+        }
+        if (!formData.position.trim()) {
+          throw new Error('Vui lòng nhập vị trí chuyên môn hiện tại.');
+        }
         if (formData.pricingType === 'hourly' && !formData.hourlyRate.trim()) {
           throw new Error('Vui lòng nhập giá theo giờ.');
         }
@@ -261,6 +287,12 @@ const CaregiverApplyJob = () => {
         hourlyRate: Number(formData.hourlyRate || 0),
         fixedRate: formData.pricingType === 'fixed' ? Number(formData.fixedRate || 0) : undefined,
         platformFeePercent: Number(formData.platformFeePercent || 10),
+        workplaceName: formData.workplaceName.trim(),
+        workplaceType: formData.workplaceType,
+        department: formData.department.trim(),
+        position: formData.position.trim(),
+        employeeIdOrLicenseNote: formData.employeeIdOrLicenseNote.trim(),
+        workplaceProofImages: formData.workplaceProofImages.filter(Boolean),
         availability: DAYS.map((day) => ({
           day: day.key,
           slots: formData.availability[day.key] || [],
@@ -410,6 +442,54 @@ const CaregiverApplyJob = () => {
                     placeholder="10"
                     value={formData.platformFeePercent}
                     onChange={(e) => setFormData((prev) => ({ ...prev, platformFeePercent: e.target.value }))}
+                  />
+                </div>
+                <div className="input-group full-span">
+                  <label>Bệnh viện / phòng khám / nơi làm việc</label>
+                  <input
+                    type="text"
+                    placeholder="Bệnh viện Từ Dũ, phòng khám sản nhi..."
+                    value={formData.workplaceName}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, workplaceName: e.target.value }))}
+                  />
+                </div>
+                <div className="input-group">
+                  <label>Loại nơi làm việc</label>
+                  <select
+                    value={formData.workplaceType}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, workplaceType: e.target.value }))}
+                  >
+                    <option value="hospital">Bệnh viện</option>
+                    <option value="clinic">Phòng khám</option>
+                    <option value="private_practice">Tư nhân</option>
+                    <option value="other">Khác</option>
+                  </select>
+                </div>
+                <div className="input-group">
+                  <label>Khoa / phòng ban</label>
+                  <input
+                    type="text"
+                    placeholder="Sản nhi, điều dưỡng, hộ sinh..."
+                    value={formData.department}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, department: e.target.value }))}
+                  />
+                </div>
+                <div className="input-group">
+                  <label>Vị trí chuyên môn</label>
+                  <input
+                    type="text"
+                    placeholder="Y tá, điều dưỡng sản nhi, hộ sinh..."
+                    value={formData.position}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, position: e.target.value }))}
+                  />
+                </div>
+                <div className="input-group">
+                  <label>Mã nhân sự / ghi chú hành nghề</label>
+                  <input
+                    type="text"
+                    placeholder="Không bắt buộc trong MVP"
+                    value={formData.employeeIdOrLicenseNote}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, employeeIdOrLicenseNote: e.target.value }))}
                   />
                 </div>
               </div>

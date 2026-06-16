@@ -162,6 +162,66 @@
   margin-bottom: 24px;
 }
 
+.booking-timeline {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin: 18px 0 6px;
+}
+
+.timeline-step {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: #8a94a3;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.timeline-step::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: -8px;
+  top: 8px;
+  height: 2px;
+  background: #e4e9ee;
+  z-index: 0;
+}
+
+.timeline-step:last-child::before {
+  display: none;
+}
+
+.timeline-dot {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  border-radius: 50%;
+  border: 2px solid #d2d9df;
+  background: #fff;
+  z-index: 1;
+}
+
+.timeline-step.done {
+  color: #1f7a62;
+}
+
+.timeline-step.done::before {
+  background: #b7dfd1;
+}
+
+.timeline-step.done .timeline-dot {
+  border-color: #1f7a62;
+  background: #1f7a62;
+}
+
+.timeline-step.current .timeline-dot {
+  box-shadow: 0 0 0 4px rgba(31, 122, 98, 0.16);
+}
+
 .detail-item {
   display: flex;
   align-items: center;
@@ -245,5 +305,21 @@
   .dashboard-layout {
     grid-template-columns: 1fr;
     gap: 48px;
+  }
+}
+
+@media (max-width: 640px) {
+  .booking-timeline {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .timeline-step::before {
+    left: 7px;
+    right: auto;
+    top: 18px;
+    bottom: -10px;
+    width: 2px;
+    height: auto;
   }
 }

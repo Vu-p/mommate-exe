@@ -16,12 +16,14 @@ interface User {
   identityName?: string;
   identityIssuedAt?: string;
   identityImages?: string[];
+  mustChangePassword?: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (userData: User) => void;
+  updateUser: (userData: Partial<User>) => void;
   logout: () => void;
 }
 
@@ -44,13 +46,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('userInfo', JSON.stringify(userData));
   };
 
+  const updateUser = (userData: Partial<User>) => {
+    setUser((current) => {
+      if (!current) return current;
+      const nextUser = { ...current, ...userData };
+      localStorage.setItem('userInfo', JSON.stringify(nextUser));
+      return nextUser;
+    });
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('userInfo');
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, updateUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

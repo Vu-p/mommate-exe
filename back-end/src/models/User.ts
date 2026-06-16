@@ -21,6 +21,7 @@ export interface IUser extends Document {
   identityName?: string;
   identityIssuedAt?: Date;
   identityImages?: string[];
+  mustChangePassword: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -40,6 +41,7 @@ const UserSchema: Schema = new Schema({
   identityName: { type: String },
   identityIssuedAt: { type: Date },
   identityImages: [{ type: String }],
+  mustChangePassword: { type: Boolean, default: false },
 }, { timestamps: true });
 
 export default mongoose.model<IUser>('User', UserSchema);

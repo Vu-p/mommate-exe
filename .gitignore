@@ -12,6 +12,7 @@ node_modules/
 
 # === Build outputs ===
 dist/
+dist-admin/
 dist-ssr/
 build/
 out/
@@ -19,6 +20,7 @@ out/
 # === Environment ===
 .env
 .env.local
+.env.admin
 .env.*.local
 
 # === IDE / Editor ===

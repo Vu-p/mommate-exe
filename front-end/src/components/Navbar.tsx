@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, LayoutDashboard, LogOut, Menu, User as UserIcon, X } from 'lucide-react';
+import { ChevronDown, FileSignature, LayoutDashboard, LogOut, Menu, User as UserIcon, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.tsx';
 import logo from '../assets/images/logo.png';
 import './Navbar.css';
 import './NavbarAdmin.css';
+import { isAdminApp } from '../config/appMode.ts';
 
 interface NavbarProps {
   currentMode?: 'login' | 'signup';
@@ -141,9 +142,24 @@ const Navbar = ({ currentMode }: NavbarProps) => {
                             <Link to="/account/profile" className="dropdown-item">
                               <UserIcon size={16} /> Hồ sơ cá nhân
                             </Link>
-                            {user.role === 'admin' && (
+                            {isAdminApp && user.role === 'admin' && (
                               <Link to="/admin" className="dropdown-item admin-link">
                                 <LayoutDashboard size={16} /> Admin Panel
+                              </Link>
+                            )}
+                            {user.role === 'carer' && (
+                              <Link to="/carer/profile" className="dropdown-item">
+                                <UserIcon size={16} /> Hồ sơ carer
+                              </Link>
+                            )}
+                            {user.role === 'carer' && (
+                              <Link to="/carer/bookings" className="dropdown-item">
+                                <LayoutDashboard size={16} /> Lịch carer
+                              </Link>
+                            )}
+                            {user.role === 'carer' && (
+                              <Link to="/carer/contract" className="dropdown-item">
+                                <FileSignature size={16} /> Hợp đồng của tôi
                               </Link>
                             )}
                             <Link to="/account/request" className="dropdown-item">
@@ -232,6 +248,21 @@ const Navbar = ({ currentMode }: NavbarProps) => {
                     <button className="mobile-auth-btn primary" onClick={() => navigate('/account/request')}>
                       Bảng điều khiển
                     </button>
+                    {user.role === 'carer' && (
+                      <button className="mobile-auth-btn secondary" onClick={() => navigate('/carer/profile')}>
+                        Hồ sơ carer
+                      </button>
+                    )}
+                    {user.role === 'carer' && (
+                      <button className="mobile-auth-btn secondary" onClick={() => navigate('/carer/bookings')}>
+                        Lịch carer
+                      </button>
+                    )}
+                    {user.role === 'carer' && (
+                      <button className="mobile-auth-btn secondary" onClick={() => navigate('/carer/contract')}>
+                        Hợp đồng của tôi
+                      </button>
+                    )}
                     <button className="mobile-auth-btn secondary" onClick={() => navigate('/account/profile')}>
                       Hồ sơ cá nhân
                     </button>

@@ -30,6 +30,11 @@ const FindService = () => {
   const queryParams = new URLSearchParams(location.search);
   const carerId = queryParams.get('carerId');
   const carerName = queryParams.get('carerName');
+  const querySearch = queryParams.get('search') || '';
+
+  useEffect(() => {
+    setSearchTerm(querySearch);
+  }, [querySearch]);
 
   useEffect(() => {
     const fetchServices = async () => {

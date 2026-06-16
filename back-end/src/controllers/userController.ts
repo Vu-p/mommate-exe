@@ -87,6 +87,7 @@ export const createUser = async (req: AuthRequest, res: Response) => {
       phoneNumber,
       avatar,
       address,
+      mustChangePassword: role === 'carer',
     });
 
     const safeUser = await User.findById(user._id).select('-password');
@@ -118,6 +119,7 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
 
     if (password) {
       user.password = await bcrypt.hash(password, 10);
+      user.mustChangePassword = user.role === 'carer';
     }
 
     await user.save();

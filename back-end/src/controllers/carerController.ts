@@ -1,9 +1,11 @@
 import type { Request, Response } from 'express';
 import Carer from '../models/Carer.js';
+import Contract from '../models/Contract.js';
 import Review from '../models/Review.js';
 import User, { UserRole } from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import type { AuthRequest } from '../middleware/auth.js';
+import { ensureContractForCarer } from '../utils/contracts.js';
 
 const calculateAge = (birthDate?: Date | string) => {
   if (!birthDate) return undefined;
@@ -75,6 +77,7 @@ export const getCarers = async (req: Request, res: Response) => {
 
     if (req.query.admin !== 'true') {
       filter.isVerified = true;
+      filter.$or = [{ verificationStatus: 'verified' }, { verificationStatus: { $exists: false } }];
     }
 
     if (req.query.serviceId) {
@@ -110,7 +113,28 @@ export const getCarers = async (req: Request, res: Response) => {
       .populate('services', 'title category')
       .lean();
 
-    res.json(await applyReviewStats(carers));
+    const carersWithReviewStats = await applyReviewStats(carers);
+
+    if (req.query.admin === 'true') {
+      const contracts = await Contract.find({
+        carer: { $in: carersWithReviewStats.map((carer) => carer._id) },
+        status: { $ne: 'voided' },
+      })
+        .sort({ createdAt: -1 })
+        .select('carer status signedAt')
+        .lean();
+
+      const contractsByCarerId = new Map(contracts.map((contract) => [String(contract.carer), contract]));
+      return res.json(
+        carersWithReviewStats.map((carer) => ({
+          ...carer,
+          contractStatus: contractsByCarerId.get(String(carer._id))?.status || 'pending',
+          contractSignedAt: contractsByCarerId.get(String(carer._id))?.signedAt,
+        }))
+      );
+    }
+
+    res.json(carersWithReviewStats);
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -220,6 +244,12 @@ export const saveCarerJobProfile = async (req: AuthRequest, res: Response) => {
       hourlyRate,
       fixedRate,
       platformFeePercent,
+      workplaceName,
+      workplaceType,
+      department,
+      position,
+      employeeIdOrLicenseNote,
+      workplaceProofImages,
       availability,
       submit,
     } = req.body;
@@ -248,10 +278,17 @@ export const saveCarerJobProfile = async (req: AuthRequest, res: Response) => {
       age,
       certifications: resolvedCertifications,
       certificationDetails,
+      workplaceName,
+      workplaceType,
+      department,
+      position,
+      employeeIdOrLicenseNote,
+      workplaceProofImages,
       services: resolvedServices,
       availability,
       applicationStatus: submit ? 'submitted' : 'draft',
       isVerified: false,
+      verificationStatus: 'pending',
     };
 
     const carer = await Carer.findOneAndUpdate(
@@ -268,6 +305,95 @@ export const saveCarerJobProfile = async (req: AuthRequest, res: Response) => {
   }
 };
 
+// @desc    Update logged-in carer's operational profile
+// @route   PUT /api/carers/me
+// @access  Private/Carer
+export const updateMyCarerProfile = async (req: AuthRequest, res: Response) => {
+  try {
+    if (req.user!.role !== UserRole.CARER) {
+      return res.status(403).json({ message: 'Only carers can update carer profile' });
+    }
+
+    const {
+      firstName,
+      lastName,
+      phoneNumber,
+      avatar,
+      location,
+      birthDate,
+      gender,
+      bio,
+      experienceYears,
+      services,
+      serviceIds,
+      pricingType,
+      hourlyRate,
+      fixedRate,
+      workplaceName,
+      workplaceType,
+      department,
+      position,
+      employeeIdOrLicenseNote,
+      certificationDetails,
+      certifications,
+      availability,
+    } = req.body;
+
+    const user = await User.findById(req.user!._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.firstName = firstName ?? user.firstName;
+    user.lastName = lastName ?? user.lastName;
+    user.phoneNumber = phoneNumber ?? user.phoneNumber;
+    user.avatar = avatar ?? user.avatar;
+    user.address = location ?? user.address;
+    user.birthDate = birthDate ? new Date(birthDate) : user.birthDate;
+    user.gender = gender ?? user.gender;
+    await user.save();
+
+    const resolvedServices = serviceIds || services || [];
+    const resolvedCertifications =
+      certifications ||
+      (Array.isArray(certificationDetails) ? certificationDetails.map((cert) => cert.name).filter(Boolean) : []);
+    const age = calculateAge(user.birthDate) || req.body.age || 18;
+
+    const carer = await Carer.findOne({ user: user._id, isDeleted: false });
+
+    if (!carer) {
+      return res.status(404).json({ message: 'Carer profile not found. Please contact admin.' });
+    }
+
+    carer.bio = bio ?? carer.bio;
+    carer.experienceYears = experienceYears !== undefined ? Number(experienceYears) : carer.experienceYears;
+    carer.hourlyRate = hourlyRate !== undefined ? Number(hourlyRate) : carer.hourlyRate;
+    carer.pricingType = pricingType || carer.pricingType;
+    carer.fixedRate = fixedRate !== undefined ? Number(fixedRate) : carer.fixedRate;
+    carer.location = location ?? carer.location;
+    carer.age = age;
+    carer.certifications = resolvedCertifications ?? carer.certifications;
+    carer.certificationDetails = certificationDetails ?? carer.certificationDetails;
+    carer.workplaceName = workplaceName ?? carer.workplaceName;
+    carer.workplaceType = workplaceType ?? carer.workplaceType;
+    carer.department = department ?? carer.department;
+    carer.position = position ?? carer.position;
+    carer.employeeIdOrLicenseNote = employeeIdOrLicenseNote ?? carer.employeeIdOrLicenseNote;
+    carer.services = resolvedServices;
+    carer.availability = availability ?? carer.availability;
+
+    const updatedCarer = await carer.save();
+    const populatedCarer = await Carer.findById(updatedCarer._id)
+      .populate('user', '-password')
+      .populate('services');
+
+    res.json({ user: await User.findById(user._id).select('-password'), carer: populatedCarer });
+  } catch (error: any) {
+    res.status(400).json({ message: error.message || 'Invalid carer profile data' });
+  }
+};
+
 // @desc    Create a carer
 // @route   POST /api/carers
 // @access  Private/Admin
@@ -275,7 +401,9 @@ export const createCarer = async (req: Request, res: Response) => {
   const { 
     email, password, firstName, lastName, avatar, 
     bio, experienceYears, hourlyRate, pricingType, fixedRate, platformFeePercent, location, age,
-    certifications, certificationDetails, services, availability, isVerified, applicationStatus
+    certifications, certificationDetails, workplaceName, workplaceType, department, position,
+    employeeIdOrLicenseNote, workplaceProofImages, verificationStatus,
+    services, availability, isVerified, applicationStatus
   } = req.body;
 
   try {
@@ -285,6 +413,13 @@ export const createCarer = async (req: Request, res: Response) => {
     if (!userId && email) {
       const userExists = await User.findOne({ email });
       if (userExists) {
+        userExists.role = UserRole.CARER;
+        userExists.mustChangePassword = true;
+        if (password) {
+          const salt = await bcrypt.genSalt(10);
+          userExists.password = await bcrypt.hash(password, salt);
+        }
+        await userExists.save();
         userId = userExists._id;
       } else {
         const salt = await bcrypt.genSalt(10);
@@ -296,7 +431,8 @@ export const createCarer = async (req: Request, res: Response) => {
           firstName,
           lastName,
           avatar,
-          role: 'carer'
+          role: 'carer',
+          mustChangePassword: true
         });
         userId = newUser._id;
       }
@@ -319,13 +455,21 @@ export const createCarer = async (req: Request, res: Response) => {
       age,
       certifications,
       certificationDetails,
+      workplaceName,
+      workplaceType,
+      department,
+      position,
+      employeeIdOrLicenseNote,
+      workplaceProofImages,
       services,
       availability,
       isVerified: isVerified || false,
+      verificationStatus: verificationStatus || (isVerified ? 'verified' : 'pending'),
       applicationStatus: applicationStatus || (isVerified ? 'verified' : 'submitted')
     });
 
     const populatedCarer = await Carer.findById(carer._id).populate('user', 'firstName lastName avatar email');
+    await ensureContractForCarer(populatedCarer, (req as AuthRequest).user?._id);
     res.status(201).json(populatedCarer);
   } catch (error: any) {
     res.status(400).json({ message: error.message || 'Invalid carer data' });
@@ -339,7 +483,9 @@ export const updateCarer = async (req: Request, res: Response) => {
   const { 
     firstName, lastName, avatar,
     bio, experienceYears, hourlyRate, pricingType, fixedRate, platformFeePercent, location, age,
-    certifications, certificationDetails, services, availability, isVerified, applicationStatus
+    certifications, certificationDetails, workplaceName, workplaceType, department, position,
+    employeeIdOrLicenseNote, workplaceProofImages, verificationStatus,
+    services, availability, isVerified, applicationStatus
   } = req.body;
 
   try {
@@ -361,17 +507,30 @@ export const updateCarer = async (req: Request, res: Response) => {
       carer.pricingType = pricingType || carer.pricingType;
       carer.fixedRate = fixedRate !== undefined ? fixedRate : carer.fixedRate;
       carer.platformFeePercent = platformFeePercent !== undefined ? platformFeePercent : carer.platformFeePercent;
-      carer.location = location || carer.location;
+      carer.location = location !== undefined ? location : carer.location;
       carer.age = age !== undefined ? age : carer.age;
       carer.certifications = certifications || carer.certifications;
       carer.certificationDetails = certificationDetails || carer.certificationDetails;
+      carer.workplaceName = workplaceName !== undefined ? workplaceName : carer.workplaceName;
+      carer.workplaceType = workplaceType !== undefined ? workplaceType : carer.workplaceType;
+      carer.department = department !== undefined ? department : carer.department;
+      carer.position = position !== undefined ? position : carer.position;
+      carer.employeeIdOrLicenseNote = employeeIdOrLicenseNote !== undefined ? employeeIdOrLicenseNote : carer.employeeIdOrLicenseNote;
+      carer.workplaceProofImages = workplaceProofImages !== undefined ? workplaceProofImages : carer.workplaceProofImages;
       carer.services = services || carer.services;
       carer.availability = availability || carer.availability;
       carer.isVerified = isVerified !== undefined ? isVerified : carer.isVerified;
+      carer.verificationStatus = verificationStatus || (carer.isVerified ? 'verified' : carer.verificationStatus);
+      carer.isVerified = carer.verificationStatus === 'verified' ? true : carer.isVerified;
       carer.applicationStatus = applicationStatus || (carer.isVerified ? 'verified' : carer.applicationStatus);
 
       const updatedCarer = await carer.save();
+      if (user && location !== undefined) {
+        user.address = location;
+        await user.save();
+      }
       const populatedCarer = await Carer.findById(updatedCarer._id).populate('user', 'firstName lastName avatar email');
+      await ensureContractForCarer(populatedCarer, (req as AuthRequest).user?._id);
       res.json(populatedCarer);
     } else {
       res.status(404).json({ message: 'Carer not found' });

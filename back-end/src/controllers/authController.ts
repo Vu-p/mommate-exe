@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import generateToken from '../utils/generateToken.js';
+import type { AuthRequest } from '../middleware/auth.js';
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
@@ -33,6 +34,7 @@ export const registerUser = async (req: Request, res: Response) => {
         lastName: user.lastName,
         email: user.email,
         role: user.role,
+        mustChangePassword: user.mustChangePassword,
         token: generateToken(String(user._id)),
       });
     } else {
@@ -61,6 +63,7 @@ export const loginUser = async (req: Request, res: Response) => {
         lastName: 'Admin',
         email: adminEmail,
         role: 'admin',
+        mustChangePassword: false,
         token: generateToken('admin-id'),
       });
     }
@@ -74,11 +77,53 @@ export const loginUser = async (req: Request, res: Response) => {
         lastName: user.lastName,
         email: user.email,
         role: user.role,
+        mustChangePassword: user.mustChangePassword,
         token: generateToken(String(user._id)),
       });
     } else {
       res.status(401).json({ message: 'Invalid email or password' });
     }
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// @desc    Change password required on first login
+// @route   PATCH /api/auth/change-password-first-login
+// @access  Private
+export const changePasswordFirstLogin = async (req: AuthRequest, res: Response) => {
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    if (!currentPassword || !newPassword || String(newPassword).length < 8) {
+      return res.status(400).json({ message: 'Current password and a new password of at least 8 characters are required' });
+    }
+
+    const user = await User.findById(req.user!._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const matches = await bcrypt.compare(currentPassword, user.password);
+
+    if (!matches) {
+      return res.status(400).json({ message: 'Current password is incorrect' });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.mustChangePassword = false;
+    await user.save();
+
+    res.json({
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      mustChangePassword: user.mustChangePassword,
+      token: generateToken(String(user._id)),
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }

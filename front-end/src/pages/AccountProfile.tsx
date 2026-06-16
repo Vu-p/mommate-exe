@@ -183,9 +183,11 @@ const AccountProfile = () => {
               <Link to="/account/request" className="account-nav-item">
                 Yêu cầu đặt lịch
               </Link>
-              <Link to="/caregiver/apply/overview" className="account-nav-item">
-                Đăng ký bảo mẫu
-              </Link>
+              {user?.role === 'carer' && (
+                <Link to="/carer/profile" className="account-nav-item">
+                  Hồ sơ carer
+                </Link>
+              )}
               <a href="#support" className="account-nav-item">
                 Hỗ trợ
               </a>

@@ -3,6 +3,9 @@ import logo from '../assets/images/logo.png';
 import './Footer.css';
 
 const Footer = () => {
+  const contactEmail = import.meta.env.VITE_CONTACT_EMAIL?.trim();
+  const contactPhone = import.meta.env.VITE_CONTACT_PHONE?.trim();
+
   return (
     <footer className="site-footer" id="contact">
       <div className="container footer-main">
@@ -16,9 +19,7 @@ const Footer = () => {
           <h4>Sản phẩm</h4>
           <a href="/services">Dịch vụ</a>
           <a href="/carers">Chuyên gia</a>
-          <a href="/booking">Đặt lịch</a>
-          <a href="/review">Đánh giá</a>
-          <a href="/caregiver/apply/overview">Đăng ký bảo mẫu</a>
+          <a href="/account/request">Lịch đặt</a>
         </div>
 
         <div className="footer-link-group">
@@ -29,19 +30,33 @@ const Footer = () => {
 
         <div className="footer-contact">
           <h4>Liên hệ</h4>
-          <a href="mailto:contact@company.com">
-            <Mail size={18} />
-            contact@company.com
-          </a>
-          <a href="tel:+84000000000">
-            <Phone size={18} />
-            (xx) xxxx-xxxx
-          </a>
+          {contactEmail ? (
+            <a href={`mailto:${contactEmail}`}>
+              <Mail size={18} />
+              {contactEmail}
+            </a>
+          ) : (
+            <span className="footer-contact-placeholder">
+              <Mail size={18} />
+              Email đang cập nhật
+            </span>
+          )}
+          {contactPhone ? (
+            <a href={`tel:${contactPhone.replace(/\s/g, '')}`}>
+              <Phone size={18} />
+              {contactPhone}
+            </a>
+          ) : (
+            <span className="footer-contact-placeholder">
+              <Phone size={18} />
+              Hotline đang cập nhật
+            </span>
+          )}
         </div>
       </div>
 
       <div className="container footer-bottom">
-        <p>Bản quyền © 2023</p>
+        <p>Bản quyền © 2026</p>
         <p>Bảo lưu mọi quyền</p>
       </div>
     </footer>

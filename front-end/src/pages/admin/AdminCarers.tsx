@@ -21,6 +21,15 @@ interface Carer {
   location: string;
   age: number;
   isVerified: boolean;
+  verificationStatus?: string;
+  contractStatus?: 'pending' | 'signed' | 'voided';
+  contractSignedAt?: string;
+  workplaceName?: string;
+  workplaceType?: string;
+  department?: string;
+  position?: string;
+  employeeIdOrLicenseNote?: string;
+  workplaceProofImages?: string[];
 }
 
 const AdminCarers = () => {
@@ -41,7 +50,7 @@ const AdminCarers = () => {
   const fetchCarers = async () => {
     try {
       setLoading(true);
-      const { data } = await api.get('/carers');
+      const { data } = await api.get('/carers?admin=true');
       setCarers(data);
     } catch (error) {
       console.error('Error fetching carers:', error);
@@ -63,7 +72,14 @@ const AdminCarers = () => {
       hourlyRate: 0,
       location: '',
       age: 0,
-      isVerified: false
+      isVerified: false,
+      verificationStatus: 'pending',
+      workplaceName: '',
+      workplaceType: 'hospital',
+      department: '',
+      position: '',
+      employeeIdOrLicenseNote: '',
+      workplaceProofImages: []
     });
     setIsModalOpen(true);
   };
@@ -81,7 +97,14 @@ const AdminCarers = () => {
       hourlyRate: carer.hourlyRate,
       location: carer.location,
       age: carer.age,
-      isVerified: carer.isVerified
+      isVerified: carer.isVerified,
+      verificationStatus: carer.verificationStatus || (carer.isVerified ? 'verified' : 'pending'),
+      workplaceName: carer.workplaceName || '',
+      workplaceType: carer.workplaceType || 'hospital',
+      department: carer.department || '',
+      position: carer.position || '',
+      employeeIdOrLicenseNote: carer.employeeIdOrLicenseNote || '',
+      workplaceProofImages: carer.workplaceProofImages || []
     });
     setIsModalOpen(true);
   };
@@ -130,7 +153,11 @@ const AdminCarers = () => {
 
   const handleToggleVerifyFromList = async (carer: Carer) => {
     try {
-      const { data } = await api.put(`/carers/${carer._id}`, { isVerified: !carer.isVerified });
+      const nextVerified = !carer.isVerified;
+      const { data } = await api.put(`/carers/${carer._id}`, {
+        isVerified: nextVerified,
+        verificationStatus: nextVerified ? 'verified' : 'pending',
+      });
       setCarers(carers.map(c => c._id === data._id ? data : c));
     } catch (error) {
       alert('Verification update failed');
@@ -190,7 +217,7 @@ const AdminCarers = () => {
                         <img src={carer.user.avatar || 'https://via.placeholder.com/150'} alt="" className="td-thumb" />
                         <div>
                           <div className="td-title">{carer.user.firstName} {carer.user.lastName}</div>
-                          <div className="sub-info">{carer.location}</div>
+                          <div className="sub-info">{carer.workplaceName || carer.location}</div>
                         </div>
                       </div>
                     </td>
@@ -198,8 +225,11 @@ const AdminCarers = () => {
                     <td><span className="price-tag">{carer.hourlyRate.toLocaleString()} VND/hr</span></td>
                     <td>
                       <span className={`badge ${carer.isVerified ? 'verified' : 'unverified'}`}>
-                        {carer.isVerified ? 'Verified' : 'Pending'}
+                        {carer.verificationStatus || (carer.isVerified ? 'verified' : 'pending')}
                       </span>
+                      <div className="sub-info" style={{ marginTop: 6 }}>
+                        Contract: {carer.contractStatus === 'signed' ? 'signed' : 'pending'}
+                      </div>
                     </td>
                     <td className="text-right">
                       <div className="action-group">
@@ -310,9 +340,10 @@ const AdminCarers = () => {
               </div>
             </div>
             <div className="form-group">
-              <label>Location</label>
+              <label>Carer Location</label>
               <input 
                 type="text" required disabled={modalMode === 'view'}
+                placeholder="City / district where this carer can serve"
                 value={currentCarer.location || ''}
                 onChange={e => setCurrentCarer({...currentCarer, location: e.target.value})}
               />
@@ -325,15 +356,72 @@ const AdminCarers = () => {
                 onChange={e => setCurrentCarer({...currentCarer, age: Number(e.target.value)})}
               />
             </div>
+
+            <div className="form-group full">
+              <label>Workplace Name</label>
+              <input
+                type="text"
+                disabled={modalMode === 'view'}
+                placeholder="Bệnh viện / phòng khám đang làm việc"
+                value={currentCarer.workplaceName || ''}
+                onChange={e => setCurrentCarer({...currentCarer, workplaceName: e.target.value})}
+              />
+            </div>
+            <div className="form-group">
+              <label>Workplace Type</label>
+              <select
+                disabled={modalMode === 'view'}
+                value={currentCarer.workplaceType || 'hospital'}
+                onChange={e => setCurrentCarer({...currentCarer, workplaceType: e.target.value})}
+              >
+                <option value="hospital">Hospital</option>
+                <option value="clinic">Clinic</option>
+                <option value="private_practice">Private Practice</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Department</label>
+              <input
+                type="text"
+                disabled={modalMode === 'view'}
+                placeholder="Sản nhi / điều dưỡng / hộ sinh"
+                value={currentCarer.department || ''}
+                onChange={e => setCurrentCarer({...currentCarer, department: e.target.value})}
+              />
+            </div>
+            <div className="form-group">
+              <label>Position</label>
+              <input
+                type="text"
+                disabled={modalMode === 'view'}
+                placeholder="Y tá / điều dưỡng / hộ sinh"
+                value={currentCarer.position || ''}
+                onChange={e => setCurrentCarer({...currentCarer, position: e.target.value})}
+              />
+            </div>
+            <div className="form-group">
+              <label>Employee ID / License Note</label>
+              <input
+                type="text"
+                disabled={modalMode === 'view'}
+                value={currentCarer.employeeIdOrLicenseNote || ''}
+                onChange={e => setCurrentCarer({...currentCarer, employeeIdOrLicenseNote: e.target.value})}
+              />
+            </div>
             
             <div className="form-group full">
               <label className="checkbox-label">
                 <input 
                   type="checkbox" disabled={modalMode === 'view'}
                   checked={currentCarer.isVerified || false}
-                  onChange={e => setCurrentCarer({...currentCarer, isVerified: e.target.checked})}
+                  onChange={e => setCurrentCarer({
+                    ...currentCarer,
+                    isVerified: e.target.checked,
+                    verificationStatus: e.target.checked ? 'verified' : 'pending',
+                  })}
                 />
-                <span>Certified & Verified Professional</span>
+                <span>Verified workplace professional</span>
               </label>
             </div>
           </div>

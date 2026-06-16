@@ -4,8 +4,6 @@ import {
   ShoppingBag, 
   DollarSign, 
   TrendingUp,
-  ArrowUpRight,
-  ArrowDownRight,
   ClipboardList
 } from 'lucide-react';
 import api from '../../utils/api';
@@ -19,6 +17,7 @@ const AdminDashboard = () => {
     carerCount: 0,
     serviceCount: 0
   });
+  const [recentBookings, setRecentBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -36,7 +35,9 @@ const AdminDashboard = () => {
 
       const bookings = bookingsRes.data;
       const revenue = bookings.reduce((acc: number, b: any) => acc + (b.totalPrice || 0), 0);
-      const active = bookings.filter((b: any) => ['pending', 'accepted', 'paid'].includes(b.status)).length;
+      const active = bookings.filter((b: any) =>
+        ['pending', 'pending_carer', 'accepted_pending_payment', 'paid_confirmed', 'confirmed', 'in_progress'].includes(b.status)
+      ).length;
 
       setStats({
         totalBookings: bookings.length,
@@ -45,6 +46,7 @@ const AdminDashboard = () => {
         carerCount: carersRes.data.length,
         serviceCount: servicesRes.data.length
       });
+      setRecentBookings(bookings.slice(0, 5));
     } catch (error) {
       console.error('Error loading dashboard stats:', error);
     } finally {
@@ -52,17 +54,11 @@ const AdminDashboard = () => {
     }
   };
 
-  const StatCard = ({ title, value, icon: Icon, trend, color }: any) => (
+  const StatCard = ({ title, value, icon: Icon, color }: any) => (
     <div className={`stat-card ${color}`}>
       <div className="stat-content">
         <span className="stat-title">{title}</span>
         <h2 className="stat-value">{value}</h2>
-        {trend && (
-          <div className={`stat-trend ${trend > 0 ? 'up' : 'down'}`}>
-            {trend > 0 ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
-            <span>{Math.abs(trend)}% from last month</span>
-          </div>
-        )}
       </div>
       <div className="stat-icon-wrapper">
         <Icon size={24} />
@@ -82,30 +78,26 @@ const AdminDashboard = () => {
       <div className="stats-grid">
         <StatCard 
           title="Total Revenue" 
-          value={`$${stats.totalRevenue.toLocaleString()}`} 
+          value={`${stats.totalRevenue.toLocaleString('vi-VN')} VND`} 
           icon={DollarSign} 
-          trend={12.5}
           color="purple"
         />
         <StatCard 
           title="Active Bookings" 
           value={stats.activeBookings} 
           icon={ShoppingBag} 
-          trend={8.2}
           color="blue"
         />
         <StatCard 
           title="Service Carers" 
           value={stats.carerCount} 
           icon={Users} 
-          trend={4.1}
           color="pink"
         />
         <StatCard 
           title="Total Requests" 
           value={stats.totalBookings} 
           icon={ClipboardList} 
-          trend={-2.4}
           color="orange"
         />
       </div>
@@ -125,23 +117,21 @@ const AdminDashboard = () => {
         <div className="admin-card activity-card">
           <div className="card-header">
             <h3>Recent Activity</h3>
-            <button className="text-btn">View All</button>
           </div>
           <div className="activity-list">
-            <div className="activity-item">
-              <div className="activity-indicator status-paid"></div>
-              <div className="activity-details">
-                <span className="activity-desc">Booking #8842 paid by <strong>Sarah J.</strong></span>
-                <span className="activity-time">2 minutes ago</span>
+            {recentBookings.length > 0 ? recentBookings.map((booking) => (
+              <div className="activity-item" key={booking._id}>
+                <div className={`activity-indicator ${booking.status === 'paid_confirmed' || booking.status === 'confirmed' ? 'status-paid' : 'status-pending'}`}></div>
+                <div className="activity-details">
+                  <span className="activity-desc">
+                    {booking.service?.title || 'Booking MomMate'} - <strong>{booking.status}</strong>
+                  </span>
+                  <span className="activity-time">{new Date(booking.createdAt || booking.scheduledAt).toLocaleString('vi-VN')}</span>
+                </div>
               </div>
-            </div>
-            <div className="activity-item">
-              <div className="activity-indicator status-pending"></div>
-              <div className="activity-details">
-                <span className="activity-desc">New carer request from <strong>Emily R.</strong></span>
-                <span className="activity-time">15 minutes ago</span>
-              </div>
-            </div>
+            )) : (
+              <p className="activity-time">No real booking activity yet.</p>
+            )}
           </div>
         </div>
       </div>
