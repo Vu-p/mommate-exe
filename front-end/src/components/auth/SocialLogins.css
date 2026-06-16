@@ -16,10 +16,21 @@
   gap: 72px;
 }
 
+.social-error {
+  color: var(--danger, #b42318);
+  font-size: 0.9rem;
+  margin: -6px 0 14px;
+}
+
 .social-btn {
   color: var(--primary-dark);
   font-size: 1.28rem;
   font-weight: 900;
+}
+
+.social-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
 }
 
 .social-btn:hover {

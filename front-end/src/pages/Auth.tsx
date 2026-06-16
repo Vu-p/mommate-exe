@@ -85,7 +85,7 @@ const Auth = ({ defaultMode = 'signup' }: AuthProps) => {
                   ) : (
                     <SignUpForm onToggle={toggleToLogin} />
                   )}
-                  <SocialLogins isLogin={isLogin} />
+                  {!isAdminApp && <SocialLogins isLogin={isLogin} />}
                 </motion.div>
               </AnimatePresence>
             </div>

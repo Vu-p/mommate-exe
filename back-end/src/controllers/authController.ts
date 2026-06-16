@@ -3,6 +3,17 @@ import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import generateToken from '../utils/generateToken.js';
 import type { AuthRequest } from '../middleware/auth.js';
+import { getFirebaseAuth } from '../config/firebaseAdmin.js';
+
+const authResponse = (user: any) => ({
+  _id: user._id,
+  firstName: user.firstName,
+  lastName: user.lastName,
+  email: user.email,
+  role: user.role,
+  mustChangePassword: user.mustChangePassword,
+  token: generateToken(String(user._id)),
+});
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
@@ -85,6 +96,70 @@ export const loginUser = async (req: Request, res: Response) => {
     }
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// @desc    Login or register with Firebase Google OAuth idToken
+// @route   POST /api/auth/firebase-google
+// @access  Public
+export const firebaseGoogleAuth = async (req: Request, res: Response) => {
+  const { idToken } = req.body;
+
+  try {
+    if (!idToken) {
+      return res.status(400).json({ message: 'Firebase idToken is required' });
+    }
+
+    const firebaseAuth = getFirebaseAuth();
+    const decodedToken = await firebaseAuth.verifyIdToken(idToken);
+    const email = decodedToken.email?.toLowerCase();
+
+    if (!email || !decodedToken.email_verified) {
+      return res.status(401).json({ message: 'Google account email is not verified' });
+    }
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      if (user.role === 'admin') {
+        return res.status(403).json({ message: 'Admin accounts must use the admin login page' });
+      }
+
+      if (!user.firebaseUid) {
+        user.firebaseUid = decodedToken.uid;
+      }
+      if (!user.authProvider || user.authProvider === 'local') {
+        user.authProvider = 'google';
+      }
+      if (!user.avatar && decodedToken.picture) {
+        user.avatar = decodedToken.picture;
+      }
+      await user.save();
+
+      return res.json(authResponse(user));
+    }
+
+    const displayName = decodedToken.name || email.split('@')[0] || 'MomMate User';
+    const [firstNameCandidate, ...lastNameParts] = displayName.trim().split(/\s+/);
+    const firstName = firstNameCandidate || 'MomMate';
+    const lastName = lastNameParts.join(' ') || 'User';
+    const randomPassword = await bcrypt.hash(`${decodedToken.uid}:${Date.now()}`, 10);
+
+    user = await User.create({
+      firstName,
+      lastName,
+      email,
+      password: randomPassword,
+      firebaseUid: decodedToken.uid,
+      authProvider: 'google',
+      avatar: decodedToken.picture,
+      role: 'parent',
+      mustChangePassword: false,
+    });
+
+    return res.status(201).json(authResponse(user));
+  } catch (error) {
+    res.status(401).json({ message: 'Google authentication failed' });
   }
 };
 

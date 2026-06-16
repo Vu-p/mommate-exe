@@ -9,6 +9,8 @@ export enum UserRole {
 export interface IUser extends Document {
   email: string;
   password: string;
+  firebaseUid?: string;
+  authProvider?: 'local' | 'google';
   role: UserRole;
   firstName: string;
   lastName: string;
@@ -29,6 +31,8 @@ export interface IUser extends Document {
 const UserSchema: Schema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  firebaseUid: { type: String, unique: true, sparse: true },
+  authProvider: { type: String, enum: ['local', 'google'], default: 'local' },
   role: { type: String, enum: Object.values(UserRole), default: UserRole.PARENT },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
