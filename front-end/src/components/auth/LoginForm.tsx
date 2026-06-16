@@ -6,6 +6,7 @@ import Input from '../common/Input.js';
 import './LoginForm.css';
 import { useAuth } from '../../context/AuthContext.js';
 import api from '../../utils/api.js';
+import { isAdminApp, redirectToAdminApp } from '../../config/appMode.js';
 
 interface LoginFormProps {
   onToggle?: () => void;
@@ -29,7 +30,25 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
 
     try {
       const { data } = await api.post('/auth/login', { email, password });
+
+      if (isAdminApp && data.role !== 'admin') {
+        setError('Tài khoản này không có quyền truy cập trang quản trị.');
+        return;
+      }
+
+      if (!isAdminApp && data.role === 'admin') {
+        if (!redirectToAdminApp()) {
+          setError('Tài khoản admin cần đăng nhập tại trang quản trị.');
+        }
+        return;
+      }
+
       login(data);
+
+      if (isAdminApp && data.role === 'admin') {
+        navigate('/admin/dashboard');
+        return;
+      }
       if (data.role === 'carer' && data.mustChangePassword) {
         navigate('/change-password');
         return;

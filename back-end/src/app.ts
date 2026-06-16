@@ -15,13 +15,25 @@ dotenv.config();
 
 const app = express();
 
+const normalizeOrigin = (origin?: string) => {
+  if (!origin) return '';
+
+  try {
+    const url = new URL(origin.trim());
+    return url.origin;
+  } catch {
+    return origin.trim().replace(/\/$/, '');
+  }
+};
+
 const configuredOrigins = [
   process.env.APP_PUBLIC_URL,
   process.env.ADMIN_PUBLIC_URL,
   process.env.FRONTEND_URL,
+  process.env.CORS_ORIGINS,
 ]
   .flatMap((origin) => origin?.split(',') ?? [])
-  .map((origin) => origin.trim())
+  .map((origin) => normalizeOrigin(origin))
   .filter(Boolean);
 
 const devOrigins = [
@@ -44,7 +56,7 @@ app.use(cors({
       return;
     }
 
-    if (allowedOrigins.has(origin)) {
+    if (allowedOrigins.has(normalizeOrigin(origin))) {
       callback(null, true);
       return;
     }

@@ -9,7 +9,7 @@ import Footer from '../components/Footer.tsx';
 import signupImg from '../assets/images/signup-mock.png';
 import './Auth.css';
 import { useAuth } from '../context/AuthContext.tsx';
-import { isAdminApp } from '../config/appMode.ts';
+import { isAdminApp, redirectToAdminApp } from '../config/appMode.ts';
 
 interface AuthProps {
   defaultMode?: 'login' | 'signup';
@@ -31,6 +31,9 @@ const Auth = ({ defaultMode = 'signup' }: AuthProps) => {
           logout();
           navigate('/auth?mode=login');
         }
+        return;
+      }
+      if (user.role === 'admin' && redirectToAdminApp()) {
         return;
       }
       if (user.role === 'carer' && user.mustChangePassword) {
