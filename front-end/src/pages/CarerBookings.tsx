@@ -118,6 +118,7 @@ const CarerBookings = () => {
           </div>
 
           <div className="card-footer-layout">
+            <button className="btn-view-details" onClick={() => navigate(`/carer/bookings/${booking._id}`)}>Xem chi tiết</button>
             {['pending', 'pending_carer'].includes(booking.status) && (
               <>
                 <button className="btn-pay-action" disabled={isUpdating || !hasSignedContract} onClick={() => patchBooking(booking._id, 'accept')}>

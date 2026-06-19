@@ -1,19 +1,47 @@
 :root {
-  --primary: #c99bd3;
-  --primary-light: #efe7f7;
-  --primary-dark: #5d5a88;
-  --primary-gradient: linear-gradient(135deg, #d8acd9 0%, #8e78b8 100%);
-  --secondary: #20202a;
-  --accent: #ded8eb;
-  --bg: #ffffff;
-  --background: #f7f4fb;
-  --surface-lavender: #f1edf9;
-  --white: #FFFFFF;
-  --text: #25232b;
-  --text-muted: #777386;
-  --text-light: #a39daf;
-  --border: #e7e2ee;
-  --error: #EF4444;
+  /* Core Colors */
+  --primary: #396940;
+  --primary-light: #baf0bc;
+  --primary-dark: #20502a;
+  --primary-container: #7bae7f;
+  --on-primary-container: #0f411d;
+  --secondary: #895032;
+  --secondary-container: #feb28d;
+  --on-secondary-container: #794225;
+  --tertiary: #8b4b5d;
+  --tertiary-container: #d88ca0;
+  
+  /* Background & Surfaces */
+  --bg: #f8f9fa;
+  --background: #f8f9fa;
+  --surface: #f8f9fa;
+  --surface-dim: #d9dadb;
+  --surface-bright: #f8f9fa;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f3f4f5;
+  --surface-container: #edeeef;
+  --surface-container-high: #e7e8e9;
+  --surface-container-highest: #e1e3e4;
+  --surface-variant: #e1e3e4;
+  --inverse-surface: #2e3132;
+  --inverse-on-surface: #f0f1f2;
+  
+  /* Text & Outline */
+  --white: #ffffff;
+  --text: #191c1d;
+  --on-surface: #191c1d;
+  --on-background: #191c1d;
+  --text-muted: #414940;
+  --on-surface-variant: #414940;
+  --text-light: #717970;
+  --outline: #717970;
+  --border: #c1c9be;
+  --outline-variant: #c1c9be;
+
+  /* Feedback Colors */
+  --error: #ba1a1a;
+  --error-container: #ffdad6;
+  --on-error-container: #93000a;
   --warning: #ffc107;
 
   /* Typography */
@@ -22,21 +50,24 @@
 
   /* Spacing */
   --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  --spacing-xxl: 48px;
-  --container: 1240px;
+  --spacing-base: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 24px;
+  --spacing-lg: 48px;
+  --spacing-xl: 80px;
+  --spacing-gutter: 24px;
+  --spacing-margin-mobile: 16px;
+  --spacing-margin-desktop: 64px;
+  --container: 1280px;
 
   /* Borders & Shadows */
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
-  --radius-pill: 999px;
-  --shadow-sm: 0 4px 12px rgba(32, 32, 42, 0.04);
-  --shadow-md: 0 12px 30px rgba(93, 90, 136, 0.10);
-  --shadow-lg: 0 20px 50px rgba(93, 90, 136, 0.16);
+  --radius-pill: 9999px;
+  --shadow-sm: 0 2px 8px rgba(25, 28, 29, 0.04);
+  --shadow-md: 0 8px 24px rgba(25, 28, 29, 0.08);
+  --shadow-lg: 0 14px 36px rgba(25, 28, 29, 0.11);
   --shadow-glass: 0 8px 32px rgba(93, 90, 136, 0.14);
 
   /* Transitions */

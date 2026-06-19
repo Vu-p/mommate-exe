@@ -96,9 +96,9 @@ const FilterSelect = ({ label, options, value, onChange }: FilterSelectProps) =>
 
 const categoryOptions = [
   { label: 'Tất cả dịch vụ', value: '' },
-  { label: 'Newborn Care', value: 'Newborn Care' },
-  { label: 'Postpartum Support', value: 'Postpartum Support' },
-  { label: 'Childcare', value: 'Consultation' },
+  { label: 'Mẹ bầu', value: 'Mẹ bầu' },
+  { label: 'Mẹ sau sinh', value: 'Chăm sóc sau sinh' },
+  { label: 'Chăm sóc em bé', value: 'Chăm sóc em bé' },
 ];
 
 const areaOptions = [

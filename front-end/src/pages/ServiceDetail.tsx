@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { ArrowRight, ChevronRight, Clock3, Loader2, Sparkles } from 'lucide-react';
+import { ArrowRight, CheckCircle2, ChevronDown, ChevronRight, Clock3, Headphones, Heart, Loader2, ShieldCheck, Star, Stethoscope } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
@@ -73,7 +73,6 @@ const ServiceDetail = () => {
   }, [service]);
 
   const servicePrice = service?.price ?? service?.basePrice ?? 0;
-  const stepCards = service?.steps || [];
 
   const handleBooking = () => {
     if (!service) return;
@@ -135,102 +134,67 @@ const ServiceDetail = () => {
           <span>{service.title}</span>
         </nav>
 
-        <section className="service-top-section">
-          <div className="service-page-heading">
-            <p className="section-eyebrow">Dịch vụ nổi bật</p>
-            <h1>{service.title}</h1>
-          </div>
-
-          <div className="gallery-container">
-            <div className="thumbnails">
-              {galleryImages.slice(1, 4).map((image, index) => (
-                <div key={`${image}-${index}`} className="thumb">
-                  <img src={image} alt={`${service.title} ${index + 2}`} />
-                </div>
-              ))}
-            </div>
-
-            <div className="main-image">
-              <img src={service.image} alt={service.title} />
-            </div>
-
-            <aside className="service-intro-card">
-              <p className="intro-category">{service.category}</p>
-              <h2>{service.title}</h2>
-
-              <div className="intro-meta">
-                <span className="meta-chip">
-                  <Sparkles size={14} />
-                  {service.tags?.[0] || 'Dịch vụ chăm sóc'}
-                </span>
-                <span className="meta-chip">
-                  <Clock3 size={14} />
-                  {service.duration}
-                </span>
+        <div className="stitch-service-layout">
+          <div className="stitch-service-main">
+            <section className="stitch-service-hero">
+              <img src={service.image || galleryImages[0]} alt={service.title} />
+              <div className="stitch-service-hero-overlay">
+                <div><span>{service.category || 'Maternal Care'}</span><span><Star size={15} fill="currentColor" /> 4.9 (124 đánh giá)</span></div>
+                <h1>{service.title}</h1>
               </div>
+            </section>
 
-              <p className="intro-description">{service.description}</p>
+            <section className="stitch-service-about">
+              <h2>Về dịch vụ này</h2>
+              <p>{service.description}</p>
+            </section>
 
-              <div className="intro-price">
-                <span className="price-label">Giá từ</span>
-                <strong>{servicePrice ? `${servicePrice.toLocaleString('vi-VN')} VND` : 'Liên hệ'}</strong>
-              </div>
-
-              <button type="button" onClick={handleBooking} className="btn-booking-primary">
-                {carerId ? 'Xác nhận đặt' : 'Đặt ngay'}
-                <ArrowRight size={16} />
-              </button>
-            </aside>
-          </div>
-        </section>
-
-        <section className="service-benefits">
-          <h3>Lợi ích của gói dịch vụ</h3>
-          <p>{service.description}</p>
-          <div className="action-buttons">
-            <button type="button" className="btn-booking-secondary" onClick={handleBooking}>
-              {carerId ? 'Xác nhận' : 'Đặt ngay'}
-            </button>
-            <button type="button" className="btn-consultation">
-              Yêu cầu tư vấn
-            </button>
-          </div>
-        </section>
-
-        {stepCards.length > 0 && (
-          <section className="treatment-details">
-            <h3>Chi tiết liệu trình</h3>
-            <div className="steps-list">
-              {stepCards.map((step, index) => (
-                <article key={`${step.title}-${index}`} className="treatment-step-card">
-                  <div className="step-header">
-                    <h4>Bước {index + 1}</h4>
-                  </div>
-                  <div className="step-body">
-                    <div className="step-image">
-                      <img src={step.image || service.image} alt={step.title || `Bước ${index + 1}`} />
-                    </div>
-                    <div className="step-text">
-                      <h5>{step.title || `Bước ${index + 1}`}</h5>
-                      <p>{step.text}</p>
-                    </div>
-                  </div>
-                </article>
-              ))}
+            <div className="stitch-service-info-grid">
+              <section>
+                <h3><CheckCircle2 size={20} /> Nội dung chăm sóc</h3>
+                <ul>
+                  {[
+                    'Kiểm tra vết mổ, vết khâu tầng sinh môn',
+                    'Massage toàn thân giảm mệt mỏi, stress',
+                    'Xông hơ thảo dược phục hồi vùng kín',
+                    'Hỗ trợ thông tắc tia sữa và hướng dẫn cho con bú',
+                    'Chăm sóc vết rạn và làm mờ thâm nám',
+                  ].map((item) => <li key={item}><CheckCircle2 size={17} />{item}</li>)}
+                </ul>
+              </section>
+              <section>
+                <h3><Clock3 size={20} /> Thời gian & Giá cả</h3>
+                <div className="stitch-price-row"><span>Gói cơ bản (90 phút)</span><strong>{servicePrice.toLocaleString('vi-VN')} VNĐ</strong></div>
+                <div className="stitch-price-row"><span>Gói chuyên sâu (120 phút)</span><strong>{Math.round(servicePrice * 1.5).toLocaleString('vi-VN')} VNĐ</strong></div>
+                <div className="stitch-price-row"><span>Liệu trình 10 buổi</span><strong>{Math.round(servicePrice * 9).toLocaleString('vi-VN')} VNĐ</strong></div>
+                <small>* Giá đã bao gồm các loại thảo dược và dụng cụ cần thiết.</small>
+              </section>
             </div>
-          </section>
-        )}
 
-        <section className="bottom-cta">
-          <div className="book-now-section">
-            <button type="button" className="btn-book-now-large" onClick={handleBooking}>
-              {carerId ? 'Đặt lịch' : 'Đặt ngay'}
-            </button>
+            <section className="stitch-service-faq">
+              <h2>Câu hỏi thường gặp</h2>
+              <details><summary>Khi nào tôi nên bắt đầu dịch vụ này?<ChevronDown size={18} /></summary><p>Mẹ có thể bắt đầu sau khi xuất viện và tình trạng sức khỏe đã ổn định. Chuyên gia sẽ trao đổi trước để điều chỉnh liệu trình phù hợp.</p></details>
+              <details><summary>Người chăm sóc có chuyên môn gì?<ChevronDown size={18} /></summary><p>Đội ngũ gồm điều dưỡng và hộ sinh có hồ sơ chuyên môn được MomMate xác minh.</p></details>
+            </section>
           </div>
-          <Link to="/services" className="btn-explore">
-            Xem thêm
-          </Link>
-        </section>
+
+          <aside className="stitch-service-sidebar">
+            <section className="stitch-booking-card">
+              <span>Giá chỉ từ</span>
+              <div><strong>{servicePrice.toLocaleString('vi-VN')}</strong><b>VNĐ</b><small>/ buổi</small></div>
+              <p>Hơn 1.200 mẹ đã tin tưởng và sử dụng dịch vụ này trong tháng qua.</p>
+              <button onClick={handleBooking}>Đặt lịch ngay <ArrowRight size={18} /></button>
+              <footer><ShieldCheck size={16} /> Cam kết chất lượng</footer>
+            </section>
+            <section className="stitch-trust-card">
+              <h3>Tại sao chọn chúng tôi?</h3>
+              <div><Stethoscope /><p><strong>Đội ngũ chuyên môn</strong><span>Chuyên gia giàu kinh nghiệm và được xác minh.</span></p></div>
+              <div><Heart /><p><strong>Tận tâm & Chu đáo</strong><span>Lắng nghe nhu cầu riêng của từng gia đình.</span></p></div>
+              <div><ShieldCheck /><p><strong>An toàn tuyệt đối</strong><span>Quy trình rõ ràng và minh bạch.</span></p></div>
+            </section>
+            <section className="stitch-support-card"><Headphones size={20} /><span>Cần hỗ trợ tư vấn?</span><button>Gọi ngay</button></section>
+          </aside>
+        </div>
       </main>
 
       <Footer />

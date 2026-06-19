@@ -1,7 +1,7 @@
 .booking-page {
   background-color: #F8F9FA; /* light background matching the design overall vibe */
   min-height: 100vh;
-  padding-top: 80px;
+  padding-top: 0;
 }
 
 .booking-content {
@@ -297,4 +297,18 @@
   .summary-card {
     padding: 24px;
   }
+}
+.stitch-booking-heading { margin: 4px 0 26px; }
+.stitch-booking-heading > span { display: inline-flex; padding: 6px 10px; border-radius: 999px; color: #20502a; background: rgba(186,240,188,.5); font-size: .7rem; font-weight: 800; letter-spacing: .08em; }
+.stitch-booking-heading h1 { margin: 9px 0 6px; font-size: 2rem; }
+.stitch-booking-heading p { color: #717970; font-size: .88rem; }
+.booking-form-section h2 { display: flex; align-items: center; gap: 10px; }
+.booking-form-section h2 > span { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: #396940; font-size: .78rem; }
+.stitch-care-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.stitch-care-options button { min-height: 86px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; border: 1px solid #c1c9be; border-radius: 8px; color: #414940; background: #fff; font-size: .8rem; font-weight: 700; }
+.stitch-care-options button > span { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; color: #396940; background: #e7f2e8; }
+.stitch-care-options button.active { border-color: #396940; color: #20502a; background: #e7f2e8; box-shadow: inset 0 0 0 1px #396940; }
+
+@media (max-width: 640px) {
+  .stitch-care-options { grid-template-columns: repeat(2, 1fr); }
 }

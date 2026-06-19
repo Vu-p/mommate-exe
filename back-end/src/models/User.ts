@@ -24,6 +24,9 @@ export interface IUser extends Document {
   identityIssuedAt?: Date;
   identityImages?: string[];
   mustChangePassword: boolean;
+  accountStatus: 'active' | 'suspended';
+  suspendedAt?: Date;
+  suspendedReason?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -46,6 +49,9 @@ const UserSchema: Schema = new Schema({
   identityIssuedAt: { type: Date },
   identityImages: [{ type: String }],
   mustChangePassword: { type: Boolean, default: false },
+  accountStatus: { type: String, enum: ['active', 'suspended'], default: 'active', index: true },
+  suspendedAt: { type: Date },
+  suspendedReason: { type: String },
 }, { timestamps: true });
 
 export default mongoose.model<IUser>('User', UserSchema);

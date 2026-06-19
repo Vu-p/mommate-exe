@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Calendar, MapPin, Search, User } from 'lucide-react';
+import { Calendar, Eye, MapPin, Search, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import api from '../../utils/api';
 import './AdminTable.css';
 
@@ -197,7 +198,7 @@ const AdminBookings = () => {
                   <th>Amount</th>
                   <th>payOS</th>
                   <th>Payout</th>
-                  <th>Status</th>
+                  <th>Status</th><th></th>
                 </tr>
               </thead>
               <tbody>
@@ -212,6 +213,7 @@ const AdminBookings = () => {
                         <div className="sub-info">{booking.service?.title || 'Deleted Service'}</div>
                       </div>
                     </td>
+                    <td><Link className="icon-btn view" to={`/admin/bookings/${booking._id}`}><Eye size={16} /></Link></td>
                     <td>
                       {booking.carer?.user?.firstName} {booking.carer?.user?.lastName}
                     </td>

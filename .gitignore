@@ -42,3 +42,9 @@ Thumbs.db
 tsconfig.tsbuildinfo
 # Added by code-review-graph
 .code-review-graph/
+design-reference/
+
+tests/
+playwright-report/
+test-results/
+

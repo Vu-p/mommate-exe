@@ -14,6 +14,7 @@ import {
   handlePayOSWebhook,
   checkInBooking,
   checkOutBooking,
+  markPayoutPaid,
 } from '../controllers/bookingController.js';
 import { protect, authorize } from '../middleware/auth.js';
 
@@ -35,6 +36,7 @@ router.patch('/:id/check-in', checkInBooking);
 router.patch('/:id/check-out', checkOutBooking);
 router.patch('/:id/payment-proof', submitPaymentProof);
 router.patch('/:id/payment-confirm', authorize('admin'), confirmPayment);
+router.patch('/:id/payout', authorize('admin'), markPayoutPaid);
 router.patch('/:id/status', updateBookingStatus);
 
 export default router;

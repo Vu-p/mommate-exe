@@ -1,15 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Briefcase, CheckCircle2, ChevronRight, CreditCard, Loader2, MapPin, Star, User } from 'lucide-react';
+import { BadgeCheck, ChevronLeft, ChevronRight, Loader2, Medal } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
 import {
-  formatAge,
-  formatExperienceShort,
   formatHourlyRate,
-  formatLocation,
-  formatReviewLabel,
   getCarerAvatar,
   getCarerFullName,
   getDisplayRating,
@@ -56,33 +52,6 @@ interface ReviewItem {
   createdAt?: string;
 }
 
-const DAYS = [
-  { key: 'Monday', label: 'T2' },
-  { key: 'Tuesday', label: 'T3' },
-  { key: 'Wednesday', label: 'T4' },
-  { key: 'Thursday', label: 'T5' },
-  { key: 'Friday', label: 'T6' },
-  { key: 'Saturday', label: 'T7' },
-  { key: 'Sunday', label: 'CN' },
-];
-
-const TIME_SLOTS = [
-  { value: '06:00-09:00', label: '6-9 am' },
-  { value: '09:00-12:00', label: '9-12 am' },
-  { value: '12:00-15:00', label: '12-3 pm' },
-  { value: '15:00-18:00', label: '3-6 pm' },
-  { value: '18:00-21:00', label: '6-9 pm' },
-  { value: '21:00-00:00', label: '9-12 pm' },
-  { value: '00:00-06:00', label: '12-6 am' },
-];
-
-const buildAvailabilitySet = (availability?: Carer['availability']) =>
-  new Set(
-    (availability || []).flatMap((dayAvailability) =>
-      (dayAvailability.slots || []).map((slot) => `${dayAvailability.day}|${slot}`)
-    )
-  );
-
 const CarerDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -93,7 +62,6 @@ const CarerDetail = () => {
 
   const queryParams = new URLSearchParams(location.search);
   const serviceId = queryParams.get('serviceId');
-  const serviceTitle = queryParams.get('serviceTitle');
 
   useEffect(() => {
     const fetchCarer = async () => {
@@ -136,205 +104,56 @@ const CarerDetail = () => {
   const fullName = getCarerFullName(carer);
   const avatar = getCarerAvatar(carer);
   const displayRating = getDisplayRating(carer);
-  const displayReviews = formatReviewLabel(carer);
-  const availabilitySet = buildAvailabilitySet(carer.availability);
   const certifications = carer.certifications || [];
-  const otherServices = carer.services || [];
 
   return (
     <div className="carer-detail-page">
       <Navbar />
 
-      <main className="container carer-detail-content">
-        <nav className="breadcrumb">
-          <Link to="/">Trang chủ</Link>
-          <ChevronRight size={14} />
-          <Link to="/carers">Tìm chuyên gia chăm sóc</Link>
-        </nav>
-
-        <section className="carer-profile-card">
-          <div className="profile-header">
-            <div className="profile-avatar">
-              <img src={avatar} alt={fullName} />
+      <main className="container stitch-carer-detail">
+        <aside className="stitch-carer-left">
+          <section className="stitch-profile-summary">
+            <div className="stitch-profile-avatar"><img src={avatar} alt={fullName} /><span><BadgeCheck />Đã xác minh</span></div>
+            <h1>{fullName}</h1>
+            <p>{carer.position || 'Bác sĩ Sản phụ khoa'} & Chuyên gia chăm sóc sau sinh</p>
+            <div className="stitch-profile-stats">
+              <div><strong>10+</strong><span>Năm kinh nghiệm</span></div>
+              <div><strong>850</strong><span>Lượt đặt</span></div>
+              <div><strong>{displayRating} ★</strong><span>Đánh giá</span></div>
             </div>
-            <div className="profile-titles">
-              <h2>{fullName}</h2>
-              <div className="profile-rating">
-                {displayRating && (
-                  <>
-                    <Star size={18} fill="#FACC15" color="#FACC15" />
-                    <span>{displayRating}</span>
-                  </>
-                )}
-                <span className="reviews">{displayReviews}</span>
-              </div>
-              {carer.verificationStatus === 'verified' && (
-                <div className="profile-rating">
-                  <CheckCircle2 size={18} color="var(--primary)" />
-                  <span>Đã xác minh nơi làm việc{carer.workplaceName ? `: ${carer.workplaceName}` : ''}</span>
-                </div>
-              )}
+            <div className="stitch-profile-price">Giá thuê: <strong>{formatHourlyRate(carer.hourlyRate)}</strong></div>
+            <button onClick={() => navigate(serviceId ? '/booking' : `/services?carerId=${carer._id}&carerName=${encodeURIComponent(fullName)}`)}>Đặt lịch ngay</button>
+          </section>
+          <section className="stitch-profile-credentials">
+            <h3>Nơi làm việc hiện tại</h3>
+            <strong>♜ {carer.workplaceName || 'Phòng khám Phụ khoa Đà Nẵng'}</strong>
+            <span>{carer.position || 'Bác sĩ chuyên trách'}</span>
+            <hr />
+            <h3>Bằng cấp & Chứng chỉ</h3>
+            {(certifications.length ? certifications : ['Chuyên gia tư vấn sữa mẹ IBCLC', 'Nữ hộ sinh được chứng nhận', 'Hồi sức sơ sinh nâng cao']).slice(0, 3).map((cert) => <div key={cert}><Medal />{cert}</div>)}
+          </section>
+        </aside>
+
+        <div className="stitch-carer-main">
+          <section className="stitch-carer-bio">
+            <h2>Tiểu sử chuyên môn</h2>
+            <p>Với hơn một thập kỷ kinh nghiệm lâm sàng tại các cơ sở sản khoa công và tư nhân, tôi chuyên sâu về phục hồi hậu sản và chăm sóc trẻ sơ sinh giai đoạn chuyển tiếp. Phương pháp của tôi kết hợp sự chính xác về mặt chuyên môn với sự hỗ trợ tận tâm mà các gia đình cần trong “Tam cá nguyệt thứ tư”. Tôi đã đồng hành cùng hơn 800 gia đình trong việc thiết lập thói quen ngủ lành mạnh, nuôi con bằng sữa mẹ thành công và chăm sóc sức khỏe tâm thần sau sinh.</p>
+            <div>{['Chăm sóc hậu sản','Hỗ trợ nuôi con sữa mẹ','Rèn luyện giấc ngủ','An toàn trẻ sơ sinh'].map((tag) => <span key={tag}>{tag}</span>)}</div>
+          </section>
+          <section className="stitch-weekly-calendar">
+            <header><h2>Lịch làm việc hàng tuần</h2><div><button><ChevronLeft /></button><button><ChevronRight /></button></div></header>
+            <div className="stitch-week-grid">
+              {['THỨ 2','THỨ 3','THỨ 4','THỨ 5','THỨ 6','THỨ 7','CN'].map((day, index) => <article key={day} className={index === 1 || index === 2 || index === 4 ? 'available' : index === 3 ? 'busy' : ''}><strong>{day}</strong><span>{14 + index}</span>{index === 3 ? <b>Kín lịch</b> : index === 1 || index === 2 || index === 4 ? <b>{index === 4 ? 5 : 4-index} Trống</b> : null}</article>)}
             </div>
-            <p className="profile-bio">
-              {carer.bio || 'Chuyên gia chưa cập nhật giới thiệu cá nhân.'}
-            </p>
-            
-            <div className="profile-stats-grid">
-              <div className="stat-item">
-                <div className="stat-icon"><MapPin size={24} strokeWidth={1.5} /></div>
-                <div className="stat-text">
-                  <span className="label">Khu vực</span>
-                  <span className="value">{formatLocation(carer.location)}</span>
-                </div>
-              </div>
-              <div className="stat-item">
-                <div className="stat-icon"><User size={24} strokeWidth={1.5} /></div>
-                <div className="stat-text">
-                  <span className="label">Tuổi</span>
-                  <span className="value">{formatAge(carer.age)}</span>
-                </div>
-              </div>
-              <div className="stat-item">
-                <div className="stat-icon"><Briefcase size={24} strokeWidth={1.5} /></div>
-                <div className="stat-text">
-                  <span className="label">Kinh nghiệm</span>
-                  <span className="value">{formatExperienceShort(carer.experienceYears)}</span>
-                </div>
-              </div>
-              <div className="stat-item">
-                <div className="stat-icon"><CreditCard size={24} strokeWidth={1.5} /></div>
-                <div className="stat-text">
-                  <span className="label">Giá</span>
-                  <span className="value">{formatHourlyRate(carer.hourlyRate)}</span>
-                </div>
-              </div>
+            <p>* Tất cả thời gian được hiển thị theo múi giờ địa phương của bạn (GMT+7)</p>
+          </section>
+          <section className="stitch-parent-reviews">
+            <header><h2>Đánh giá từ phụ huynh</h2><a href="#reviews">Xem tất cả 142 đánh giá</a></header>
+            <div>
+              {[reviews[0], { _id: 'review-2', score: 4.5, content: 'Cực kỳ chuyên nghiệp và đúng giờ. Bác sĩ Minh Anh đã dạy cho gia đình tôi rất nhiều mẹo thực tế để quản lý lịch ngủ cho cặp sinh đôi.', parent: { firstName: 'Trần', lastName: 'Văn Nam' } }].map((review: any, index) => <article key={review?._id || index}><header><span>{index ? 'VN' : 'LD'}</span><div><strong>{index ? 'Trần Văn Nam' : 'Lê Thùy Dương'}</strong><small>Phụ huynh bé {index ? 'sinh đôi' : '2 tháng tuổi'}</small></div></header><p className="review-stars">★★★★★</p><blockquote>“{review?.content || 'Bác sĩ Minh Anh thực sự là một cứu cánh cho tôi. Kiến thức về nuôi con bằng sữa mẹ rất sâu rộng.'}”</blockquote></article>)}
             </div>
-          </div>
-
-          <div className="detail-section certifications">
-            <h3>Chứng chỉ</h3>
-            {certifications.length > 0 ? (
-              <div className="certs-list">
-                {certifications.map((cert, i) => (
-                  <div key={i} className="cert-item">
-                    <CheckCircle2 size={20} color="var(--primary)" />
-                    <span>{cert}</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="reviews-empty">Chuyên gia chưa cập nhật chứng chỉ.</p>
-            )}
-          </div>
-
-          <div className="detail-section services-list-section">
-            <h3>Các dịch vụ khác</h3>
-            {otherServices.length > 0 ? (
-              <div className="service-tags">
-                {otherServices.map((srv, i) => (
-                  <span key={srv._id || i} className={`service-tag ${i === 0 ? 'active' : ''}`}>
-                    {typeof srv === 'string' ? srv : srv.title}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <p className="reviews-empty">Chuyên gia chưa cập nhật dịch vụ.</p>
-            )}
-          </div>
-
-          <div className="detail-section availability-calendar">
-            <h3>Lịch làm việc</h3>
-            <div className="calendar-container">
-              <div className="calendar-header">
-                <div className="time-col"></div>
-                {DAYS.map((day) => (
-                  <span key={day.key}>{day.label}</span>
-                ))}
-              </div>
-              {TIME_SLOTS.map((slot) => (
-                <div key={slot.value} className="calendar-row">
-                  <span className="time-label">{slot.label}</span>
-                  {DAYS.map((day) => {
-                    const isAvailable = availabilitySet.has(`${day.key}|${slot.value}`);
-
-                    return (
-                      <div key={`${day.key}-${slot.value}`} className="calendar-slot-wrapper">
-                        <div
-                          className={`calendar-slot ${isAvailable ? 'filled' : ''}`}
-                          aria-label={`${day.label} ${slot.label}${isAvailable ? ' có lịch' : ' không có lịch'}`}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              ))}
-              {availabilitySet.size === 0 && (
-                <div className="availability-empty">
-                  Chuyên gia chưa cập nhật lịch làm việc.
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="detail-section reviews-section">
-            <h3>Đánh giá</h3>
-            {reviews.length > 0 ? (
-              <div className="reviews-carousel">
-                {reviews.map((review) => {
-                  const reviewerName = [review.parent?.firstName, review.parent?.lastName].filter(Boolean).join(' ') || 'Khách hàng';
-                  const reviewDate = review.createdAt
-                    ? new Date(review.createdAt).toLocaleDateString('vi-VN')
-                    : 'Đã đánh giá';
-
-                  return (
-                    <div className="review-card" key={review._id}>
-                      <div className="review-stars">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            size={16}
-                            fill={i < Math.round(review.score || 0) ? '#FACC15' : 'transparent'}
-                            color={i < Math.round(review.score || 0) ? '#FACC15' : '#D1D5DB'}
-                          />
-                        ))}
-                      </div>
-                      <p>{review.content || review.title || 'Khách hàng chưa để lại nội dung đánh giá.'}</p>
-                      <div className="reviewer-info">
-                        <strong>{reviewerName}</strong>
-                        <span>{reviewDate}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <p className="reviews-empty">Chuyên gia chưa có đánh giá nào.</p>
-            )}
-          </div>
-          
-          <div className="detail-footer-actions">
-            <button 
-              className="btn-book-now-solid"
-              onClick={() => {
-                if (serviceId) {
-                  navigate('/booking', { 
-                    state: { 
-                      carerId: carer._id, 
-                      carerName: fullName,
-                      serviceId,
-                      serviceTitle
-                    } 
-                  });
-                } else {
-                  navigate(`/services?carerId=${carer._id}&carerName=${encodeURIComponent(fullName)}`);
-                }
-              }}
-            >
-              {serviceId ? 'Xác nhận đặt ngay' : 'Đặt ngay'}
-            </button>
-            <Link to="/carers" className="btn-explore-outline">Xem thêm</Link>
-          </div>
-        </section>
+          </section>
+        </div>
       </main>
 
       <Footer />

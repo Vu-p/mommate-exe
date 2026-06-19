@@ -1,27 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, FilterX, Star } from 'lucide-react';
+import { ChevronDown, Star } from 'lucide-react';
+import supportImage from '../../assets/stitch/carer-profile.jpg';
 import './CarerSidebar.css';
-
-const DAYS = [
-  { key: 'Monday', label: 'M' },
-  { key: 'Tuesday', label: 'T' },
-  { key: 'Wednesday', label: 'W' },
-  { key: 'Thursday', label: 'T' },
-  { key: 'Friday', label: 'F' },
-  { key: 'Saturday', label: 'S' },
-  { key: 'Sunday', label: 'S' },
-];
-
-const TIME_SLOTS = [
-  { value: '06:00-09:00', label: '6-9 am' },
-  { value: '09:00-12:00', label: '9-12 am' },
-  { value: '12:00-15:00', label: '12-3 pm' },
-  { value: '15:00-18:00', label: '3-6 pm' },
-  { value: '18:00-21:00', label: '6-9 pm' },
-  { value: '21:00-00:00', label: '9-12 pm' },
-  { value: '00:00-06:00', label: '12-6 am' },
-];
 
 type SelectOption = {
   label: string;
@@ -121,25 +102,16 @@ const areaOptions = [
   { value: 'Đà Nẵng', label: 'Đà Nẵng' },
 ];
 
-const priceOptions = [
-  { value: '', label: 'Tất cả mức giá' },
-  { value: '100000', label: 'Dưới 100.000đ/giờ' },
-  { value: '150000', label: 'Dưới 150.000đ/giờ' },
-  { value: '200000', label: 'Dưới 200.000đ/giờ' },
-  { value: '300000', label: 'Dưới 300.000đ/giờ' },
-];
-
-const CarerSidebar = ({ filters, onChange, onToggleSchedule, onClear }: CarerSidebarProps) => {
+const CarerSidebar = ({ filters, onChange, onClear }: CarerSidebarProps) => {
   return (
     <aside className="carer-sidebar">
       <div className="sidebar-header">
-        <span className="sidebar-eyebrow">Bộ lọc</span>
-        <h3>Chuyên gia chăm sóc</h3>
-        <p>Thu hẹp danh sách theo khu vực, ngân sách và mức đánh giá phù hợp.</p>
+        <h3>Bộ lọc</h3>
+        <button type="button" onClick={onClear}>Xóa tất cả</button>
       </div>
 
       <div className="sidebar-group">
-        <label>Khu vực</label>
+        <label>Khu vực (Quận/Huyện)</label>
         <CarerFilterSelect
           value={filters.area}
           options={areaOptions}
@@ -148,75 +120,41 @@ const CarerSidebar = ({ filters, onChange, onToggleSchedule, onClear }: CarerSid
       </div>
 
       <div className="sidebar-group">
-        <label>Ngân sách tối đa</label>
-        <CarerFilterSelect
-          value={filters.maxPrice}
-          options={priceOptions}
-          onChange={(value) => onChange('maxPrice', value)}
-        />
+        <label>Mức giá (VNĐ/Giờ)</label>
+        <input className="carer-price-range" type="range" min="100000" max="1000000" step="50000"
+          value={filters.maxPrice || '500000'} onChange={(event) => onChange('maxPrice', event.target.value)} />
+        <div className="price-range-labels"><span>100k</span><span>1.000k</span></div>
       </div>
 
       <div className="sidebar-group">
-        <label>Đánh giá tối thiểu</label>
-        <div className="rating-filter">
-          {[
-            { value: '', label: 'Tất cả' },
-            { value: '4.5', label: '4.5+', icon: 5 },
-            { value: '4', label: '4.0+', icon: 4 },
-            { value: '3', label: '3.0+', icon: 3 },
-          ].map((item) => (
-            <button
-              key={item.label}
-              type="button"
-              className={`rating-chip ${filters.minRating === item.value ? 'active' : ''}`}
-              onClick={() => onChange('minRating', item.value)}
-            >
-              {item.icon ? <Star size={14} fill="currentColor" /> : <FilterX size={14} />}
-              {item.label}
-            </button>
-          ))}
+        <label>Kinh nghiệm</label>
+        <div className="sidebar-check-list">
+          <label><input type="checkbox" /> Dưới 2 năm</label>
+          <label><input type="checkbox" defaultChecked /> 2 - 5 năm</label>
+          <label><input type="checkbox" /> Trên 5 năm</label>
         </div>
       </div>
 
       <div className="sidebar-group">
-        <div className="section-label-row">
-          <label>Lịch làm việc</label>
-          <span className="schedule-count">{filters.scheduleSlots.length} ô đã chọn</span>
-        </div>
-        <div className="availability-grid">
-          <div className="grid-header">
-            <span />
-            {DAYS.map((day) => (
-              <span key={day.key}>{day.label}</span>
-            ))}
-          </div>
-
-          {TIME_SLOTS.map((slot) => (
-            <div key={slot.value} className="grid-row">
-              <span className="time-label">{slot.label}</span>
-              {DAYS.map((day) => {
-                const selectedKey = `${day.key}|${slot.value}`;
-                const active = filters.scheduleSlots.includes(selectedKey);
-
-                return (
-                  <button
-                    key={selectedKey}
-                    type="button"
-                    className={`cell-button ${active ? 'active' : ''}`}
-                    onClick={() => onToggleSchedule(day.key, slot.value)}
-                    aria-label={`${day.key} ${slot.label}`}
-                  />
-                );
-              })}
-            </div>
-          ))}
+        <label>Chuyên môn</label>
+        <div className="sidebar-check-list">
+          <label><input type="checkbox" defaultChecked /> Chăm sóc trẻ sơ sinh</label>
+          <label><input type="checkbox" /> Điều dưỡng sau sinh</label>
+          <label><input type="checkbox" /> Tắm bé tại nhà</label>
         </div>
       </div>
 
-      <div className="sidebar-actions">
-        <button type="button" className="btn-clear-filters" onClick={onClear}>
-          Xóa bộ lọc
-        </button>
+      <div className="sidebar-group">
+        <label>Đánh giá</label>
+        <div className="sidebar-rating-list">
+          <button type="button" onClick={() => onChange('minRating', '4.5')}>○ 4.5+ <Star size={13} fill="currentColor" /></button>
+          <button type="button" onClick={() => onChange('minRating', '4')}>○ 4.0+ <Star size={13} fill="currentColor" /></button>
+        </div>
+      </div>
+
+      <div className="carer-support-card" style={{ backgroundImage: `linear-gradient(180deg, transparent, rgba(10,35,18,.9)), url(${supportImage})` }}>
+        <strong>Cần hỗ trợ gấp?</strong>
+        <span>Liên hệ đội ngũ điều dưỡng trực 24/7 của chúng tôi.</span>
       </div>
     </aside>
   );

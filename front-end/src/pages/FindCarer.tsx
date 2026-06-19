@@ -111,6 +111,8 @@ const FindCarer = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('default');
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [filters, setFilters] = useState({
     area: '',
     maxPrice: '',
@@ -135,9 +137,16 @@ const FindCarer = () => {
             maxPrice: filters.maxPrice || undefined,
             minRating: filters.minRating || undefined,
             scheduleSlots: filters.scheduleSlots.length > 0 ? filters.scheduleSlots.join(',') : undefined,
+            search: searchTerm || undefined,
+            sort: sortBy === 'default' ? undefined : sortBy,
+            page: currentPage,
+            limit: CARERS_PER_PAGE,
           },
         });
-        setCarers(data);
+        const items = Array.isArray(data) ? data : data.items || data.carers || [];
+        setCarers(items);
+        setTotalItems(data.pagination?.total ?? items.length);
+        setTotalPages(data.pagination?.totalPages ?? 1);
       } catch (error) {
         console.error('Error fetching carers:', error);
       } finally {
@@ -146,7 +155,7 @@ const FindCarer = () => {
     };
 
     fetchCarers();
-  }, [filters.area, filters.maxPrice, filters.minRating, filters.scheduleSlots, serviceId]);
+  }, [currentPage, filters.area, filters.maxPrice, filters.minRating, filters.scheduleSlots, searchTerm, serviceId, sortBy]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -199,12 +208,8 @@ const FindCarer = () => {
     });
   }, [carers, filters, searchTerm, sortBy]);
 
-  const totalPages = Math.max(1, Math.ceil(visibleCarers.length / CARERS_PER_PAGE));
   const safeCurrentPage = Math.min(currentPage, totalPages);
-  const paginatedCarers = visibleCarers.slice(
-    (safeCurrentPage - 1) * CARERS_PER_PAGE,
-    safeCurrentPage * CARERS_PER_PAGE
-  );
+  const paginatedCarers = visibleCarers;
 
   const updateFilter = (name: string, value: string) => {
     setFilters((current) => ({ ...current, [name]: value }));
@@ -233,11 +238,11 @@ const FindCarer = () => {
 
   const flowTitle = serviceId
     ? `Chuyên gia phù hợp cho ${serviceTitle || 'dịch vụ bạn đã chọn'}`
-    : 'Tìm chuyên gia chăm sóc phù hợp';
+    : 'Tìm điều dưỡng viên';
 
   const flowDescription = serviceId
     ? 'Danh sách này đã được lọc theo dịch vụ bạn đang quan tâm. Chọn một chuyên gia để tiếp tục đặt lịch ngay.'
-    : 'Khám phá toàn bộ chuyên gia chăm sóc trên hệ thống, sau đó vào hồ sơ chuyên gia để chọn dịch vụ phù hợp và đặt lịch.';
+    : `Có ${totalItems.toLocaleString('vi-VN')} chuyên gia đang sẵn sàng hỗ trợ bạn.`;
 
   return (
     <div className="find-carer-page">
@@ -256,12 +261,17 @@ const FindCarer = () => {
             <h1>{flowTitle}</h1>
             <p>{flowDescription}</p>
           </div>
+          <div className="stitch-sort-tabs">
+            <button type="button" className={sortBy === 'default' ? 'active' : ''} onClick={() => setSortBy('default')}>Gần bạn nhất</button>
+            <button type="button" className={sortBy === 'rating-desc' ? 'active' : ''} onClick={() => setSortBy('rating-desc')}>Được đánh giá cao</button>
+            <button type="button" className={sortBy === 'price-asc' ? 'active' : ''} onClick={() => setSortBy('price-asc')}>Giá thấp nhất</button>
+          </div>
 
           <div className="carer-hero-stats">
             <div className="carer-stat">
               <Users size={18} />
               <div>
-                <strong>{visibleCarers.length.toLocaleString('vi-VN')}</strong>
+                <strong>{totalItems.toLocaleString('vi-VN')}</strong>
                 <span>Chuyên gia phù hợp</span>
               </div>
             </div>
@@ -308,7 +318,7 @@ const FindCarer = () => {
                 </div>
 
                 <div className="carer-results-toolbar">
-                  <span>{visibleCarers.length.toLocaleString('vi-VN')} chuyên gia phù hợp</span>
+                  <span>{totalItems.toLocaleString('vi-VN')} chuyên gia phù hợp</span>
                   <button type="button" onClick={clearFilters} className="btn-reset-inline">
                     Đặt lại bộ lọc
                   </button>
@@ -354,7 +364,7 @@ const FindCarer = () => {
                     >
                       <ChevronLeft size={18} />
                     </button>
-                    {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+                    {[1, 2, 3].filter((page) => page <= totalPages).map((page) => (
                       <button
                         key={page}
                         type="button"
@@ -364,6 +374,8 @@ const FindCarer = () => {
                         {page}
                       </button>
                     ))}
+                    {totalPages > 4 && <span className="dots">...</span>}
+                    {totalPages > 3 && <button type="button" className="page-btn" onClick={() => setCurrentPage(totalPages)}>{totalPages}</button>}
                     <button
                       type="button"
                       className="page-btn arrow"

@@ -9,19 +9,33 @@ import CarerDetail from './pages/CarerDetail';
 import Booking from './pages/Booking';
 import AccountRequests from './pages/AccountRequests';
 import Payment from './pages/Payment';
+import PaymentSuccess from './pages/PaymentSuccess';
 import Review from './pages/Review';
 import AccountProfile from './pages/AccountProfile';
 import CarerProfile from './pages/CarerProfile';
 import CarerBookings from './pages/CarerBookings';
 import CarerContract from './pages/CarerContract';
 import ChangePassword from './pages/ChangePassword';
+import BookingDetail from './pages/BookingDetail';
+import IncidentReport from './pages/IncidentReport';
+import NotFound from './pages/NotFound';
+import PublicMotion from './components/common/PublicMotion';
 import './styles/global.css';
+import './styles/public-redesign.css';
 
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminServices from './pages/admin/AdminServices';
 import AdminCarers from './pages/admin/AdminCarers';
 import AdminBookings from './pages/admin/AdminBookings';
+import {
+  AdminBookingDetail,
+  AdminIncidents,
+  AdminReconciliation,
+  AdminRevenue,
+  AdminReviews,
+  AdminUsers,
+} from './pages/admin/AdminOperations';
 import useDocumentTitle from './hooks/useDocumentTitle.ts';
 import { isAdminApp } from './config/appMode.ts';
 
@@ -67,6 +81,12 @@ function App() {
             <Route path="services" element={<AdminServices />} />
             <Route path="carers" element={<AdminCarers />} />
             <Route path="bookings" element={<AdminBookings />} />
+            <Route path="bookings/:id" element={<AdminBookingDetail />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="reviews" element={<AdminReviews />} />
+            <Route path="incidents" element={<AdminIncidents />} />
+            <Route path="revenue" element={<AdminRevenue />} />
+            <Route path="reconciliation" element={<AdminReconciliation />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
@@ -78,6 +98,7 @@ function App() {
   return (
     <Router>
       <TitleUpdater />
+      <PublicMotion />
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/about" element={<About />} />
@@ -87,7 +108,9 @@ function App() {
         <Route path="/carers/:id" element={<CarerDetail />} />
         <Route path="/booking" element={<Booking />} />
         <Route path="/account/request" element={<AccountRequests />} />
+        <Route path="/account/request/:id" element={<BookingDetail />} />
         <Route path="/payment" element={<Payment />} />
+        <Route path="/payment/success" element={<PaymentSuccess />} />
         <Route path="/review" element={<Review />} />
         <Route path="/account/profile" element={<AccountProfile />} />
         <Route path="/auth" element={<Auth />} />
@@ -96,9 +119,11 @@ function App() {
         <Route path="/login" element={<Auth defaultMode="login" />} />
         <Route path="/carer/profile" element={<CarerProfile />} />
         <Route path="/carer/bookings" element={<CarerBookings />} />
+        <Route path="/carer/bookings/:id" element={<BookingDetail />} />
         <Route path="/carer/contract" element={<CarerContract />} />
+        <Route path="/incidents/new" element={<IncidentReport />} />
         <Route path="/admin/*" element={<Navigate to="/" replace />} />
-
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

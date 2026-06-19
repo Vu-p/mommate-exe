@@ -82,6 +82,9 @@ export const loginUser = async (req: Request, res: Response) => {
     const user = await User.findOne({ email });
 
     if (user && (await bcrypt.compare(password, user.password))) {
+      if ((user as any).accountStatus === 'suspended') {
+        return res.status(403).json({ message: 'Tài khoản đã bị tạm khóa. Vui lòng liên hệ MomMate.' });
+      }
       res.json({
         _id: user._id,
         firstName: user.firstName,

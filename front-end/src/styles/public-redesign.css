@@ -1,0 +1,835 @@
+.public-app {
+  background: var(--bg);
+}
+
+.public-app .container { max-width: 1280px; padding-inline: 32px; }
+.public-app main { background: var(--bg); }
+.public-app h1, .public-app h2, .public-app h3 { color: var(--text); letter-spacing: 0; }
+.public-app .btn-primary,
+.public-app .btn-secondary,
+.public-app .btn-signup,
+.public-app .btn-booking-primary,
+.public-app .btn-booking-secondary,
+.public-app .btn-book-now-solid,
+.public-app .btn-book-now-large,
+.public-app .btn-confirm-payment,
+.public-app .btn-booking-submit {
+  border-radius: 8px;
+  min-height: 48px;
+  font-weight: 700;
+  box-shadow: none;
+}
+.public-app .btn-primary,
+.public-app .btn-signup,
+.public-app .btn-booking-primary,
+.public-app .btn-book-now-solid,
+.public-app .btn-book-now-large,
+.public-app .btn-confirm-payment,
+.public-app .btn-booking-submit { background: var(--primary); color: #fff; }
+.public-app .btn-primary:hover,
+.public-app .btn-signup:hover,
+.public-app .btn-booking-primary:hover,
+.public-app .btn-book-now-solid:hover,
+.public-app .btn-book-now-large:hover,
+.public-app .btn-confirm-payment:hover,
+.public-app .btn-booking-submit:hover { background: var(--primary-dark); }
+
+.public-app .navbar {
+  position: sticky;
+  top: 0;
+  background: rgba(255,255,255,.98);
+  border-bottom: 1px solid var(--border);
+  box-shadow: none;
+  backdrop-filter: blur(12px);
+}
+.public-app .navbar-main { height: 80px; }
+.public-app .navbar-content { grid-template-columns: auto 1fr auto; gap: 40px; }
+.public-app .nav-group.center { grid-column: 1; grid-row: 1; justify-content: flex-start; }
+.public-app .nav-group.left { grid-column: 2; grid-row: 1; gap: 28px; }
+.public-app .nav-group.right { grid-column: 3; grid-row: 1; }
+.public-app .brand-logo { color: var(--primary); font-size: 1.5rem; font-weight: 700; }
+.public-app .logo-img { width: 40px; height: 40px; }
+.public-app .nav-link,
+.public-app .secondary-nav-link { color: #414940; font-size: .94rem; font-weight: 600; text-shadow: none !important; }
+.public-app .nav-link:hover,
+.public-app .secondary-nav-link:hover { color: var(--primary); }
+.public-app .auth-btn-nav { min-height: 42px; padding-inline: 20px; border-radius: 8px; }
+.public-app .auth-btn-nav.primary { background: var(--primary); }
+.public-app .navbar-secondary { height: 44px; background: #f3f4f5; border-color: var(--border); }
+.public-app .navbar-secondary-content { justify-content: flex-start; gap: 36px; }
+.public-app .user-dropdown-toggle { border-radius: 8px; }
+.public-app .user-avatar { border-radius: 6px; background: var(--primary); }
+.public-app .user-dropdown-menu { border-radius: 8px; }
+
+.public-app .site-footer {
+  background: #e1e3e4;
+  color: var(--text);
+  border-top: 1px solid var(--border);
+}
+.public-app .footer-main { grid-template-columns: 1.5fr repeat(3, 1fr); gap: 56px; padding-block: 64px 44px; }
+.public-app .footer-brand h3,
+.public-app .footer-link-group h4,
+.public-app .footer-contact h4 { color: var(--primary-dark); }
+.public-app .footer-link-group a:hover,
+.public-app .footer-contact a:hover { color: var(--primary); }
+.public-app .footer-bottom { border-color: #c1c9be; }
+
+.public-app .hero { min-height: 640px; background: #dce8dc; }
+.public-app .hero-main-container {
+  min-height: 640px;
+  background:
+    linear-gradient(90deg, rgba(10,35,18,.84) 0%, rgba(10,35,18,.58) 42%, rgba(10,35,18,.05) 72%),
+    url('../assets/stitch/hero-maternal-care.jpg') center/cover no-repeat;
+}
+.public-app .hero-content { min-height: 640px; display: flex; align-items: center; }
+.public-app .hero-copy { max-width: 650px; color: #fff; }
+.public-app .hero-trust-line { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; font-weight: 700; color: #d9f1db; }
+.public-app .hero-copy h1 { color: #fff; font-size: clamp(2.7rem, 5vw, 4rem); line-height: 1.08; font-weight: 700; }
+.public-app .hero-copy p { color: rgba(255,255,255,.9); max-width: 590px; font-size: 1.08rem; }
+.public-app .search-bar {
+  max-width: 620px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: var(--shadow-md);
+}
+.public-app .search-input-wrapper input { color: var(--text); }
+
+.public-app .services,
+.public-app .values,
+.public-app .carers,
+.public-app .testimonials,
+.public-app .newsletter { padding-block: 80px; }
+.public-app .services:nth-child(even),
+.public-app .values,
+.public-app .testimonials { background: #f3f4f5; }
+.public-app .services-header,
+.public-app .carers-heading { margin-bottom: 36px; }
+.public-app .services-header h2,
+.public-app .section-title { font-size: clamp(2rem, 3vw, 2.6rem); }
+.public-app .label,
+.public-app .section-label,
+.public-app .page-eyebrow,
+.public-app .section-eyebrow { color: var(--primary); font-weight: 700; letter-spacing: 0; }
+.public-app .tab-btn,
+.public-app .service-meta-chip,
+.public-app .meta-chip,
+.public-app .carer-badge { border-radius: 4px; }
+.public-app .service-content-figma,
+.public-app .carer-card,
+.public-app .solution-card,
+.public-app .review-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: none;
+}
+.public-app .carer-card:hover,
+.public-app .service-content-figma:hover { box-shadow: var(--shadow-md); }
+
+.marketplace-proof { background: #fff; border-bottom: 1px solid var(--border); }
+.marketplace-proof-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
+.marketplace-proof-grid > div { display: grid; grid-template-columns: auto 1fr; column-gap: 14px; padding: 26px 30px; border-right: 1px solid var(--border); }
+.marketplace-proof-grid > div:last-child { border-right: 0; }
+.marketplace-proof-grid svg { grid-row: 1 / 3; color: var(--primary); }
+.marketplace-proof-grid strong { font-size: 1rem; }
+.marketplace-proof-grid span { color: var(--text-muted); font-size: .88rem; }
+.public-section-heading { margin-bottom: 34px; }
+.public-section-heading > span,
+.public-section-heading > div > span,
+.public-eyebrow { display: block; margin-bottom: 10px; color: var(--primary); font-size: .82rem; font-weight: 800; }
+.public-section-heading h2 { max-width: 720px; font-size: clamp(1.9rem, 3vw, 2.55rem); line-height: 1.2; }
+.public-section-heading p { margin-top: 10px; color: var(--text-muted); }
+.public-section-heading-row { display: flex; align-items: end; justify-content: space-between; gap: 30px; }
+.public-section-heading-row > a { display: inline-flex; align-items: center; gap: 8px; color: var(--primary); font-weight: 700; }
+.landing-service-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+.landing-service-card { overflow: hidden; border: 1px solid var(--border); border-radius: 8px; background: #fff; transition: .2s ease; }
+.landing-service-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+.landing-service-card > img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+.landing-service-card > div { padding: 22px; display: flex; flex-direction: column; flex: 1; }
+.landing-service-card span:first-of-type { display: inline-flex; width: fit-content; padding: 4px 10px; margin-bottom: 12px; background: rgba(57, 105, 64, 0.08); color: var(--primary); font-size: .78rem; font-weight: 750; border-radius: 6px; }
+.landing-service-card h3 { font-size: 1.15rem; font-weight: 800; line-height: 1.4; margin-bottom: 10px; flex: 1; }
+.service-rating-meta { display: flex; align-items: center; gap: 4px; margin-bottom: 16px; font-size: .85rem; }
+.rating-star { color: #facc15; }
+.rating-score { font-weight: 700; color: var(--secondary); }
+.rating-count { color: var(--text-light); }
+.landing-service-meta { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); }
+.landing-service-meta strong { color: var(--primary); font-weight: 800; font-size: 1.05rem; }
+.how-it-works { padding-block: 80px; background: #f3f4f5; }
+.how-it-works-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.how-it-works-grid article { position: relative; padding: 28px; border: 1px solid var(--border); border-radius: 8px; background: #fff; }
+.how-it-works-grid svg { color: var(--primary); }
+.how-it-works-grid h3 { margin: 18px 0 8px; }
+.how-it-works-grid p { color: var(--text-muted); }
+.step-number { position: absolute; right: 22px; top: 18px; color: #c1c9be; font-size: 1.45rem; font-weight: 800; }
+.landing-carer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.landing-carer-card { overflow: hidden; border: 1px solid var(--border); border-radius: 8px; background: #fff; transition: .2s ease; }
+.landing-carer-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+.landing-carer-card > img { width: 100%; aspect-ratio: 4 / 4.4; object-fit: cover; }
+.landing-carer-body { padding: 18px; }
+.verified-chip { display: inline-flex; align-items: center; gap: 5px; color: var(--primary); font-size: .75rem; font-weight: 700; }
+.landing-carer-body h3 { margin: 9px 0 5px; font-size: 1.08rem; }
+.landing-carer-body p { display: flex; align-items: center; gap: 5px; color: var(--text-muted); font-size: .86rem; }
+.landing-carer-body > div { display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); font-size: .82rem; }
+.landing-carer-body strong { color: var(--primary-dark); }
+.rating-value { display: inline-flex; align-items: center; gap: 4px; color: #895032; }
+.public-cta-band { padding-block: 64px; color: #fff; background: var(--primary-dark); }
+.public-cta-inner { display: flex; align-items: center; justify-content: space-between; gap: 30px; }
+.public-cta-inner span { color: #baf0bc; font-size: .82rem; font-weight: 800; }
+.public-cta-inner h2 { max-width: 650px; margin-top: 8px; color: #fff; font-size: clamp(1.8rem, 3vw, 2.5rem); }
+.public-cta-inner .btn-primary { background: #fff; color: var(--primary-dark); }
+.about-redesign-hero,
+.about-redesign-story,
+.about-commitments { padding-block: 80px; }
+.about-redesign-story { background: #fff; }
+.about-commitments { background: #f3f4f5; }
+.about-redesign-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 64px; }
+.about-redesign-grid > img { width: 100%; min-height: 440px; object-fit: cover; border-radius: 8px; }
+.about-redesign-grid h1 { font-size: clamp(2.4rem, 4vw, 3.5rem); line-height: 1.1; }
+.about-redesign-grid h2 { font-size: clamp(2rem, 3vw, 2.7rem); line-height: 1.2; }
+.about-redesign-grid p { margin-top: 18px; color: var(--text-muted); font-size: 1.02rem; line-height: 1.75; }
+.about-redesign-grid.reverse > img { order: 1; }
+.about-redesign-grid.reverse > div { order: 2; }
+.about-commitment-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.about-commitment-grid article { padding: 24px; border: 1px solid var(--border); border-radius: 8px; background: #fff; }
+.about-commitment-grid svg { color: var(--primary); }
+.about-commitment-grid h3 { margin: 18px 0 9px; }
+.about-commitment-grid p { color: var(--text-muted); font-size: .92rem; }
+
+.public-app .find-service-content,
+.public-app .main-content,
+.public-app .find-carer-content,
+.public-app .service-detail-content,
+.public-app .carer-detail-content,
+.public-app .booking-content,
+.public-app .payment-content { padding-top: 40px; padding-bottom: 80px; }
+.public-app .find-service-page,
+.public-app .find-carer-page { padding-top: 0; }
+.public-app .breadcrumb { margin-bottom: 28px; }
+.public-app .page-header,
+.public-app .carer-hero-card {
+  padding: 32px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+}
+.public-app .listing-search-box,
+.public-app .filter-bar,
+.public-app .carer-sidebar,
+.public-app .carer-list-item,
+.public-app .service-card,
+.public-app .service-intro-card,
+.public-app .service-benefits,
+.public-app .treatment-step-card,
+.public-app .carer-profile-card,
+.public-app .booking-form-section,
+.public-app .summary-card,
+.public-app .payment-methods-col,
+.public-app .vietqr-details-card,
+.public-app .auth-panel {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: none;
+}
+.public-app input,
+.public-app textarea,
+.public-app select {
+  border-radius: 8px !important;
+  border-color: var(--border) !important;
+  background: #fff !important;
+}
+.public-app input:focus,
+.public-app textarea:focus,
+.public-app select:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(57,105,64,.12) !important;
+}
+
+.public-app .service-top-section .main-image img { min-height: 460px; object-fit: cover; }
+.public-app .service-intro-card { border-top: 4px solid var(--primary); }
+.public-app .profile-avatar img { object-fit: cover; }
+.public-app .profile-rating,
+.public-app .cert-item { color: var(--primary-dark); }
+.public-app .calendar-slot.filled { background: var(--primary); }
+.public-app .service-tag.active { background: var(--primary); color: #fff; }
+
+.public-app .booking-layout,
+.public-app .payment-layout { align-items: start; gap: 32px; }
+.public-app .booking-form-section { padding: 28px; margin-bottom: 20px; }
+.public-app .booking-form-section h2 { font-size: 1.25rem; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+.public-app .booking-summary-col { position: sticky; top: 140px; }
+.public-app .summary-card { padding: 24px; }
+.public-app .total-price { color: var(--primary-dark); }
+.public-app .form-success { background: #e7f2e8; color: #20502a; border: 1px solid #9fd3a2; border-radius: 8px; }
+.public-app .form-alert { border-radius: 8px; }
+
+.public-app .auth-main { padding: 48px 0 80px; }
+.public-app .auth-panel { min-height: 680px; }
+.public-app .auth-image-side {
+  background: url('../assets/stitch/booking-parent.jpg') center/cover;
+}
+.public-app .auth-hero-img { opacity: 0; }
+.public-app .auth-form-side { background: #fff; }
+.public-app .auth-submit-row .submit-btn { border-radius: 8px; background: var(--primary); }
+.public-app .social-btn.google {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  background: #fff;
+}
+
+.payment-success-page { min-height: 100vh; background: var(--bg); }
+.payment-success-shell { padding-block: 64px 96px; }
+.payment-success-card {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 48px;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+}
+.payment-success-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--primary);
+}
+.payment-success-card h1 { font-size: 2rem; margin-bottom: 12px; }
+.payment-success-card > p { color: var(--text-muted); }
+.payment-success-details {
+  margin: 32px 0;
+  padding: 20px;
+  text-align: left;
+  background: #f3f4f5;
+  border-radius: 8px;
+}
+.payment-success-row { display: flex; justify-content: space-between; gap: 20px; padding: 10px 0; }
+.payment-success-row + .payment-success-row { border-top: 1px solid var(--border); }
+.payment-success-actions { display: flex; justify-content: center; gap: 12px; }
+
+@media (max-width: 900px) {
+  .public-app .container { padding-inline: 20px; }
+  .public-app .desktop-only { display: none !important; }
+  .public-app .navbar-content { display: flex; justify-content: space-between; }
+  .public-app .mobile-menu-toggle { display: flex; }
+  .public-app .navbar-secondary { display: none; }
+  .public-app .footer-main { grid-template-columns: 1fr 1fr; }
+  .landing-service-grid,
+  .how-it-works-grid { grid-template-columns: 1fr 1fr; }
+  .landing-carer-grid,
+  .about-commitment-grid { grid-template-columns: repeat(2, 1fr); }
+  .about-redesign-grid { gap: 34px; }
+  .public-app .booking-summary-col { position: static; }
+}
+
+@media (max-width: 640px) {
+  .public-app .container { padding-inline: 16px; }
+  .public-app .hero,
+  .public-app .hero-main-container,
+  .public-app .hero-content { min-height: 600px; }
+  .public-app .hero-main-container {
+    background:
+      linear-gradient(180deg, rgba(10,35,18,.3) 0%, rgba(10,35,18,.86) 64%),
+      url('../assets/stitch/hero-maternal-care.jpg') 62% center/cover;
+  }
+  .public-app .hero-content { align-items: flex-end; padding-bottom: 48px; }
+  .public-app .hero-copy { width: 100%; min-width: 0; overflow: hidden; }
+  .public-app .hero-copy,
+  .public-app .hero-copy h1,
+  .public-app .hero-copy p,
+  .public-app .search-bar { max-width: calc(100vw - 32px); }
+  .public-app .hero-copy h1 { width: calc(100vw - 32px); font-size: 2.05rem; line-height: 1.12; overflow-wrap: break-word; }
+  .public-app .hero-copy p { width: calc(100vw - 32px); font-size: .95rem; }
+  .public-app .search-bar { width: calc(100vw - 32px); display: grid; gap: 8px; background: transparent; padding: 0; box-shadow: none; }
+  .public-app .search-input-wrapper,
+  .public-app .search-bar button { min-height: 50px; background: #fff; border-radius: 8px; }
+  .public-app .search-input-wrapper { width: 100%; min-width: 0; overflow: hidden; }
+  .public-app .search-input-wrapper input { min-width: 0; width: 100%; font-size: .9rem; }
+  .public-app .search-bar button { background: var(--primary); }
+  .public-app .services,
+  .public-app .values,
+  .public-app .carers,
+  .public-app .testimonials,
+  .public-app .newsletter { padding-block: 56px; }
+  .public-app .footer-main { grid-template-columns: 1fr; padding-block: 48px 32px; }
+  .marketplace-proof-grid,
+  .landing-service-grid,
+  .how-it-works-grid,
+  .landing-carer-grid,
+  .about-redesign-grid,
+  .about-commitment-grid { grid-template-columns: 1fr; }
+  .marketplace-proof-grid > div { border-right: 0; border-bottom: 1px solid var(--border); padding-inline: 0; }
+  .public-section-heading-row,
+  .public-cta-inner { align-items: flex-start; flex-direction: column; }
+  .about-redesign-grid.reverse > img,
+  .about-redesign-grid.reverse > div { order: initial; }
+  .about-redesign-grid > img { min-height: 280px; }
+  .public-app .page-header,
+  .public-app .carer-hero-card,
+  .public-app .booking-form-section { padding: 20px; }
+  .public-app .form-row-2 { grid-template-columns: 1fr; }
+  .public-app .payment-success-card { padding: 28px 20px; }
+  .payment-success-actions { flex-direction: column; }
+}
+
+/* Stitch fidelity pass: shared rhythm, surfaces and motion */
+.public-app {
+  --cream: #f6f1e8;
+  --peach: #fff0e8;
+  --green-soft: #e7f2e8;
+  --green-wash: #f0f6ef;
+  --ink-green: #193d22;
+}
+
+.public-app body,
+.public-app main {
+  background: #f8f9fa;
+}
+
+.public-app .container {
+  max-width: 1280px;
+  padding-inline: 64px;
+}
+
+.public-app .navbar {
+  min-height: 72px;
+  background: rgba(248, 249, 250, .94);
+  border-bottom: 1px solid #cfd6cd;
+  backdrop-filter: blur(16px) saturate(150%);
+}
+
+.public-app .navbar-main { height: 72px; }
+.public-app .navbar-content { gap: 32px; }
+.public-app .brand-logo { gap: 9px; color: var(--primary); font-size: 1.5rem; }
+.public-app .logo-img { width: 56px; height: 56px; border-radius: 10px; }
+.public-app .nav-group.left { gap: 24px; }
+.public-app .nav-link { position: relative; padding-block: 26px 23px; font-size: .83rem; }
+.public-app .nav-link::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  right: 50%;
+  bottom: 0;
+  height: 2px;
+  background: var(--primary);
+  transition: left .25s ease, right .25s ease;
+}
+.public-app .nav-link:hover::after { left: 0; right: 0; }
+.public-app .nav-link.is-active { color: #396940; font-weight: 750; }
+.public-app .nav-link.is-active::after { left: 0; right: 0; }
+.public-app .auth-btn-nav { min-height: 38px; padding-inline: 16px; font-size: .82rem; }
+
+.public-app .hero,
+.public-app .hero-main-container { min-height: 610px; background: var(--cream); }
+.public-app .hero-main-container {
+  background:
+    radial-gradient(circle at 5% 12%, rgba(123,174,127,.18), transparent 24%),
+    linear-gradient(110deg, #f6f1e8 0 58%, #e7f2e8 58% 100%);
+}
+.public-app .hero-content { min-height: 610px; display: grid; align-items: center; }
+.public-app .hero-copy { max-width: none; color: var(--text); }
+.public-app .hero-copy h1 { color: var(--ink-green); font-size: clamp(2.75rem, 4.4vw, 4.3rem); line-height: 1.04; }
+.public-app .hero-copy p { color: var(--text-muted); }
+.public-app .hero-trust-line { color: var(--primary); }
+.public-app .search-bar { max-width: 640px; border-radius: 12px; }
+.public-app .search-bar button { border-radius: 8px; }
+
+.public-app .marketplace-proof { background: #fff; }
+.public-app .marketplace-proof-grid > div { min-height: 112px; align-content: center; }
+.public-app .marketplace-proof-grid svg {
+  width: 42px;
+  height: 42px;
+  padding: 10px;
+  border-radius: 50%;
+  background: var(--green-soft);
+}
+
+.public-app .services,
+.public-app .carers,
+.public-app .how-it-works,
+.public-app .about-redesign-hero,
+.public-app .about-redesign-story,
+.public-app .about-commitments { padding-block: 80px; }
+.public-app .services { background: #f8f9fa; }
+.public-app .carers { background: #fff; }
+.public-app .how-it-works { background: var(--green-wash); }
+
+.public-app .public-section-heading > span,
+.public-app .public-section-heading > div > span,
+.public-app .public-eyebrow {
+  color: var(--primary);
+  font-size: .76rem;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+.public-app .public-section-heading h2 { color: var(--ink-green); font-size: clamp(1.9rem, 3vw, 2.65rem); }
+
+.public-app .landing-service-card,
+.public-app .landing-carer-card,
+.public-app .how-it-works-grid article,
+.public-app .about-commitment-grid article {
+  position: relative;
+  border-color: #d7ddd4;
+  border-radius: 12px;
+  box-shadow: 0 1px 0 rgba(25, 61, 34, .02);
+  transition: transform .32s cubic-bezier(.2,.8,.2,1), box-shadow .32s ease, border-color .32s ease;
+}
+.public-app .landing-service-card:hover,
+.public-app .landing-carer-card:hover,
+.public-app .how-it-works-grid article:hover,
+.public-app .about-commitment-grid article:hover {
+  transform: translateY(-7px);
+  border-color: #9ab69c;
+  box-shadow: 0 18px 42px rgba(31, 73, 40, .11);
+}
+.public-app .landing-service-card > img { aspect-ratio: 16 / 9; transition: transform .65s cubic-bezier(.2,.8,.2,1); }
+.public-app .landing-service-card:hover > img { transform: scale(1.045); }
+.public-app .landing-service-card > div > span { color: #895032; }
+.public-app .landing-service-card h3,
+.public-app .landing-carer-body h3,
+.public-app .how-it-works-grid h3 { color: var(--ink-green); }
+.public-app .landing-service-meta strong,
+.public-app .landing-carer-body strong { color: var(--primary); }
+.public-app .landing-carer-card > img { transition: transform .65s cubic-bezier(.2,.8,.2,1); }
+.public-app .landing-carer-card:hover > img { transform: scale(1.04); }
+
+.public-app .public-cta-band {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(112deg, #174523, #396940 62%, #6b3d27);
+}
+.public-app .public-cta-band::after {
+  content: '';
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  right: -80px;
+  top: -150px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 50%;
+  box-shadow: 0 0 0 45px rgba(255,255,255,.035), 0 0 0 90px rgba(255,255,255,.025);
+}
+
+/* Listings */
+.public-app .find-service-page,
+.public-app .find-carer-page,
+.public-app .service-detail-page,
+.public-app .carer-detail-page,
+.public-app .booking-page,
+.public-app .payment-page { padding-top: 0; background: #f8f9fa; }
+
+.public-app .find-service-page,
+.public-app .find-carer-page { padding-top: 0; }
+
+.public-app .find-service-content,
+.public-app .main-content,
+.public-app .find-carer-content,
+.public-app .service-detail-content,
+.public-app .carer-detail-content,
+.public-app .booking-content,
+.public-app .payment-content { padding-top: 28px; }
+
+.public-app .page-header {
+  max-width: none;
+  margin: 16px 0 24px;
+  padding: 0;
+  align-items: flex-start;
+  text-align: left;
+  border: 0;
+  background: transparent;
+}
+.public-app .page-header h1 { color: var(--ink-green); font-size: 2rem; font-weight: 650; }
+.public-app .page-header p { margin: 0; color: var(--text-muted); font-size: .92rem; }
+.public-app .listing-search-row { justify-content: stretch; margin-bottom: 16px; }
+.public-app .listing-search-box { width: 100%; min-height: 44px; border-radius: 8px; background: #fff; }
+.public-app .filter-bar { padding: 12px; border-radius: 8px; }
+.public-app .services-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+.public-app .service-card-premium {
+  min-height: 0;
+  border-color: #cfd6cd;
+  border-radius: 8px;
+  transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+}
+.public-app .service-card-premium:hover { transform: translateY(-5px); border-color: #8dac90; box-shadow: 0 14px 30px rgba(31, 73, 40, .1); }
+.public-app .service-card-premium .card-image { height: 190px; margin: 0; border-radius: 0; }
+.public-app .service-card-premium .card-content { padding: 16px; }
+.public-app .service-card-premium .card-content h3 { min-height: 44px; margin-bottom: 12px; color: var(--ink-green); font-size: 1.03rem; line-height: 1.35; }
+.public-app .service-card-premium .card-content .price { margin-bottom: 14px; color: #895032; font-size: .92rem; font-weight: 700; }
+.public-app .service-card-premium .learn-more { color: var(--primary); font-size: .82rem; }
+.public-app .pagination { margin-top: 40px; }
+.public-app .page-btn { width: 34px; height: 34px; border-radius: 6px; }
+.public-app .page-btn.active { color: #fff; background: var(--primary); }
+.public-app .page-btn.arrow { background: #fff; color: var(--primary); border: 1px solid var(--border); }
+
+.public-app .carer-hero-card {
+  padding: 0;
+  margin: 12px 0 24px;
+  border: 0;
+  background: transparent;
+}
+.public-app .carer-hero-copy h1 { color: var(--ink-green); font-size: 2rem; }
+.public-app .carer-hero-copy p { max-width: 620px; font-size: .92rem; }
+.public-app .carer-hero-stats { flex-direction: row; min-width: 0; }
+.public-app .carer-stat { border-radius: 8px; background: #fff; }
+.public-app .carer-browser-main { grid-template-columns: 240px 1fr; gap: 22px; }
+.public-app .carer-sidebar { top: 92px; padding: 22px 18px; border-radius: 8px; box-shadow: none; }
+.public-app .carer-select-trigger,
+.public-app .carer-sort-trigger { min-height: 44px; border-radius: 8px; background: #fff; }
+.public-app .carer-list-item { border-radius: 8px; transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease; }
+.public-app .carer-list-item:hover { transform: translateY(-4px); border-color: #91ad94; box-shadow: 0 14px 32px rgba(31,73,40,.09); }
+.public-app .carer-main-info { gap: 20px; padding: 20px; }
+.public-app .carer-avatar { width: 132px; height: 132px; border-radius: 6px; }
+.public-app .name-rating h3 { color: var(--ink-green); font-size: 1.2rem; }
+.public-app .carer-info-blocks { background: #fafbf9; }
+.public-app .info-block { padding: 14px; gap: 7px; }
+
+/* Detail screens */
+.public-app .service-page-heading { text-align: left; margin-bottom: 20px; }
+.public-app .service-page-heading h1 { color: var(--ink-green); font-size: 2.2rem; }
+.public-app .gallery-container { grid-template-columns: minmax(0, 1fr) 310px; align-items: stretch; gap: 24px; }
+.public-app .gallery-container .thumbnails { display: none; }
+.public-app .service-top-section .main-image { min-height: 430px; overflow: hidden; border-radius: 8px; }
+.public-app .service-top-section .main-image img { min-height: 430px; transition: transform .8s ease; }
+.public-app .service-top-section .main-image:hover img { transform: scale(1.025); }
+.public-app .service-intro-card { padding: 28px; border-top: 1px solid var(--border); border-radius: 8px; }
+.public-app .service-intro-card h2 { color: var(--ink-green); font-size: 1.35rem; }
+.public-app .service-benefits { padding: 28px; border-radius: 8px; }
+.public-app .treatment-step-card { border-radius: 8px; }
+
+.public-app .carer-profile-card {
+  max-width: 1160px;
+  margin: 20px auto 72px;
+  border-radius: 8px;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  align-items: start;
+}
+.public-app .profile-header { grid-row: 1 / 6; padding: 28px; border-right: 1px solid var(--border); }
+.public-app .profile-avatar { width: 150px; height: 150px; border-radius: 50%; box-shadow: 0 0 0 5px #e7f2e8; }
+.public-app .profile-titles h2 { color: var(--ink-green); font-size: 1.5rem; }
+.public-app .profile-bio { margin-bottom: 24px; }
+.public-app .profile-stats-grid { grid-template-columns: repeat(2, 1fr); }
+.public-app .stat-item { padding: 16px 8px; }
+.public-app .detail-section { padding: 28px 32px; }
+.public-app .detail-section h3 { color: var(--ink-green); }
+.public-app .detail-footer-actions { grid-column: 2; padding: 24px 32px 32px; }
+
+/* Forms, checkout and authenticated screens */
+.public-app .booking-layout { grid-template-columns: minmax(0, 1fr) 360px; gap: 24px; }
+.public-app .booking-form-col { gap: 18px; }
+.public-app .booking-form-section { padding: 24px; border-radius: 8px; }
+.public-app .booking-form-section h2 { color: var(--ink-green); }
+.public-app .input-field { gap: 8px; }
+.public-app .input-field label { color: #414940; font-size: .82rem; }
+.public-app .input-field input,
+.public-app .input-field textarea,
+.public-app .booking-page .select-wrapper select { padding: 12px 14px; border: 1px solid #cfd6cd !important; border-radius: 6px !important; }
+.public-app .summary-card { padding: 24px; border-radius: 8px; }
+.public-app .summary-header { align-items: flex-start; flex-direction: row; text-align: left; gap: 14px; margin-bottom: 24px; }
+.public-app .summary-image { width: 72px; height: 72px; border-radius: 6px; }
+.public-app .btn-booking-submit { border-radius: 8px; }
+.public-app .payment-layout { grid-template-columns: minmax(0, 1fr) 340px; }
+.public-app .payment-methods-col { padding: 28px; }
+.public-app .payment-methods-col h2 { color: var(--ink-green); }
+.public-app .vietqr-details-card { margin-left: 0; padding: 24px; border-radius: 8px; background: #f3f4f5; }
+
+.public-app .auth-main { padding: 40px 0 72px; background: #f8f9fa; }
+.public-app .auth-panel {
+  min-height: 650px;
+  grid-template-columns: 1fr 1fr;
+  border-radius: 0;
+  box-shadow: 0 18px 50px rgba(31,73,40,.08);
+}
+.public-app .auth-image-side {
+  position: relative;
+  min-height: 650px;
+  background:
+    linear-gradient(180deg, rgba(57,105,64,.08), rgba(32,80,42,.2)),
+    url('../assets/stitch/booking-parent.jpg') center/cover;
+}
+.public-app .auth-image-side::before {
+  content: 'Chăm sóc mẹ bầu mà bạn có thể tin tưởng.';
+  position: absolute;
+  z-index: 2;
+  left: 48px;
+  right: 48px;
+  top: 54px;
+  color: #fff;
+  font-size: clamp(2rem, 3vw, 3.2rem);
+  font-weight: 750;
+  line-height: 1.08;
+  text-shadow: 0 2px 24px rgba(18,54,27,.32);
+}
+.public-app .auth-form-side { min-height: 650px; background: #fff; }
+
+.public-app .account-profile-page,
+.public-app .account-requests-page,
+.public-app .review-page,
+.public-app .change-password-page,
+.public-app .carer-profile-page,
+.public-app .carer-bookings-page,
+.public-app .carer-contract-page { background: #f8f9fa; }
+.public-app .account-card,
+.public-app .request-card,
+.public-app .review-form-card,
+.public-app .change-password-card,
+.public-app .profile-summary-card,
+.public-app .dashboard-sidebar,
+.public-app .account-profile-sidebar {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: none;
+  background: #fff;
+}
+
+.public-app .motion-reveal {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity .65s cubic-bezier(.2,.8,.2,1) var(--motion-delay, 0ms),
+    transform .65s cubic-bezier(.2,.8,.2,1) var(--motion-delay, 0ms);
+}
+.public-app .motion-reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 1024px) {
+  .public-app .container { padding-inline: 28px; }
+  .public-app .services-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .public-app .carer-browser-main { grid-template-columns: 1fr; }
+  .public-app .carer-profile-card { grid-template-columns: 1fr; }
+  .public-app .profile-header { grid-row: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+  .public-app .detail-footer-actions { grid-column: 1; }
+}
+
+@media (max-width: 768px) {
+  .public-app .container { padding-inline: 18px; }
+  .public-app .hero-main-container { background: var(--cream); }
+  .public-app .hero-content { min-height: auto; }
+  .public-app .hero-copy,
+  .public-app .hero-copy h1,
+  .public-app .hero-copy p,
+  .public-app .search-bar {
+    width: 100%;
+    max-width: 100%;
+  }
+  .public-app .hero-copy { overflow: visible; }
+  .public-app .hero-copy h1 {
+    font-size: clamp(2rem, 9.4vw, 2.75rem);
+    line-height: 1.08;
+    overflow-wrap: anywhere;
+  }
+  .public-app .services-grid { grid-template-columns: 1fr; }
+  .public-app .gallery-container { grid-template-columns: 1fr; }
+  .public-app .service-top-section .main-image,
+  .public-app .service-top-section .main-image img { min-height: 310px; }
+  .public-app .booking-layout,
+  .public-app .payment-layout { grid-template-columns: 1fr; }
+  .public-app .auth-panel { grid-template-columns: 1fr; }
+  .public-app .auth-image-side { min-height: 330px; }
+  .public-app .auth-image-side::before { left: 28px; right: 28px; top: 30px; }
+}
+
+@media (max-width: 420px) {
+  .public-app .hero-copy h1 { font-size: 2.16rem; }
+  .public-app .hero-copy p { font-size: .92rem; }
+  .public-app .hero-visual { min-height: 315px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-app *,
+  .public-app *::before,
+  .public-app *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  .public-app .motion-reveal { opacity: 1; transform: none; }
+}
+
+/* Route-specific Stitch structures */
+.public-app .hero,
+.public-app .hero-main-container,
+.public-app .hero-content { min-height: 640px; }
+.public-app .hero-main-container { background: transparent; }
+.public-app .hero-content { display: block; }
+.public-app .hero-copy { max-width: 650px; color: var(--text); }
+.public-app .hero-copy h1 { color: #191c1d; }
+.public-app .hero-kicker { color: #20502a; }
+
+.public-app .landing-team { background: #f3f4f5; }
+.public-app .landing-team-grid article { border-radius: 24px; }
+.public-app .landing-dual-cta { background: #fff; }
+
+.public-app .auth-main { padding: 0; }
+.public-app .auth-panel { min-height: 1023px; grid-template-columns: 1fr 1fr; box-shadow: none; }
+.public-app .auth-image-side {
+  min-height: 1023px;
+  background: #7bae7f;
+}
+.public-app .auth-form-side { min-height: 1023px; padding: 138px 72px 54px; background: #f8f9fa; }
+.public-app .auth-image-side::before { display: none; }
+
+.payment-success-card {
+  max-width: 760px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.stitch-success-header { text-align: center; margin-bottom: 28px; }
+.stitch-success-header .payment-success-icon { width: 80px; height: 80px; margin-bottom: 20px; color: #0f411d; background: #9fd3a2; }
+.stitch-success-header h1 { margin-bottom: 6px; }
+.stitch-success-header p { color: #717970; }
+.stitch-receipt { position: relative; padding: 32px; border: 1px solid #c1c9be; border-radius: 12px; background: #fff; overflow: hidden; }
+.stitch-receipt::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: #396940; }
+.stitch-receipt-top { display: flex; justify-content: space-between; gap: 24px; padding-bottom: 22px; border-bottom: 1px solid #c1c9be; }
+.stitch-receipt-top > div:last-child { text-align: right; }
+.stitch-receipt small { display: block; margin-bottom: 5px; color: #717970; font-size: .72rem; }
+.stitch-receipt-top strong { color: #396940; font-size: 1.25rem; }
+.stitch-receipt-top > div:last-child strong { color: #895032; }
+.stitch-receipt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 48px; padding: 26px 0; }
+.stitch-receipt-grid strong,
+.stitch-receipt-grid span { display: flex; align-items: center; gap: 7px; }
+.stitch-receipt-grid svg { color: #396940; }
+.stitch-next-steps { padding: 20px; border-radius: 8px; background: #f3f4f5; }
+.stitch-next-steps h3 { display: flex; align-items: center; gap: 7px; margin-bottom: 12px; font-size: .8rem; }
+.stitch-next-steps h3 svg { color: #396940; }
+.stitch-next-steps p { display: flex; gap: 9px; margin-top: 9px; color: #5f675f; font-size: .82rem; }
+.stitch-next-steps p b { flex: 0 0 auto; width: 20px; height: 20px; display: grid; place-items: center; border-radius: 50%; color: #0f411d; background: #9fd3a2; font-size: .65rem; }
+.payment-success-actions { margin: 22px 0 0; align-items: center; }
+.payment-success-actions a,
+.payment-success-actions button { display: inline-flex; align-items: center; gap: 7px; }
+.stitch-home-link { padding: 12px 8px; color: #717970; font-weight: 650; }
+.stitch-success-tip { display: flex; gap: 18px; margin-top: 48px; padding: 18px; border: 1px dashed #c1c9be; border-radius: 12px; background: #fff; text-align: left; }
+.stitch-success-tip > div { flex: 0 0 120px; min-height: 84px; border-radius: 8px; background: url('../assets/stitch/booking-parent.jpg') center/cover; }
+.stitch-success-tip p strong,
+.stitch-success-tip p span,
+.stitch-success-tip p a { display: block; }
+.stitch-success-tip p span { margin-top: 5px; color: #717970; font-size: .76rem; line-height: 1.5; }
+.stitch-success-tip p a { margin-top: 7px; color: #396940; font-size: .76rem; text-decoration: underline; }
+
+@media (max-width: 900px) {
+  .public-app .auth-panel { grid-template-columns: 1fr; }
+  .public-app .auth-image-side { min-height: 360px; }
+  .public-app .auth-form-side { min-height: 660px; padding-inline: 28px; }
+}
+
+@media (max-width: 640px) {
+  .public-app .hero,
+  .public-app .hero-main-container,
+  .public-app .hero-content { min-height: 660px; }
+  .public-app .hero-content { display: flex; }
+  .public-app .hero-copy { max-width: 100%; }
+  .public-app .auth-image-side { min-height: 300px; }
+  .public-app .auth-form-side { padding: 145px 20px 50px; }
+  .stitch-receipt { padding: 22px 18px; }
+  .stitch-receipt-grid { grid-template-columns: 1fr; gap: 18px; }
+  .stitch-success-tip > div { display: none; }
+}

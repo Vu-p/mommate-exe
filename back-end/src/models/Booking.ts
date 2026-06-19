@@ -72,6 +72,9 @@ export interface IBooking extends Document {
   carerPayoutStatus: CarerPayoutStatus;
   carerPayoutAmount: number;
   platformFeeAmount: number;
+  payoutPaidAt?: Date;
+  payoutReference?: string;
+  payoutNote?: string;
   numSessions: number;
   hours: number;
   isDeleted: boolean;
@@ -118,6 +121,9 @@ const BookingSchema: Schema = new Schema({
   carerPayoutStatus: { type: String, enum: Object.values(CarerPayoutStatus), default: CarerPayoutStatus.UNPAID },
   carerPayoutAmount: { type: Number, default: 0 },
   platformFeeAmount: { type: Number, default: 0 },
+  payoutPaidAt: { type: Date },
+  payoutReference: { type: String },
+  payoutNote: { type: String },
   numSessions: { type: Number, default: 1 },
   hours: { type: Number, default: 1 },
   isDeleted: { type: Boolean, default: false },

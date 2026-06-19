@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import './ServiceCard.css';
@@ -12,6 +12,10 @@ interface ServiceCardProps {
     image?: string;
     img?: string;
     description?: string;
+    category?: string;
+    rating?: number;
+    reviewCount?: number;
+    priceUnit?: string;
   };
   onSelect?: () => void;
   carerId?: string | null;
@@ -23,7 +27,7 @@ const ServiceCard = ({ service, onSelect, carerId, carerName }: ServiceCardProps
   const serviceId = service._id || service.id;
   const serviceImage = service.image || service.img;
   const displayPrice = typeof service.price === 'number'
-    ? `Price: ${service.price.toLocaleString()} VND / buổi`
+    ? service.price.toLocaleString('vi-VN')
     : service.price;
 
   const handleAction = () => {
@@ -54,14 +58,18 @@ const ServiceCard = ({ service, onSelect, carerId, carerName }: ServiceCardProps
               <span>{service.title.substring(0, 1)}</span>
             </div>
           )}
+          <span className={`service-category-tag ${service.category === 'Mẹ bầu' ? 'pregnant' : service.category === 'Mẹ sau sinh' ? 'postpartum' : ''}`}>
+            {service.category || 'Dịch vụ'}
+          </span>
         </div>
 
         <div className="card-content">
           <h3>{service.title}</h3>
-          <p className="price">{displayPrice}</p>
-          <span className="learn-more">
-            {onSelect ? 'Chọn' : 'Xem thêm'} <ArrowRight size={20} />
-          </span>
+          <p className="service-rating"><Star fill="currentColor" /> <strong>{service.rating || 4.9}</strong> <span>({service.reviewCount || 0} đánh giá)</span></p>
+          <div className="service-card-bottom">
+            <p className="price"><small>Giá từ</small><strong>{displayPrice}đ</strong><span>/{service.priceUnit || 'buổi'}</span></p>
+            <span className="learn-more">{carerId ? 'Chọn' : 'Xem chi tiết'}</span>
+          </div>
         </div>
       </button>
     </motion.article>

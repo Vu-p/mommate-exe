@@ -1,4 +1,4 @@
-import { Briefcase, CreditCard, MapPin, Star, User } from 'lucide-react';
+import { BadgeCheck, BriefcaseBusiness, Languages, MapPin, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
   formatAge,
@@ -29,6 +29,10 @@ const CarerListItem = ({ carer, onSelect, serviceId, serviceTitle }: CarerListIt
   const displayAge = formatAge(carer.age);
   const displayExp = formatExperience(carer.experienceYears);
   const displayPrice = formatHourlyRate(carer.hourlyRate || carer.price);
+  const subtitle = carer.position
+    ? `${carer.position}${carer.workplaceName ? ` tại ${carer.workplaceName}` : ''}`
+    : 'Chuyên gia chăm sóc sau sinh';
+  const specialty = carer.skills?.[0] || carer.services?.[0]?.category || 'Chăm sóc trẻ sơ sinh';
 
   const profileUrl = `/carers/${carerId}${serviceId ? `?serviceId=${serviceId}&serviceTitle=${encodeURIComponent(serviceTitle || '')}` : ''}`;
 
@@ -43,44 +47,39 @@ const CarerListItem = ({ carer, onSelect, serviceId, serviceTitle }: CarerListIt
       <div className="carer-main-info">
         <div className="carer-avatar">
           <img src={avatar} alt={fullName} />
+          {carerId === 'carer-1' && <span className="top-rated-label">Top rated</span>}
         </div>
         <div className="carer-details">
           <div className="name-rating">
-            <h3>{fullName}</h3>
+            <div>
+              <div className="carer-name-line">
+                <h3>{fullName}</h3>
+                <span className="verified-label"><BadgeCheck />Đã xác thực</span>
+              </div>
+              <p className="carer-subtitle">{subtitle}</p>
+            </div>
             <div className="rating">
-              {displayRating && (
-                <>
-                  <Star size={18} fill="#FACC15" color="#FACC15" />
-                  <span>{displayRating}</span>
-                </>
-              )}
-              <span className="reviews">{displayReviews}</span>
+              <Star size={18} fill="currentColor" />
+              <span>{displayRating}</span>
+              <span className="reviews">({displayReviews.replace('bình luận', 'đánh giá')})</span>
             </div>
           </div>
-          <p className="carer-bio">
-            {carer.bio || 'Chuyên gia chưa cập nhật giới thiệu cá nhân.'}
-          </p>
+          <div className="carer-card-facts">
+            <span><BriefcaseBusiness />{displayExp}</span>
+            <span><MapPin />Khu vực: {displayLoc}</span>
+            <span><BriefcaseBusiness />Chuyên khoa: {specialty}</span>
+            <span><Languages />Ngôn ngữ: Tiếng Việt{carerId === 'carer-1' ? ', Tiếng Anh' : ''}</span>
+          </div>
+          <div className="carer-card-footer">
+            <div><small>Giá thuê theo giờ</small><strong>{displayPrice}</strong></div>
+            <div>
+              <button type="button">Xem hồ sơ</button>
+              <span>{serviceId ? 'Tiếp tục đặt lịch' : 'Đặt lịch ngay'}</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="carer-info-blocks">
-        <div className="info-block">
-          <MapPin size={20} strokeWidth={1.5} />
-          <span>{displayLoc}</span>
-        </div>
-        <div className="info-block">
-          <User size={20} strokeWidth={1.5} />
-          <span>{displayAge}</span>
-        </div>
-        <div className="info-block">
-          <Briefcase size={20} strokeWidth={1.5} />
-          <span>{displayExp}</span>
-        </div>
-        <div className="info-block">
-          <CreditCard size={20} strokeWidth={1.5} />
-          <span>{displayPrice}</span>
-        </div>
-      </div>
     </CardWrapper>
   );
 };

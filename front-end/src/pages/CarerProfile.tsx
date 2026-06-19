@@ -113,9 +113,10 @@ const CarerProfile = () => {
         api.get('/carers/me'),
       ]);
 
-      const profileUser = profileRes.data?.user || {};
-      const carer = profileRes.data?.carer || {};
-      setServices(servicesRes.data || []);
+      const carer = profileRes.data?.carer || profileRes.data || {};
+      const profileUser = carer.user || profileRes.data?.user || {};
+      const servicePayload = servicesRes.data;
+      setServices(Array.isArray(servicePayload) ? servicePayload : servicePayload?.items || servicePayload?.services || []);
       setForm({
         firstName: profileUser.firstName || user?.firstName || '',
         lastName: profileUser.lastName || user?.lastName || '',

@@ -35,6 +35,10 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
         return res.status(401).json({ message: 'User not found, please login again' });
       }
 
+      if ((req.user as any).accountStatus === 'suspended') {
+        return res.status(403).json({ message: 'Tài khoản đã bị tạm khóa. Vui lòng liên hệ MomMate.' });
+      }
+
       next();
     } catch (error) {
       res.status(401).json({ message: 'Not authorized, token failed' });

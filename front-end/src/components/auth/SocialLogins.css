@@ -1,19 +1,24 @@
 .social-logins {
   width: 100%;
-  margin-top: 26px;
+  margin-top: 8px;
   text-align: center;
 }
 
 .social-text {
-  color: var(--text-muted);
-  font-size: 1rem;
-  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #3f4840;
+  font-size: .72rem;
+  letter-spacing: .12em;
+  margin: 34px 0 30px;
 }
+.social-text span { flex: 1; height: 1px; background: #c1c9be; }
 
 .social-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 72px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
 .social-error {
@@ -23,9 +28,17 @@
 }
 
 .social-btn {
-  color: var(--primary-dark);
-  font-size: 1.28rem;
-  font-weight: 900;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 1px solid #c1c9be;
+  border-radius: 8px;
+  color: #191c1d;
+  background: #fff;
+  font-size: .92rem;
+  font-weight: 700;
 }
 
 .social-btn:disabled {
@@ -40,6 +53,7 @@
 .social-btn.facebook {
   text-transform: lowercase;
 }
+.google-mark { font-size: 1.1rem; font-weight: 900; color: #4285f4; }
 
 @media (max-width: 480px) {
   .social-buttons {

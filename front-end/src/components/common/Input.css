@@ -8,9 +8,9 @@
 
 .input-label {
   font-size: 0.95rem;
-  font-weight: 800;
-  color: var(--secondary);
-  padding-left: 28px;
+  font-weight: 650;
+  color: #191c1d;
+  padding-left: 0;
 }
 
 .input-control-wrapper {
@@ -19,11 +19,11 @@
 }
 
 .input-control {
-  min-height: 54px;
-  padding: 0 28px;
-  border: 1px solid transparent;
-  background-color: #fbf9ff;
-  border-radius: var(--radius-pill);
+  min-height: 52px;
+  padding: 0 16px;
+  border: 1px solid #c1c9be;
+  background-color: #fff;
+  border-radius: 8px;
   font-size: 1rem;
   color: var(--secondary);
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);

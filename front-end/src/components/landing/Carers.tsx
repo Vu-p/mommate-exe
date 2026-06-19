@@ -1,15 +1,9 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { Loader2, MapPin, ShieldCheck, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Loader2, ShieldCheck, Star } from 'lucide-react';
 import api from '../../utils/api';
-import {
-  formatLocation,
-  formatReviewLabel,
-  getCarerAvatar,
-  getCarerFullName,
-  getDisplayRating,
-} from '../../utils/carerDisplay';
+import { formatReviewLabel, getCarerAvatar, getCarerFullName, getDisplayRating } from '../../utils/carerDisplay';
+import fallbackAvatar from '../../assets/stitch/carer-profile.jpg';
 import './Carers.css';
 
 const Carers = () => {
@@ -17,78 +11,46 @@ const Carers = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCarers = async () => {
-      try {
-        setLoading(true);
-        const { data } = await api.get('/carers');
-        setCarers(data.slice(0, 4));
-      } catch (error) {
-        console.error('Error fetching carers for landing:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCarers();
+    api.get('/carers')
+      .then(({ data }) => {
+        const items = Array.isArray(data) ? data : Array.isArray(data?.carers) ? data.carers : [];
+        const featured = [...items]
+          .sort((first, second) => {
+            const ratingDifference = Number(second.rating || 0) - Number(first.rating || 0);
+            return ratingDifference || Number(second.reviewCount || 0) - Number(first.reviewCount || 0);
+          })
+          .slice(0, 4);
+        setCarers(featured);
+      })
+      .catch((error) => console.error('Error fetching carers:', error))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
     <section className="carers">
       <div className="container">
-        <div className="carers-heading">
-          <span className="section-label">ĐỘI NGŨ CHUYÊN GIA ĐÁNG TIN CẬY</span>
-          <h2 className="section-title">Gặp gỡ các chuyên gia của chúng tôi</h2>
-          <p>Những bảo mẫu và chuyên gia chăm sóc được tuyển chọn để đồng hành cùng mẹ và bé.</p>
+        <div className="public-section-heading public-section-heading-row">
+          <div><span>CHUYÊN GIA NỔI BẬT</span><h2>Đội ngũ chuyên viên</h2><p>Các hồ sơ nổi bật được lựa chọn dựa trên đánh giá tích cực từ các gia đình.</p></div>
+          <Link to="/carers">Xem tất cả chuyên gia</Link>
         </div>
-        
-        {loading ? (
-          <div className="landing-loading">
-            <Loader2 className="spinner" />
-            <p>Đang tải danh sách chuyên gia...</p>
-          </div>
-        ) : carers.length > 0 ? (
-          <div className="carer-track">
+        {loading ? <div className="landing-loading"><Loader2 className="spinner" /><p>Đang tải chuyên gia...</p></div> : (
+          <div className="landing-carer-grid">
             {carers.map((carer) => {
-              const fullName = getCarerFullName(carer);
-              const avatar = getCarerAvatar(carer);
+              const name = getCarerFullName(carer);
               const rating = getDisplayRating(carer);
-
               return (
-                <Link to={`/carers/${carer._id}`} key={carer._id} className="carer-link-wrapper">
-                  <motion.div 
-                    className="carer-card"
-                    whileHover={{ y: -15, scale: 1.02 }}
-                    transition={{ type: 'spring', stiffness: 300 }}
-                  >
-                    <img src={avatar} alt={fullName} className="carer-img" />
-                    <div className="carer-info">
-                      <div className="carer-info-top">
-                        <span className="carer-badge">
-                          <ShieldCheck size={12} />
-                          Đã xác minh
-                        </span>
-                        <span className="carer-rating">
-                          {rating ? (
-                            <>
-                              <Star size={12} fill="currentColor" />
-                              {rating}
-                            </>
-                          ) : (
-                            formatReviewLabel(carer)
-                          )}
-                        </span>
-                      </div>
-                      <h4>{fullName}</h4>
-                      <p>{formatLocation(carer.location)}</p>
-                    </div>
-                  </motion.div>
+                <Link to={`/carers/${carer._id}`} className="landing-carer-card" key={carer._id}>
+                  <img src={getCarerAvatar(carer) || fallbackAvatar} alt={name} />
+                  <div className="landing-carer-body">
+                    {carer.verificationStatus === 'verified' && <span className="verified-chip"><ShieldCheck size={14} />Đã xác minh nơi làm việc</span>}
+                    <h3>{name}</h3>
+                    <p><MapPin size={15} />{carer.location || 'Khu vực đang cập nhật'}</p>
+                    <div>{rating ? <span className="rating-value"><Star size={15} fill="currentColor" />{rating}</span> : <span>{formatReviewLabel(carer)}</span>}<strong>{Number(carer.hourlyRate || 0).toLocaleString('vi-VN')} VNĐ/giờ</strong></div>
+                  </div>
                 </Link>
               );
             })}
-          </div>
-        ) : (
-          <div className="empty-state">
-            <p>Hiện chưa có chuyên gia nào rảnh. Vui lòng quay lại sau!</p>
+            {!carers.length && <div className="empty-state"><p>Chưa có chuyên gia đang mở lịch.</p></div>}
           </div>
         )}
       </div>

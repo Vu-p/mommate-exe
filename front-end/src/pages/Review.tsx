@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Star, Loader2, ChevronRight } from 'lucide-react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
@@ -16,7 +16,8 @@ const Review = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { bookingId } = location.state || {};
+  const [searchParams] = useSearchParams();
+  const bookingId = location.state?.bookingId || searchParams.get('bookingId');
 
   useEffect(() => {
     const fetchBookingDetails = async () => {

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ChevronRight, Loader2 } from 'lucide-react';
+import { CalendarDays, ChevronRight, Clock3, CreditCard, Loader2, LockKeyhole, ShieldCheck, Stethoscope, UserRound } from 'lucide-react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -54,6 +54,12 @@ const Payment = () => {
 
   const canPay = booking?.status === 'accepted_pending_payment';
   const isPaid = booking?.status === 'paid_confirmed' || booking?.status === 'confirmed';
+
+  useEffect(() => {
+    if (paymentResult === 'success' && bookingId && isPaid) {
+      navigate(`/payment/success?bookingId=${bookingId}`, { replace: true });
+    }
+  }, [bookingId, isPaid, navigate, paymentResult]);
 
   useEffect(() => {
     if (paymentResult !== 'success' || !bookingId || isPaid) return;
@@ -145,88 +151,48 @@ const Payment = () => {
           </div>
         ) : (
           <div className="payment-layout">
-            <section className="payment-methods-col">
-              <h2>Thanh toán qua payOS</h2>
-              <p>
-                Booking chỉ có thể thanh toán sau khi carer đã xác nhận nhận lịch. payOS sẽ tạo mã VietQR
-                và ghi nhận giao dịch tự động qua webhook.
-              </p>
-
-              <div className="vietqr-details-card">
-                <div className="bank-info-grid">
-                  <div className="info-item">
-                    <span className="label">Trạng thái booking</span>
-                    <strong>{booking.status}</strong>
-                  </div>
-                  <div className="info-item">
-                    <span className="label">payOS orderCode</span>
-                    <strong>{booking.payosOrderCode || 'Chưa tạo'}</strong>
-                  </div>
-                  <div className="info-item full-width">
-                    <span className="label">Ghi chú</span>
-                    <strong>Webhook payOS là nguồn xác nhận thanh toán chính.</strong>
-                  </div>
-                </div>
-              </div>
-
-              {isPaid ? (
-                <button className="btn-confirm-payment" onClick={() => navigate('/account/request')}>
-                  Đã thanh toán - quay lại lịch đặt
-                </button>
-              ) : (
-                <button 
-                  className="btn-confirm-payment"
-                  onClick={handleCreatePaymentLink}
-                  disabled={!canPay || creatingLink}
-                >
-                  {creatingLink ? 'Đang tạo link payOS...' : 'Thanh toán qua payOS'}
-                </button>
-              )}
-
-              {!canPay && !isPaid && (
-                <p className="empty-text">
-                  Booking này chưa được carer xác nhận nên chưa thể thanh toán.
-                </p>
-              )}
-            </section>
-
-            <aside className="booking-summary-col">
-              <div className="summary-card">
-                <div className="summary-header">
-                  <div className="summary-image">
-                    {booking.service?.image ? (
-                      <img src={booking.service.image} alt={booking.service?.title || 'Service'} />
-                    ) : (
-                      <div className="img-placeholder" />
-                    )}
-                  </div>
-                  <div className="summary-title-wrapper">
-                    <h3>{booking.service?.title || 'Dịch vụ MomMate'}</h3>
-                    <p className="carer-name">Chuyên gia: {carerName}</p>
-                  </div>
-                </div>
-
-                <div className="summary-details">
-                  <div className="summary-row">
-                    <span>Lịch hẹn</span>
-                    <span>{new Date(booking.scheduledAt).toLocaleString('vi-VN')}</span>
-                  </div>
-                  <div className="summary-row">
-                    <span>Thời lượng</span>
-                    <span>{booking.numSessions || 1} buổi x {booking.hours || 1} giờ</span>
-                  </div>
-                  <div className="summary-row">
-                    <span>Địa chỉ</span>
-                    <span>{booking.fullAddress || booking.address}</span>
-                  </div>
-                  <div className="summary-divider"></div>
-                  <div className="summary-row total">
-                    <span>Tổng thanh toán</span>
-                    <span className="total-price">{formatCurrency(booking.totalPrice)}</span>
-                  </div>
-                </div>
-              </div>
+            <aside className="stitch-payment-summary">
+              <section className="stitch-payment-status"><div><Clock3 size={18} /><strong>Đang chờ thanh toán</strong></div><b>9:47</b><p>Vui lòng hoàn tất thanh toán trong thời gian giới hạn để giữ lịch hẹn.</p></section>
+              <section className="stitch-payment-recap">
+                <h2>Tóm tắt đặt lịch</h2>
+                <div><Stethoscope /><p><small>Dịch vụ</small><strong>{booking.service?.title || 'Dịch vụ MomMate'}</strong></p></div>
+                <div><UserRound /><p><small>Người chăm sóc</small><strong>{carerName}</strong></p></div>
+                <div><CalendarDays /><p><small>Ngày & giờ</small><strong>{new Date(booking.scheduledAt).toLocaleString('vi-VN')}</strong></p></div>
+                <footer>
+                  <span>Phí dịch vụ <b>{formatCurrency(booking.totalPrice)}</b></span>
+                  <span>Phí xử lý <b>0đ</b></span>
+                  <strong>Tổng cộng <b>{formatCurrency(booking.totalPrice)}</b></strong>
+                </footer>
+              </section>
+              <section className="stitch-payment-security"><ShieldCheck /><div><strong>Thanh toán bảo mật</strong><p>Thông tin thanh toán được mã hóa và xử lý an toàn bởi payOS.</p></div></section>
             </aside>
+
+            <section className="stitch-payment-gateway">
+              <header><div><strong>payOS</strong><span>Cổng thanh toán bảo mật</span></div><LockKeyhole size={20} /></header>
+              <div className="stitch-gateway-body">
+                <div className="stitch-qr-column">
+                  <h3>Quét mã để trả qua App Ngân hàng</h3>
+                  <div className="stitch-fake-qr" aria-label="Mã QR thanh toán"><span>payOS</span></div>
+                  <p>Hỗ trợ tất cả ứng dụng ngân hàng qua chuẩn VietQR.</p>
+                </div>
+                <div className="stitch-card-column">
+                  <h3>Thẻ Tín dụng hoặc Ghi nợ</h3>
+                  <label>Tên trên thẻ<input placeholder="NGUYEN VAN A" /></label>
+                  <label>Số thẻ<span><input placeholder="**** **** **** ****" /><CreditCard size={18} /></span></label>
+                  <div><label>Ngày hết hạn<input placeholder="MM/YY" /></label><label>Mã CVV<input placeholder="***" type="password" /></label></div>
+                  {isPaid ? (
+                    <button className="stitch-pay-button" onClick={() => navigate('/account/request')}>Đã thanh toán</button>
+                  ) : (
+                    <button className="stitch-pay-button" onClick={handleCreatePaymentLink} disabled={!canPay || creatingLink}>
+                      {creatingLink ? 'Đang tạo link payOS...' : `Thanh toán ${formatCurrency(booking.totalPrice)} an toàn`}
+                      <ChevronRight size={18} />
+                    </button>
+                  )}
+                  {!canPay && !isPaid && <p className="empty-text">Booking chưa được chuyên gia xác nhận nên chưa thể thanh toán.</p>}
+                  <footer><span><ShieldCheck size={14} /> Tuân thủ PCI-DSS</span><span><LockKeyhole size={14} /> Mã hóa SSL 256-bit</span></footer>
+                </div>
+              </div>
+            </section>
           </div>
         )}
       </main>

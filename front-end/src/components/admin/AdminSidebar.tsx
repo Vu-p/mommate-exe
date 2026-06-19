@@ -1,15 +1,22 @@
-import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Package, 
-  Users, 
-  ClipboardList, 
-  LogOut,
-  ChevronLeft
+import {
+  BarChart3, CircleHelp, ClipboardList, LayoutDashboard, LogOut,
+  Package, Settings, ShieldAlert, Star, Users, WalletCards,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './AdminSidebar.css';
+
+const links = [
+  ['/admin/dashboard', 'Tổng quan', LayoutDashboard],
+  ['/admin/users', 'Quản lý người dùng', Users],
+  ['/admin/services', 'Dịch vụ', Package],
+  ['/admin/carers', 'Chuyên gia', Users],
+  ['/admin/bookings', 'Đặt lịch', ClipboardList],
+  ['/admin/reconciliation', 'Thanh toán', WalletCards],
+  ['/admin/reviews', 'Đánh giá', Star],
+  ['/admin/incidents', 'Sự cố', ShieldAlert],
+  ['/admin/revenue', 'Doanh thu', BarChart3],
+] as const;
 
 const AdminSidebar = () => {
   const { logout } = useAuth();
@@ -23,38 +30,21 @@ const AdminSidebar = () => {
   return (
     <aside className="admin-sidebar">
       <div className="sidebar-header">
-        <div className="admin-logo">
-          <span className="logo-accent">Mom</span>mate Admin
-        </div>
+        <div className="admin-logo">MomMate</div>
+        <p>Bảng Quản Trị</p>
       </div>
-
       <nav className="sidebar-nav">
-        <NavLink to="/admin/dashboard" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-          <LayoutDashboard size={20} />
-          <span>Overview</span>
-        </NavLink>
-        
-        <NavLink to="/admin/services" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-          <Package size={20} />
-          <span>Services</span>
-        </NavLink>
-
-        <NavLink to="/admin/carers" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-          <Users size={20} />
-          <span>Carers</span>
-        </NavLink>
-
-        <NavLink to="/admin/bookings" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-          <ClipboardList size={20} />
-          <span>Bookings</span>
-        </NavLink>
+        {links.map(([to, label, Icon]) => (
+          <NavLink key={to} to={to} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+            <Icon size={20} />
+            <span>{label}</span>
+          </NavLink>
+        ))}
+        <span className="nav-item settings-item"><Settings size={20} /><span>Cài đặt</span></span>
       </nav>
-
       <div className="sidebar-footer">
-        <button onClick={handleLogout} className="logout-btn">
-          <LogOut size={20} />
-          <span>Sign Out</span>
-        </button>
+        <a href="#support" className="sidebar-help"><CircleHelp size={20} /><span>Trung tâm hỗ trợ</span></a>
+        <button onClick={handleLogout} className="logout-btn"><LogOut size={20} /><span>Đăng xuất</span></button>
       </div>
     </aside>
   );

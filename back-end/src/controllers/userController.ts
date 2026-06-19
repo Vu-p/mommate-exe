@@ -2,6 +2,7 @@ import type { Response } from 'express';
 import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import type { AuthRequest } from '../middleware/auth.js';
+import { escapeRegex, getPagination, paginationPayload } from '../utils/pagination.js';
 
 // @desc    Get users for admin management
 // @route   GET /api/users
@@ -9,13 +10,14 @@ import type { AuthRequest } from '../middleware/auth.js';
 export const getUsers = async (req: AuthRequest, res: Response) => {
   try {
     const filter: Record<string, any> = {};
+    const { enabled, page, limit, skip } = getPagination(req.query, 20);
 
     if (req.query.role) {
       filter.role = req.query.role;
     }
 
     if (req.query.search) {
-      const search = String(req.query.search);
+      const search = escapeRegex(req.query.search);
       filter.$or = [
         { firstName: { $regex: search, $options: 'i' } },
         { lastName: { $regex: search, $options: 'i' } },
@@ -23,9 +25,17 @@ export const getUsers = async (req: AuthRequest, res: Response) => {
         { phoneNumber: { $regex: search, $options: 'i' } },
       ];
     }
+    if (req.query.accountStatus) filter.accountStatus = req.query.accountStatus;
 
-    const users = await User.find(filter).select('-password').sort({ createdAt: -1 });
-    res.json(users);
+    const sortMap: Record<string, any> = {
+      oldest: { createdAt: 1 },
+      'name-asc': { firstName: 1, lastName: 1 },
+      newest: { createdAt: -1 },
+    };
+    const query = User.find(filter).select('-password').sort(sortMap[String(req.query.sort)] || { createdAt: -1 });
+    if (!enabled) return res.json(await query);
+    const [items, total] = await Promise.all([query.skip(skip).limit(limit), User.countDocuments(filter)]);
+    res.json(paginationPayload(items, total, page, limit));
   } catch (error: any) {
     res.status(500).json({ message: error.message || 'Server error' });
   }
@@ -108,7 +118,7 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const { firstName, lastName, role, phoneNumber, avatar, address, password } = req.body;
+    const { firstName, lastName, role, phoneNumber, avatar, address, password, accountStatus, suspendedReason } = req.body;
 
     user.firstName = firstName ?? user.firstName;
     user.lastName = lastName ?? user.lastName;
@@ -116,6 +126,9 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
     user.phoneNumber = phoneNumber ?? user.phoneNumber;
     user.avatar = avatar ?? user.avatar;
     user.address = address ?? user.address;
+    user.accountStatus = accountStatus ?? user.accountStatus;
+    user.suspendedReason = accountStatus === 'suspended' ? (suspendedReason || user.suspendedReason) : undefined;
+    user.suspendedAt = accountStatus === 'suspended' ? new Date() : undefined;
 
     if (password) {
       user.password = await bcrypt.hash(password, 10);

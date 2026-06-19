@@ -5,13 +5,19 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 import './Booking.css';
 
 const Booking = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { serviceId, serviceTitle, carerId, carerName } = location.state || {};
+  const query = new URLSearchParams(location.search);
+  const state = location.state || {};
+  const serviceId = state.serviceId || query.get('serviceId');
+  const serviceTitle = state.serviceTitle || query.get('serviceTitle');
+  const carerId = state.carerId || query.get('carerId');
+  const carerName = state.carerName || query.get('carerName');
   const hasRequiredBookingData = Boolean(serviceId && carerId);
 
   const [formData, setFormData] = useState({
@@ -37,6 +43,8 @@ const Booking = () => {
   });
   const [service, setService] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const today = new Date();
+  const minimumBookingDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 
   useEffect(() => {
     if (!hasRequiredBookingData) {
@@ -85,7 +93,12 @@ const Booking = () => {
 
     setLoading(true);
     try {
-      const scheduledAt = new Date(`${formData.date}T${formData.time}`);
+      const scheduledAt = new Date(`${formData.date}T${formData.time}:00`);
+
+      if (Number.isNaN(scheduledAt.getTime()) || scheduledAt.getTime() <= Date.now()) {
+        alert('Vui lòng chọn thời gian hẹn trong tương lai.');
+        return;
+      }
       
       if (!hasRequiredBookingData) {
         alert('Thiếu thông tin dịch vụ hoặc chuyên gia để đặt lịch.');
@@ -95,7 +108,7 @@ const Booking = () => {
       const payload = {
         carerId,
         serviceId,
-        scheduledAt: scheduledAt,
+        scheduledAt: scheduledAt.toISOString(),
         contactName: formData.name,
         contactPhone: formData.contactPhone,
         city: formData.city,
@@ -121,7 +134,10 @@ const Booking = () => {
       navigate('/account/request');
     } catch (error) {
       console.error('Booking failed:', error);
-      alert('Đặt lịch thất bại. Vui lòng kiểm tra lại thông tin.');
+      const message = axios.isAxiosError(error)
+        ? error.response?.data?.message
+        : '';
+      alert(message || 'Đặt lịch thất bại. Vui lòng kiểm tra lại thông tin.');
     } finally {
       setLoading(false);
     }
@@ -157,11 +173,17 @@ const Booking = () => {
           <span>Đặt lịch</span>
         </nav>
 
+        <header className="stitch-booking-heading">
+          <span>ĐĂNG KÝ DỊCH VỤ</span>
+          <h1>Thông tin đặt lịch chăm sóc</h1>
+          <p>Vui lòng cung cấp thông tin để chuyên gia chuẩn bị buổi chăm sóc phù hợp nhất.</p>
+        </header>
+
         <div className="booking-layout">
           {/* Left Form Column */}
-          <form className="booking-form-col" onSubmit={handleSubmit}>
+          <form id="booking-request-form" className="booking-form-col" onSubmit={handleSubmit}>
             <div className="booking-form-section">
-              <h2>Thông tin người đặt</h2>
+              <h2><span>1</span> Thông tin liên hệ & Địa chỉ</h2>
               <div className="form-row-2">
                 <div className="input-field">
                   <label>Họ và Tên</label>
@@ -182,10 +204,6 @@ const Booking = () => {
                   />
                 </div>
               </div>
-            </div>
-
-            <div className="booking-form-section">
-              <h2>Địa chỉ chăm sóc</h2>
               <div className="form-row-2">
                 <div className="input-field">
                   <label>Thành phố</label>
@@ -224,129 +242,45 @@ const Booking = () => {
             </div>
 
             <div className="booking-form-section">
-              <h2>Thông tin lịch hẹn</h2>
-              <div className="input-field">
-                <label>Nhu cầu chăm sóc</label>
-                <div className="select-wrapper">
-                  <select 
-                    value={formData.careFor}
-                    onChange={e => setFormData({...formData, careFor: e.target.value})}
-                  >
-                    <option value="pregnant_mom">Mẹ đang mang thai</option>
-                    <option value="postpartum_mom">Mẹ sau sinh</option>
-                    <option value="baby">Chăm bé</option>
-                    <option value="mom_and_baby">Mẹ và bé</option>
-                  </select>
-                  <ChevronDown size={18} />
-                </div>
+              <h2><span>2</span> Đối tượng chăm sóc</h2>
+              <div className="stitch-care-options">
+                {[['pregnant_mom', 'Mẹ bầu'], ['postpartum_mom', 'Mẹ sau sinh'], ['baby', 'Em bé'], ['mom_and_baby', 'Mẹ & bé']].map(([value, label]) => (
+                  <button type="button" key={value} className={formData.careFor === value ? 'active' : ''} onClick={() => setFormData({...formData, careFor: value})}>
+                    <span>{label.slice(0, 1)}</span>{label}
+                  </button>
+                ))}
               </div>
+            </div>
 
-              <div className="form-row-2">
-                <div className="input-field">
-                  <label>Ngày hẹn</label>
-                  <input 
-                    type="date" required
-                    value={formData.date}
-                    onChange={e => setFormData({...formData, date: e.target.value})}
-                  />
-                </div>
-                <div className="input-field">
-                  <label>Giờ hẹn</label>
-                  <div className="select-wrapper">
-                    <select 
-                      value={formData.time}
-                      onChange={e => setFormData({...formData, time: e.target.value})}
-                    >
-                      <option value="07:00">07:00</option>
-                      <option value="08:00">08:00</option>
-                      <option value="09:00">09:00</option>
-                      <option value="10:00">10:00</option>
-                      <option value="14:00">14:00</option>
-                      <option value="15:00">15:00</option>
-                    </select>
-                    <ChevronDown size={18} />
-                  </div>
-                </div>
-              </div>
-
-              <div className="form-row-2">
-                <div className="input-field">
-                  <label>Số buổi</label>
-                  <div className="select-wrapper">
-                    <select 
-                      value={formData.numSessions}
-                      onChange={e => setFormData({...formData, numSessions: parseInt(e.target.value)})}
-                    >
-                      <option value="1">1 Buổi</option>
-                      <option value="5">5 Buổi</option>
-                      <option value="10">10 Buổi</option>
-                    </select>
-                    <ChevronDown size={18} />
-                  </div>
-                </div>
-                <div className="input-field">
-                  <label>Số giờ / buổi</label>
-                  <div className="select-wrapper">
-                    <select 
-                      value={formData.hours}
-                      onChange={e => setFormData({...formData, hours: parseInt(e.target.value)})}
-                    >
-                      <option value="2">2 Giờ</option>
-                      <option value="4">4 Giờ</option>
-                      <option value="8">8 Giờ</option>
-                    </select>
-                    <ChevronDown size={18} />
-                  </div>
-                </div>
-              </div>
-
+            <div className="booking-form-section">
+              <h2><span>3</span> Hồ sơ sức khỏe</h2>
               <div className="form-row-2">
                 <div className="input-field">
                   <label>Tuần thai</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="42"
-                    placeholder="Nếu đang mang thai"
-                    value={formData.pregnancyWeek}
+                  <input type="number" min="1" max="42" placeholder="Nếu đang mang thai" value={formData.pregnancyWeek}
                     onChange={e => setFormData({...formData, pregnancyWeek: e.target.value})}
                   />
                 </div>
                 <div className="input-field">
                   <label>Ngày dự sinh</label>
-                  <input
-                    type="date"
-                    value={formData.expectedBirthDate}
-                    onChange={e => setFormData({...formData, expectedBirthDate: e.target.value})}
-                  />
+                  <input type="date" value={formData.expectedBirthDate} onChange={e => setFormData({...formData, expectedBirthDate: e.target.value})} />
                 </div>
               </div>
-
               <div className="form-row-2">
                 <div className="input-field">
                   <label>Ngày sinh của bé</label>
-                  <input
-                    type="date"
-                    value={formData.babyBirthDate}
-                    onChange={e => setFormData({...formData, babyBirthDate: e.target.value})}
-                  />
+                  <input type="date" value={formData.babyBirthDate} onChange={e => setFormData({...formData, babyBirthDate: e.target.value})} />
                 </div>
                 <div className="input-field">
                   <label>Hình thức sinh</label>
                   <div className="select-wrapper">
-                    <select
-                      value={formData.birthMethod}
-                      onChange={e => setFormData({...formData, birthMethod: e.target.value})}
-                    >
-                      <option value="unknown">Chưa cập nhật</option>
-                      <option value="vaginal">Sinh thường</option>
-                      <option value="c_section">Sinh mổ</option>
+                    <select value={formData.birthMethod} onChange={e => setFormData({...formData, birthMethod: e.target.value})}>
+                      <option value="unknown">Chưa cập nhật</option><option value="vaginal">Sinh thường</option><option value="c_section">Sinh mổ</option>
                     </select>
                     <ChevronDown size={18} />
                   </div>
                 </div>
               </div>
-
               <div className="form-row-2">
                 <div className="input-field">
                   <label>Tình trạng mẹ</label>
@@ -365,34 +299,26 @@ const Booking = () => {
                   />
                 </div>
               </div>
-
-              <div className="form-row-2">
-                <div className="input-field">
-                  <label>Dị ứng / lưu ý đặc biệt</label>
-                  <textarea
-                    placeholder="Dị ứng thuốc, thực phẩm, lưu ý trong nhà..."
-                    value={formData.allergies}
-                    onChange={e => setFormData({...formData, allergies: e.target.value})}
-                  />
-                </div>
-                <div className="input-field">
-                  <label>Lưu ý y tế</label>
-                  <textarea
-                    placeholder="Chẩn đoán, chỉ định bác sĩ, giới hạn cần tránh..."
-                    value={formData.medicalNotes}
-                    onChange={e => setFormData({...formData, medicalNotes: e.target.value})}
-                  />
-                </div>
-              </div>
-
               <div className="input-field">
-                <label>Lời nhắn</label>
-                <textarea 
-                  placeholder="Ghi chú thêm cho chuyên gia..."
-                  value={formData.notes}
-                  onChange={e => setFormData({...formData, notes: e.target.value})}
-                ></textarea>
+                <label>Lưu ý y tế & dị ứng</label>
+                <textarea placeholder="Chẩn đoán, dị ứng, chỉ định bác sĩ hoặc lưu ý đặc biệt..."
+                  value={formData.medicalNotes} onChange={e => setFormData({...formData, medicalNotes: e.target.value})} />
               </div>
+            </div>
+
+            <div className="booking-form-section">
+              <h2><span>4</span> Lịch trình chăm sóc</h2>
+              <div className="form-row-2">
+                <div className="input-field"><label>Ngày hẹn</label><input type="date" min={minimumBookingDate} required value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} /></div>
+                <div className="input-field"><label>Giờ hẹn</label><div className="select-wrapper"><select value={formData.time} onChange={e => setFormData({...formData, time: e.target.value})}>
+                  <option value="07:00">07:00</option><option value="08:00">08:00</option><option value="09:00">09:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option>
+                </select><ChevronDown size={18} /></div></div>
+              </div>
+              <div className="form-row-2">
+                <div className="input-field"><label>Số buổi</label><div className="select-wrapper"><select value={formData.numSessions} onChange={e => setFormData({...formData, numSessions: parseInt(e.target.value)})}><option value="1">1 buổi</option><option value="5">5 buổi</option><option value="10">10 buổi</option></select><ChevronDown size={18} /></div></div>
+                <div className="input-field"><label>Số giờ / buổi</label><div className="select-wrapper"><select value={formData.hours} onChange={e => setFormData({...formData, hours: parseInt(e.target.value)})}><option value="2">2 giờ</option><option value="4">4 giờ</option><option value="8">8 giờ</option></select><ChevronDown size={18} /></div></div>
+              </div>
+              <div className="input-field"><label>Lời nhắn cho chuyên gia</label><textarea placeholder="Ghi chú thêm cho chuyên gia..." value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} /></div>
             </div>
           </form>
 
@@ -445,9 +371,9 @@ const Booking = () => {
 
               <button 
                 type="submit" 
+                form="booking-request-form"
                 className="btn-booking-submit" 
                 disabled={loading}
-                onClick={handleSubmit}
               >
                 {loading ? 'Đang xử lý...' : 'Gửi yêu cầu cho carer'}
               </button>

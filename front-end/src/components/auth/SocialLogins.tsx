@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { signInWithPopup } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
+import { Apple } from 'lucide-react';
 import './SocialLogins.css';
 import { useAuth } from '../../context/AuthContext.js';
 import api from '../../utils/api.js';
@@ -22,7 +23,7 @@ const SocialLogins = ({ isLogin }: SocialLoginsProps) => {
     setError('');
 
     if (!firebaseAuth || !hasFirebaseConfig) {
-      setError('Google login is not configured yet.');
+      setError('Đăng nhập Google chưa được cấu hình.');
       return;
     }
 
@@ -35,7 +36,7 @@ const SocialLogins = ({ isLogin }: SocialLoginsProps) => {
 
       if (!isAdminApp && data.role === 'admin') {
         if (!redirectToAdminApp()) {
-          setError('Tai khoan admin can dang nhap tai trang quan tri.');
+          setError('Tài khoản admin cần đăng nhập tại trang quản trị.');
         }
         return;
       }
@@ -49,7 +50,7 @@ const SocialLogins = ({ isLogin }: SocialLoginsProps) => {
 
       navigate('/');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Khong the dang nhap bang Google. Vui long thu lai.');
+      setError(err.response?.data?.message || 'Không thể đăng nhập bằng Google. Vui lòng thử lại.');
     } finally {
       setIsSubmitting(false);
     }
@@ -57,7 +58,6 @@ const SocialLogins = ({ isLogin }: SocialLoginsProps) => {
 
   return (
     <div className="social-logins">
-      <p className="social-text">{isLogin ? 'Hoac dang nhap voi' : 'Dang ky nhanh voi'}</p>
       {error && <p className="social-error">{error}</p>}
       <div className="social-buttons">
         <motion.button
@@ -68,9 +68,11 @@ const SocialLogins = ({ isLogin }: SocialLoginsProps) => {
           onClick={handleGoogleLogin}
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Dang xu ly...' : 'Google'}
+          <span className="google-mark">G</span>{isSubmitting ? 'Đang xử lý...' : 'Google'}
         </motion.button>
+        <button className="social-btn apple" type="button"><Apple size={18} fill="currentColor" />Apple</button>
       </div>
+      <p className="social-text"><span />{isLogin ? 'HOẶC ĐĂNG NHẬP BẰNG EMAIL' : 'HOẶC ĐĂNG KÝ BẰNG EMAIL'}<span /></p>
     </div>
   );
 };

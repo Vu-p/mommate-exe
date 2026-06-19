@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import Navbar from '../components/Navbar.tsx';
+import { BriefcaseMedical } from 'lucide-react';
 import SignUpForm from '../components/auth/SignUpForm.tsx';
 import LoginForm from '../components/auth/LoginForm.tsx';
 import SocialLogins from '../components/auth/SocialLogins.tsx';
-import Footer from '../components/Footer.tsx';
-import signupImg from '../assets/images/signup-mock.png';
+import logo from '../assets/images/logo.png';
 import './Auth.css';
 import { useAuth } from '../context/AuthContext.tsx';
 import { isAdminApp, redirectToAdminApp } from '../config/appMode.ts';
@@ -49,10 +48,7 @@ const Auth = ({ defaultMode = 'signup' }: AuthProps) => {
 
   return (
     <div className={`auth-page ${isAdminApp ? 'admin-auth-page' : ''}`}>
-      <Navbar currentMode={isLogin ? 'login' : 'signup'} />
-      
       <main className="auth-main">
-        <div className="container">
           <motion.div 
             className="auth-panel"
             initial={{ opacity: 0, y: 20 }}
@@ -61,16 +57,18 @@ const Auth = ({ defaultMode = 'signup' }: AuthProps) => {
             layout
           >
             <div className="auth-image-side" aria-hidden="true">
-              <motion.img 
-                key="hero-img"
-                src={signupImg} 
-                alt="Welcome to Mommate" 
-                className="auth-hero-img"
-                layout
-              />
+              <div className="auth-visual-copy">
+                <h1>Chăm sóc mẹ bầu mà bạn có thể tin tưởng.</h1>
+                <p>Tham gia cộng đồng tìm kiếm sự hỗ trợ chuyên nghiệp hoàn hảo cho hành trình làm mẹ.</p>
+              </div>
             </div>
             
             <div className="auth-form-side">
+              <div className="auth-brand"><img src={logo} alt="" /><strong>Mommate</strong></div>
+              <div className="auth-tabs">
+                <button className={isLogin ? 'active' : ''} onClick={toggleToLogin}>Đăng nhập</button>
+                <button className={!isLogin ? 'active' : ''} onClick={toggleToSignup}>Đăng ký</button>
+              </div>
               <AnimatePresence mode="wait">
                 <motion.div
                   className="auth-form-motion"
@@ -80,20 +78,31 @@ const Auth = ({ defaultMode = 'signup' }: AuthProps) => {
                   exit={{ opacity: 0, x: isLogin ? -20 : 20 }}
                   transition={{ duration: 0.3 }}
                 >
+                  <div className="auth-form-intro">
+                    <h2>{isLogin ? 'Chào mừng quay trở lại' : 'Tạo tài khoản MaternalCare'}</h2>
+                    <p>{isLogin ? 'Nhập thông tin của bạn để truy cập bảng điều khiển chăm sóc.' : 'Tìm kiếm sự hỗ trợ chuyên nghiệp mà gia đình bạn xứng đáng có được.'}</p>
+                  </div>
+                  {!isAdminApp && <SocialLogins isLogin={isLogin} />}
                   {isLogin ? (
                     <LoginForm onToggle={toggleToSignup} />
                   ) : (
                     <SignUpForm onToggle={toggleToLogin} />
                   )}
-                  {!isAdminApp && <SocialLogins isLogin={isLogin} />}
                 </motion.div>
               </AnimatePresence>
+              {!isAdminApp && (
+                <>
+                  <aside className="auth-expert-card">
+                    <BriefcaseMedical aria-hidden="true" />
+                    <span><strong>Bạn là Chuyên gia?</strong><small>Truy cập cổng thông tin chuyên gia</small></span>
+                    <a href="/carer/login">Đăng nhập cho<br />Chuyên gia →</a>
+                  </aside>
+                  <p className="auth-copyright">© 2024 Dịch vụ Chuyên nghiệp MaternalCare. Bảo lưu mọi quyền.</p>
+                </>
+              )}
             </div>
           </motion.div>
-        </div>
       </main>
-      
-      <Footer />
     </div>
   );
 };

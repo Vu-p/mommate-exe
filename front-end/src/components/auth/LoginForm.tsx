@@ -75,15 +75,14 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
 
   return (
     <div className="login-form-container">
-      <h2 className="form-title">Đăng nhập tài khoản</h2>
-
       <form className="login-form" onSubmit={handleSubmit}>
         {error && <p className="auth-message error-message">{error}</p>}
         {notice && <p className="auth-message success-message">{notice}</p>}
 
         <Input
-          label="Email"
+          label="Địa chỉ Email"
           type="email"
+          placeholder="✉  vi-du@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -91,6 +90,7 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
         <Input
           label="Mật khẩu"
           type={showPassword ? 'text' : 'password'}
+          placeholder="🔒  ••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -108,11 +108,7 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
         />
 
         <div className="form-options">
-          <label className="checkbox-container">
-            <input type="checkbox" />
-            <span className="checkmark"></span>
-            Nhớ mật khẩu
-          </label>
+          <span />
           <button type="button" className="forgot-password" onClick={handleForgotPassword}>
             Quên mật khẩu?
           </button>
@@ -126,13 +122,11 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
             type="submit"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Đang đăng nhập...' : 'Log in'}
+            {isSubmitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
           </motion.button>
         </div>
 
-        <p className="toggle-auth-text">
-          Chưa có tài khoản? <button type="button" onClick={onToggle}>Đăng kí</button>
-        </p>
+        <button className="toggle-auth-text" type="button" onClick={onToggle}>Chưa có tài khoản? Đăng ký</button>
       </form>
     </div>
   );

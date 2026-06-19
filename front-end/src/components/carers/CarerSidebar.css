@@ -11,6 +11,67 @@
   top: 112px;
 }
 
+.public-app .carer-sidebar {
+  position: static;
+  gap: 28px;
+  padding: 28px 24px 0;
+  border-color: #c1c9be;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.public-app .carer-sidebar .sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+}
+
+.public-app .carer-sidebar .sidebar-header h3 {
+  margin: 0;
+  color: #396940;
+  font-size: 1.35rem;
+}
+
+.public-app .carer-sidebar .sidebar-header button {
+  color: #396940;
+  font-size: .75rem;
+}
+
+.public-app .carer-sidebar .sidebar-group { gap: 14px; }
+.public-app .carer-sidebar .sidebar-group > label { color: #191c1d; }
+.public-app .carer-sidebar .carer-select-trigger {
+  min-height: 52px;
+  border-color: #c1c9be;
+  border-radius: 8px;
+  background: #fff;
+  color: #414940;
+}
+
+.carer-price-range { width: 100%; accent-color: #396940; }
+.price-range-labels { display: flex; justify-content: space-between; color: #414940; font-size: .72rem; }
+.sidebar-check-list { display: flex; flex-direction: column; gap: 12px; }
+.sidebar-check-list label { display: flex; align-items: center; gap: 9px; color: #414940; font-size: .85rem; }
+.sidebar-check-list input { width: 16px; height: 16px; accent-color: #396940; }
+.sidebar-rating-list { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.sidebar-rating-list button { display: inline-flex; align-items: center; gap: 5px; color: #414940; }
+.sidebar-rating-list svg { color: #8b4b5d; }
+.carer-support-card {
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 7px;
+  margin: 4px -25px -1px;
+  padding: 28px 24px;
+  border-radius: 12px;
+  color: #fff;
+  background-position: center;
+  background-size: cover;
+}
+.carer-support-card strong { font-size: 1.25rem; }
+.carer-support-card span { font-size: .78rem; line-height: 1.5; }
+
 .sidebar-header {
   padding-bottom: 8px;
 }

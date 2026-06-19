@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import Service from '../models/Service.js';
+import { escapeRegex, getPagination, paginationPayload } from '../utils/pagination.js';
 
 // @desc    Get all services
 // @route   GET /api/services
@@ -7,9 +8,36 @@ import Service from '../models/Service.js';
 export const getServices = async (req: Request, res: Response) => {
   try {
     const isAdmin = req.query.admin === 'true';
-    const filter = isAdmin ? {} : { isActive: true };
-    const services = await Service.find(filter);
-    res.json(services);
+    const filter: Record<string, any> = isAdmin ? {} : { isActive: true };
+    const { enabled, page, limit, skip } = getPagination(req.query, 12);
+
+    if (req.query.search) {
+      const search = escapeRegex(req.query.search);
+      filter.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { category: { $regex: search, $options: 'i' } },
+        { tags: { $regex: search, $options: 'i' } },
+      ];
+    }
+    if (req.query.category) filter.category = req.query.category;
+
+    const sortMap: Record<string, any> = {
+      newest: { createdAt: -1 },
+      'price-asc': { price: 1 },
+      'price-desc': { price: -1 },
+      'name-asc': { title: 1 },
+    };
+    const sort = sortMap[String(req.query.sort)] || { createdAt: -1 };
+    const query = Service.find(filter).sort(sort);
+
+    if (!enabled) return res.json(await query);
+
+    const [items, total] = await Promise.all([
+      query.skip(skip).limit(limit),
+      Service.countDocuments(filter),
+    ]);
+    res.json(paginationPayload(items, total, page, limit));
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }

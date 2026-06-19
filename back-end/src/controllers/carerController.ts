@@ -6,6 +6,7 @@ import User, { UserRole } from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import type { AuthRequest } from '../middleware/auth.js';
 import { ensureContractForCarer } from '../utils/contracts.js';
+import { escapeRegex, getPagination, paginationPayload } from '../utils/pagination.js';
 
 const calculateAge = (birthDate?: Date | string) => {
   if (!birthDate) return undefined;
@@ -74,6 +75,7 @@ const applyReviewStats = async (carers: any[]) => {
 export const getCarers = async (req: Request, res: Response) => {
   try {
     const filter: Record<string, any> = { isDeleted: false };
+    const pagination = getPagination(req.query, 6);
 
     if (req.query.admin !== 'true') {
       filter.isVerified = true;
@@ -86,6 +88,26 @@ export const getCarers = async (req: Request, res: Response) => {
 
     if (req.query.area) {
       filter.location = { $regex: String(req.query.area), $options: 'i' };
+    }
+    if (req.query.search) {
+      const search = escapeRegex(req.query.search);
+      const matchingUsers = await User.find({
+        $or: [
+          { firstName: { $regex: search, $options: 'i' } },
+          { lastName: { $regex: search, $options: 'i' } },
+        ],
+      }).select('_id');
+      filter.$and = [
+        ...(filter.$and || []),
+        {
+          $or: [
+            { user: { $in: matchingUsers.map((user) => user._id) } },
+            { bio: { $regex: search, $options: 'i' } },
+            { location: { $regex: search, $options: 'i' } },
+            { workplaceName: { $regex: search, $options: 'i' } },
+          ],
+        },
+      ];
     }
 
     if (req.query.maxPrice) {
@@ -113,7 +135,24 @@ export const getCarers = async (req: Request, res: Response) => {
       .populate('services', 'title category')
       .lean();
 
-    const carersWithReviewStats = await applyReviewStats(carers);
+    let carersWithReviewStats = await applyReviewStats(carers);
+    if (req.query.minRating) {
+      carersWithReviewStats = carersWithReviewStats.filter((carer) => Number(carer.rating || 0) >= Number(req.query.minRating));
+    }
+
+    const sort = String(req.query.sort || '');
+    carersWithReviewStats.sort((first: any, second: any) => {
+      if (sort === 'rating-desc') return Number(second.rating || 0) - Number(first.rating || 0);
+      if (sort === 'price-asc') return Number(first.hourlyRate || 0) - Number(second.hourlyRate || 0);
+      if (sort === 'price-desc') return Number(second.hourlyRate || 0) - Number(first.hourlyRate || 0);
+      if (sort === 'experience-desc') return Number(second.experienceYears || 0) - Number(first.experienceYears || 0);
+      if (sort === 'name-asc') {
+        const firstName = `${first.user?.firstName || ''} ${first.user?.lastName || ''}`;
+        const secondName = `${second.user?.firstName || ''} ${second.user?.lastName || ''}`;
+        return firstName.localeCompare(secondName, 'vi');
+      }
+      return Number(second.rating || 0) - Number(first.rating || 0);
+    });
 
     if (req.query.admin === 'true') {
       const contracts = await Contract.find({
@@ -125,16 +164,17 @@ export const getCarers = async (req: Request, res: Response) => {
         .lean();
 
       const contractsByCarerId = new Map(contracts.map((contract) => [String(contract.carer), contract]));
-      return res.json(
-        carersWithReviewStats.map((carer) => ({
+      carersWithReviewStats = carersWithReviewStats.map((carer) => ({
           ...carer,
           contractStatus: contractsByCarerId.get(String(carer._id))?.status || 'pending',
           contractSignedAt: contractsByCarerId.get(String(carer._id))?.signedAt,
-        }))
-      );
+        }));
     }
 
-    res.json(carersWithReviewStats);
+    if (!pagination.enabled) return res.json(carersWithReviewStats);
+    const total = carersWithReviewStats.length;
+    const items = carersWithReviewStats.slice(pagination.skip, pagination.skip + pagination.limit);
+    res.json(paginationPayload(items, total, pagination.page, pagination.limit));
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }

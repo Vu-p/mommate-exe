@@ -52,8 +52,6 @@ const SignUpForm = ({ onToggle }: SignUpFormProps) => {
 
   return (
     <div className="signup-form-container">
-      <h2 className="form-title">Đăng kí tài khoản</h2>
-
       <form className="signup-form" onSubmit={handleSubmit}>
         {error && <p className="auth-message error-message">{error}</p>}
 

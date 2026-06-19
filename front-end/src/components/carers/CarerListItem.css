@@ -157,3 +157,51 @@
     border-bottom: none;
   }
 }
+.carer-card-inline-meta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 15px; }
+.carer-card-inline-meta span { display: inline-flex; align-items: center; gap: 5px; color: #5f675f; font-size: .78rem; }
+.carer-card-action { flex: 0 0 130px; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; text-align: right; }
+.carer-card-action strong { color: #396940; font-size: 1.05rem; }
+.carer-card-action small { margin: 5px 0 16px; color: #717970; }
+.carer-card-action span { min-width: 110px; padding: 10px 14px; border-radius: 6px; color: #fff; background: #396940; text-align: center; font-size: .8rem; font-weight: 750; }
+.public-app .carer-list-item .carer-info-blocks { display: none; }
+
+.public-app .carer-list-item { border-color: #c1c9be; }
+.public-app .carer-main-info { gap: 24px; padding: 24px; }
+.public-app .carer-avatar { position: relative; width: 192px; height: 192px; border-radius: 8px; }
+.top-rated-label {
+  position: absolute; top: 8px; left: 8px; padding: 5px 9px; border-radius: 4px;
+  color: #fff; background: #396940; font-size: 10px; font-weight: 800; text-transform: uppercase;
+}
+.public-app .carer-details { justify-content: space-between; }
+.public-app .name-rating { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: 20px; margin: 0; }
+.carer-name-line { display: flex; align-items: center; gap: 10px; }
+.public-app .name-rating h3 { color: #191c1d; font-size: 1.5rem; font-weight: 600; }
+.verified-label {
+  display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px;
+  border: 1px solid #7bae7f; border-radius: 999px; color: #0f411d; background: rgba(123,174,127,.16);
+  font-size: .62rem; font-weight: 800; text-transform: uppercase;
+}
+.verified-label svg { width: 14px; height: 14px; }
+.carer-subtitle { margin-top: 4px; color: #396940; font-size: .9rem; font-style: italic; }
+.public-app .rating { color: #8b4b5d; white-space: nowrap; font-size: .82rem; }
+.public-app .rating .reviews { margin-left: 0; color: #414940; opacity: 1; font-size: .68rem; }
+.carer-card-facts {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 9px 24px; margin-top: 18px;
+  color: #414940; font-size: .8rem;
+}
+.carer-card-facts span { display: flex; align-items: center; gap: 8px; }
+.carer-card-facts svg { width: 20px; color: #396940; }
+.carer-card-footer {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 20px;
+  margin-top: 20px; padding-top: 16px; border-top: 1px solid #c1c9be;
+}
+.carer-card-footer small,.carer-card-footer strong { display: block; }
+.carer-card-footer small { color: #414940; font-size: .68rem; }
+.carer-card-footer strong { margin-top: 3px; color: #396940; font-size: 1.35rem; }
+.carer-card-footer > div:last-child { display: flex; align-items: center; gap: 18px; }
+.carer-card-footer button { color: #396940; font-size: .78rem; }
+.carer-card-footer span { padding: 12px 24px; border-radius: 8px; color: #fff; background: #396940; font-size: .78rem; font-weight: 700; }
+
+@media (max-width: 700px) {
+  .carer-card-action { width: 100%; flex: auto; align-items: stretch; text-align: left; }
+}

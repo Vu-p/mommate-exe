@@ -9,19 +9,25 @@
     "build": "vite build",
     "build:admin": "vite build --mode admin --outDir dist-admin",
     "lint": "eslint .",
+    "test:visual": "playwright test tests/visual.spec.ts",
+    "test:visual:update-assets": "node scripts/sync-stitch-assets.mjs",
+    "test:visual:render-baselines": "node scripts/render-stitch-baselines.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.2.8",
     "axios": "^1.13.6",
     "firebase": "^12.14.0",
     "framer-motion": "^12.35.2",
     "lucide-react": "^0.577.0",
+    "material-symbols": "^0.45.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.13.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "@playwright/test": "^1.61.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.3.4",
@@ -31,6 +37,9 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",
     "globals": "^15.14.0",
+    "pixelmatch": "^7.2.0",
+    "pngjs": "^7.0.0",
+    "sharp": "^0.35.1",
     "typescript": "^5.9.3",
     "vite": "^6.1.0"
   }

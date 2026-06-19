@@ -1,18 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, Loader2, Search } from 'lucide-react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import FilterBar, { type ServiceFilters } from '../components/services/FilterBar';
+import type { ServiceFilters } from '../components/services/FilterBar';
 import ServiceCard from '../components/services/ServiceCard';
 import api from '../utils/api';
 import './FindService.css';
 
 const fallbackImages = ['/src/assets/images/service-1.png', '/src/assets/images/service-2.png'];
-const SERVICES_PER_PAGE = 6;
-
-const normalizeText = (value: unknown) => String(value || '').toLowerCase().trim();
-const getServicePrice = (service: any) => Number(service.price || service.basePrice || 0);
+const SERVICES_PER_PAGE = 12;
 
 const FindService = () => {
   const [services, setServices] = useState<any[]>([]);
@@ -24,6 +21,8 @@ const FindService = () => {
     sort: 'default',
   });
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -40,20 +39,35 @@ const FindService = () => {
     const fetchServices = async () => {
       try {
         setLoading(true);
-        const { data: allServices } = await api.get('/services');
+        const { data } = await api.get('/services', { params: {
+          page: currentPage,
+          limit: SERVICES_PER_PAGE,
+          search: searchTerm || undefined,
+          category: filters.category || undefined,
+          sort: filters.sort === 'default' ? undefined : filters.sort,
+        }});
+        let allServices = Array.isArray(data) ? data : data.items || [];
+        let total = data.pagination?.total ?? allServices.length;
+        let pages = data.pagination?.totalPages ?? 1;
 
         if (carerId) {
           try {
             const { data: carerData } = await api.get(`/carers/${carerId}`);
-            const carerServiceIds = carerData.services.map((service: any) => service._id || service);
-            setServices(allServices.filter((service: any) => carerServiceIds.includes(service._id)));
+            const carerServiceIds = (Array.isArray(carerData?.services) ? carerData.services : [])
+              .map((service: any) => service._id || service);
+            allServices = allServices.filter((service: any) => carerServiceIds.includes(service._id));
+            total = allServices.length;
+            pages = 1;
           } catch (err) {
             console.error('Error fetching carer for filtering:', err);
-            setServices(allServices);
+            // Keep paginated service result if the carer profile cannot be loaded.
           }
         } else {
-          setServices(allServices);
+          // No additional filtering required.
         }
+        setServices(allServices);
+        setTotalItems(total);
+        setTotalPages(pages);
       } catch (error) {
         console.error('Error fetching services:', error);
       } finally {
@@ -62,63 +76,17 @@ const FindService = () => {
     };
 
     fetchServices();
-  }, [carerId]);
+  }, [carerId, currentPage, filters.category, filters.sort, searchTerm]);
 
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filters.category, filters.area, filters.sort]);
 
-  const filteredServices = useMemo(() => {
-    const keyword = normalizeText(searchTerm);
-
-    const nextServices = services.filter((service) => {
-      const searchableText = normalizeText([
-        service.title,
-        service.description,
-        service.category,
-        ...(service.tags || []),
-      ].join(' '));
-      const serviceArea = normalizeText(service.area || service.location || service.city);
-      const matchesSearch = !keyword || searchableText.includes(keyword);
-      const matchesCategory = !filters.category || service.category === filters.category;
-      const matchesArea = !filters.area || !serviceArea || serviceArea.includes(normalizeText(filters.area));
-
-      return matchesSearch && matchesCategory && matchesArea;
-    });
-
-    return [...nextServices].sort((first, second) => {
-      if (filters.sort === 'newest') {
-        return new Date(second.createdAt || 0).getTime() - new Date(first.createdAt || 0).getTime();
-      }
-
-      if (filters.sort === 'price-asc') {
-        return getServicePrice(first) - getServicePrice(second);
-      }
-
-      if (filters.sort === 'price-desc') {
-        return getServicePrice(second) - getServicePrice(first);
-      }
-
-      if (filters.sort === 'name-asc') {
-        return String(first.title || '').localeCompare(String(second.title || ''), 'vi');
-      }
-
-      return 0;
-    });
-  }, [filters, searchTerm, services]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredServices.length / SERVICES_PER_PAGE));
   const safeCurrentPage = Math.min(currentPage, totalPages);
-
-  const displayServices = useMemo(
-    () => filteredServices
-      .slice((safeCurrentPage - 1) * SERVICES_PER_PAGE, safeCurrentPage * SERVICES_PER_PAGE)
-      .map((service, index) => ({
+  const displayServices = services.map((service, index) => ({
         ...service,
         image: service.image || fallbackImages[index % fallbackImages.length],
-      })),
-    [filteredServices, safeCurrentPage]
-  );
+      }));
 
   const updateFilter = (name: keyof ServiceFilters, value: string) => {
     setFilters((current) => ({ ...current, [name]: value }));
@@ -128,40 +96,39 @@ const FindService = () => {
     <div className="find-service-page">
       <Navbar />
 
-      <main className="container main-content">
-        <nav className="breadcrumb">
-          <Link to="/">Trang chủ</Link>
-          <ChevronRight size={14} />
-          <span>Tìm dịch vụ</span>
-        </nav>
-
-        <FilterBar filters={filters} onChange={updateFilter} />
-
-        <div className="listing-search-row">
+      <div className="stitch-service-filter-shell">
+        <div className="container stitch-service-filter-inner">
           <div className="listing-search-box">
-            <Search size={20} />
-            <input
-              type="search"
-              value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
-              placeholder="Tìm theo tên dịch vụ, mô tả hoặc tag..."
-              aria-label="Tìm dịch vụ"
-            />
+              <Search size={18} />
+              <input type="search" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)}
+                placeholder="Tìm kiếm dịch vụ..." aria-label="Tìm dịch vụ" />
           </div>
+          <div className="stitch-category-chips">
+            {[
+              ['', 'Tất cả'],
+              ['Mẹ bầu', 'Mẹ bầu'],
+              ['Chăm sóc sau sinh', 'Mẹ sau sinh'],
+              ['Chăm sóc em bé', 'Bé'],
+            ].map(([value, label]) => (
+              <button key={label} type="button" className={filters.category === value ? 'active' : ''} onClick={() => updateFilter('category', value)}>{label}</button>
+            ))}
+          </div>
+          <select className="stitch-area-select" value={filters.area} onChange={(event) => updateFilter('area', event.target.value)}>
+            <option value="">⌖ Toàn quốc</option><option>Hà Nội</option><option>TP. Hồ Chí Minh</option><option>Đà Nẵng</option>
+          </select>
+          <label className="stitch-sort-select">Sắp xếp:
+            <select value={filters.sort} onChange={(event) => updateFilter('sort', event.target.value)}>
+              <option value="default">Phổ biến nhất</option><option value="price-asc">Giá thấp đến cao</option><option value="price-desc">Giá cao đến thấp</option>
+            </select>
+          </label>
         </div>
+      </div>
 
+      <main className="container main-content">
         <header className="page-header">
-          <span className="page-eyebrow">Tìm dịch vụ</span>
-          <h1>
-            {carerId && carerName
-              ? `Dịch vụ của chuyên gia ${carerName}`
-              : 'Dịch vụ cho mẹ sau sinh'}
-          </h1>
-          <p>
-            {carerId
-              ? 'Khám phá các dịch vụ mà chuyên gia này có thể hỗ trợ và tiếp tục đặt lịch nhanh chóng.'
-              : 'Khám phá các dịch vụ chăm sóc mẹ và bé được thiết kế theo từng giai đoạn phục hồi, từ hậu sản đến chăm sóc tại nhà.'}
-          </p>
+          <div><h1>{carerId && carerName ? `Dịch vụ của chuyên gia ${carerName}` : 'Dịch vụ chăm sóc mẹ & bé'}</h1>
+          <p>{carerId ? 'Khám phá các dịch vụ mà chuyên gia này có thể hỗ trợ và tiếp tục đặt lịch nhanh chóng.' : 'Khám phá các gói dịch vụ chuẩn y khoa từ đội ngũ chuyên gia tận tâm.'}</p></div>
+          <span>Hiển thị <strong>{totalItems}</strong> kết quả</span>
         </header>
 
         {loading ? (
@@ -171,10 +138,6 @@ const FindService = () => {
           </div>
         ) : (
           <>
-            <div className="listing-results-summary">
-              {filteredServices.length.toLocaleString('vi-VN')} dịch vụ phù hợp
-            </div>
-
             <div className="services-grid">
               {displayServices.map((service) => (
                 <ServiceCard
@@ -215,7 +178,7 @@ const FindService = () => {
                 >
                   <ChevronLeft size={18} />
                 </button>
-                {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+                {Array.from({ length: Math.min(5, totalPages) }, (_, index) => index + Math.max(1, safeCurrentPage - 2)).filter((page) => page <= totalPages).map((page) => (
                   <button
                     key={page}
                     type="button"

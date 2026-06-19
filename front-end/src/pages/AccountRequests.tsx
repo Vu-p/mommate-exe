@@ -201,7 +201,7 @@ const AccountRequests = () => {
                         )}
                         
                         <div className="card-footer-layout">
-                          <button className="btn-view-details">Xem chi tiết</button>
+                          <button className="btn-view-details" onClick={() => navigate(`/account/request/${booking._id}`)}>Xem chi tiết</button>
                           {booking.status === 'accepted_pending_payment' && (
                             <button 
                               className="btn-pay-action" 
