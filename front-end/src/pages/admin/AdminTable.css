@@ -225,3 +225,18 @@
   color: var(--text-light);
   font-weight: 600;
 }
+
+.admin-services-page,.admin-carers-page { gap: 26px; }
+.admin-services-page .header-text h1,.admin-carers-page .header-text h1 { color: #191c1d; }
+.admin-services-page .add-btn,.admin-carers-page .add-btn { min-height: 48px; border-radius: 8px; background: #396940; box-shadow: none; }
+.admin-services-page .search-box,.admin-carers-page .search-box { max-width: 560px; min-height: 48px; border-color: #bdc9ba; border-radius: 8px; }
+.admin-services-page .admin-card,.admin-carers-page .admin-card { padding: 0 28px; overflow: hidden; border: 1px solid #bdc9ba; border-radius: 12px; box-shadow: none; }
+.admin-services-page .admin-table th,.admin-carers-page .admin-table th { padding-top: 22px; padding-bottom: 22px; color: #364038; background: #f1f2f3; border-bottom-color: #bdc9ba; }
+.admin-services-page .admin-table td { padding-top: 22px; padding-bottom: 22px; border-bottom-color: #d4dbd2; }
+.admin-carers-page .admin-table td { padding-top: 16px; padding-bottom: 16px; border-bottom-color: #d4dbd2; }
+.admin-services-page .td-thumb,.admin-carers-page .td-thumb { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; }
+.admin-services-page .badge,.admin-carers-page .badge { color: #396940; background: #edf3ee; }
+.admin-services-page .price-tag,.admin-carers-page .price-tag { color: #396940; }
+.admin-main:has(.admin-services-page) { height: 1069px; min-height: 1069px; overflow: hidden; }
+.admin-main:has(.admin-carers-page) { height: 917px; min-height: 917px; overflow: hidden; }
+.admin-main:has(.admin-services-page) .admin-footer,.admin-main:has(.admin-carers-page) .admin-footer { margin-top: 28px; padding-top: 28px; }

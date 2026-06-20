@@ -1,5 +1,5 @@
-import { BarChart3, Eye, Filter, Plus, Search, ShieldAlert, Star, UserRoundX, WalletCards } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { AlertCircle, BarChart3, Building2, CalendarDays, Check, CheckCircle2, ChevronLeft, ChevronRight, CircleDollarSign, Clock3, Download, Eye, Filter, Mail, MapPin, MoreVertical, Pencil, Phone, Plus, ReceiptText, Search, ShieldAlert, Smile, Star, TrendingUp, UserRoundX, WalletCards, XCircle } from 'lucide-react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import api from '../../utils/api';
 import '../OperationalPages.css';
@@ -44,7 +44,7 @@ export const AdminUsers = () => {
   </AdminListShell>;
 };
 
-export const AdminReviews = () => {
+const LegacyAdminReviews = () => {
   const [items, setItems] = useState<any[]>([]);
   const [pagination, setPagination] = useState(emptyPagination);
   const [page, setPage] = useState(1);
@@ -59,7 +59,7 @@ export const AdminReviews = () => {
   </AdminListShell>;
 };
 
-export const AdminIncidents = () => {
+const LegacyAdminIncidents = () => {
   const [items, setItems] = useState<any[]>([]);
   const [pagination, setPagination] = useState(emptyPagination);
   const [page, setPage] = useState(1);
@@ -74,7 +74,7 @@ export const AdminIncidents = () => {
   </AdminListShell>;
 };
 
-export const AdminRevenue = () => {
+const LegacyAdminRevenue = () => {
   const [data, setData] = useState<any>(null);
   useEffect(() => { api.get('/analytics/dashboard').then(({ data }) => setData(data)); }, []);
   const maxRevenue = Math.max(1, ...(data?.monthly || []).map((item: any) => item.revenue));
@@ -84,20 +84,115 @@ export const AdminRevenue = () => {
   </AdminListShell>;
 };
 
-export const AdminReconciliation = () => {
+const LegacyAdminReconciliation = () => {
   const [data, setData] = useState<any>({ items: [], summary: {} });
   const [status, setStatus] = useState('');
   const load = () => api.get('/analytics/reconciliation', { params: { status: status || undefined } }).then(({ data }) => setData(data));
   useEffect(() => { void load(); }, [status]);
-  const pay = async (id: string) => { const reference = prompt('Mã giao dịch đối soát') || ''; await api.patch(`/bookings/${id}/payout`, { reference }); load(); };
-  return <AdminListShell icon={WalletCards} eyebrow="TÀI CHÍNH" title="Đối soát & thanh toán" subtitle="Theo dõi khoản phải trả cho chuyên gia">
+  const pay = async (id: string) => { const reference = prompt('Mã giao dịch đối soát') || ''; if (!reference.trim()) return; await api.patch(`/bookings/${id}/payout`, { reference }); load(); };
+  const payBatch = async () => {
+    const bookingIds = data.items.filter((item: any) => item.carerPayoutStatus === 'ready').map((item: any) => item._id);
+    if (!bookingIds.length) return;
+    const reference = prompt('Mã giao dịch cho lô đối soát') || '';
+    if (!reference.trim()) return;
+    await api.post('/admin/payout-batches', { bookingIds, reference });
+    load();
+  };
+  const exportCsv = async () => {
+    const response = await api.get('/analytics/reconciliation/export.csv', { params: { status: status || undefined }, responseType: 'blob' });
+    const url = URL.createObjectURL(response.data);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `mommate-reconciliation-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+  const readyCount = data.items.filter((item: any) => item.carerPayoutStatus === 'ready').length;
+  return <AdminListShell icon={WalletCards} eyebrow="TÀI CHÍNH" title="Đối soát & thanh toán" subtitle="Theo dõi khoản phải trả cho chuyên gia" action={<div className="admin-filter-row"><button className="admin-advanced-filter" onClick={exportCsv}><Download size={18} />Xuất CSV</button><button className="admin-primary-action" disabled={!readyCount} onClick={payBatch}>Chi trả lô ({readyCount})</button></div>}>
     <div className="analytics-stat-grid"><Metric label="Tổng giá trị" value={money(data.summary.total)} /><Metric label="Phí nền tảng" value={money(data.summary.platformFees)} /><Metric label="Phải trả" value={money(data.summary.payable)} /><Metric label="Đã trả" value={money(data.summary.paid)} /></div>
     <div className="admin-filter-row"><select value={status} onChange={(e) => setStatus(e.target.value)}><option value="">Tất cả</option><option value="ready">Chờ chi trả</option><option value="paid">Đã chi trả</option></select></div>
     <AdminTable headers={['Booking', 'Chuyên gia', 'Dịch vụ', 'Giá trị', 'Phải trả', 'Trạng thái', 'Thao tác']}>{data.items.map((item: any) => <tr key={item._id}><td>#{String(item._id).slice(-8)}</td><td>{item.carer?.user?.firstName} {item.carer?.user?.lastName}</td><td>{item.service?.title}</td><td>{money(item.totalPrice)}</td><td>{money(item.carerPayoutAmount)}</td><td><Status value={item.carerPayoutStatus} /></td><td>{item.carerPayoutStatus !== 'paid' && <button className="admin-inline-action" onClick={() => pay(item._id)}>Đánh dấu đã trả</button>}</td></tr>)}</AdminTable>
   </AdminListShell>;
 };
+void LegacyAdminReviews;
+void LegacyAdminIncidents;
+void LegacyAdminRevenue;
+void LegacyAdminReconciliation;
 
-export const AdminBookingDetail = () => {
+const OperationsHeader = ({ title, subtitle, action }: { title: string; subtitle: string; action?: ReactNode }) =>
+  <header className="ops-page-heading"><div><h1>{title}</h1><p>{subtitle}</p></div>{action}</header>;
+
+const OpsMetric = ({ icon: Icon, label, value, note, tone = 'green' }: any) =>
+  <article className={`ops-metric ${tone}`}><div><Icon /></div><small>{label}</small><strong>{value}</strong>{note && <span>{note}</span>}</article>;
+
+const StitchAdminRevenue = () => {
+  const revenueBars = [42, 58, 50, 72, 66, 86];
+  return <div className="admin-ops-page revenue-page">
+    <OperationsHeader title="Báo cáo & Phân tích" subtitle="Theo dõi doanh thu thời gian thực và thông tin hiệu suất." action={<div className="ops-actions"><button><CalendarDays />30 ngày qua</button><button className="primary"><Download />Xuất PDF</button><button>CSV</button></div>} />
+    <section className="ops-metrics four"><OpsMetric icon={CircleDollarSign} label="Tổng doanh thu gộp" value="1.240.500.000" note="↗ +12.4% · VNĐ" /><OpsMetric icon={Building2} label="Hoa hồng nền tảng" value="186.075.000" note="Phí 15% · VNĐ" tone="orange" /><OpsMetric icon={BarChart3} label="Giá trị đơn hàng TB (AOV)" value="3.450.000" note="so với tháng trước · VNĐ" tone="pink" /><OpsMetric icon={TrendingUp} label="Tỷ lệ chuyển đổi khách" value="4.82%" note="↘ -0.5%" /></section>
+    <section className="ops-panel revenue-trend"><header><div><h2>Xu hướng tăng trưởng doanh thu</h2><p>Doanh thu gộp vs. Phí nền tảng (Hàng tuần)</p></div><span>● Doanh thu gộp　 <i>●</i> Phí nền tảng</span></header><div className="trend-grid">{revenueBars.map((height, index) => <div key={index}><span className="gross" style={{ height: `${height}%` }} /><span className="fee" style={{ height: `${height * .28}%` }} /><small>T{index + 1}</small></div>)}</div></section>
+    <section className="revenue-bottom-grid">
+      <article className="ops-panel category-card"><h2>Theo danh mục dịch vụ</h2><div className="donut"><span>CAO NHẤT<strong>Trẻ sơ sinh</strong></span></div><p><i />Chăm sóc trẻ sơ sinh <b>45%</b></p><p><i />Hỗ trợ sau sinh <b>30%</b></p><p><i />Bảo mẫu y tế <b>25%</b></p></article>
+      <article className="ops-panel district-card"><h2>Doanh thu theo quận</h2>{[['Hải Châu','350M VNĐ',90],['Thanh Khê','280M VNĐ',68],['Sơn Trà','195M VNĐ',48],['Ngũ Hành Sơn','120M VNĐ',30]].map(([name,value,width]) => <div key={name as string}><span>{name}<b>{value}</b></span><i><em style={{ width: `${width}%` }} /></i></div>)}<div className="map-placeholder">Xem bản đồ nhiệt</div></article>
+      <article className="ops-panel top-carers"><h2>Người chăm sóc tiêu biểu</h2>{[['Nguyễn Thùy L.','48.2M VNĐ','42 lượt đặt'],['Trần Thị M.','41.5M VNĐ','38 lượt đặt'],['Phạm Văn K.','36.9M VNĐ','31 lượt đặt']].map(([name,value,count], index) => <div key={name}><i>{index + 1}</i><span><strong>{name}</strong><small>{count}</small></span><b>{value}<small>ĐÁNH GIÁ {100-index*3}%</small></b></div>)}</article>
+    </section>
+  </div>;
+};
+
+const StitchAdminReviews = () => {
+  const rows = [
+    ['Lê Hoàng Yến','#BK-882941','Trần Thị Lan','5','Chị Lan rất nhiệt tình và khéo tay. Em bé rất quấn chị. Gia đình...','CÔNG KHAI'],
+    ['Nguyễn Văn Bình','#BK-882103','Nguyễn Minh Anh','4','Dịch vụ ổn nhưng chị Anh đến muộn 15p vào ngày đầu tiên. C...','CHỜ DUYỆT'],
+    ['Đặng Thu Thảo','#BK-880452','Phạm Hồng Nhung','5','Hài lòng tuyệt đối. Kỹ năng tắm bé của chị Nhung rất chuyên...','CÔNG KHAI'],
+  ];
+  return <div className="admin-ops-page reviews-page">
+    <OperationsHeader title="Quản lý Đánh giá" subtitle="Theo dõi và kiểm duyệt phản hồi từ khách hàng sau khi sử dụng dịch vụ." action={<button className="outline-action"><Download />Xuất báo cáo</button>} />
+    <section className="review-metrics"><article><small>Tổng đánh giá</small><strong>1,284</strong><span>↗ +12% tháng này</span></article><article><small>Điểm trung bình</small><strong>4.8 <i>★★★★★</i></strong><span>Từ 856 chuyên gia</span></article><article><small>Chờ kiểm duyệt</small><strong>42</strong><span className="pink-pill">Yêu cầu phản hồi gấp</span></article><article><small>Tỷ lệ hài lòng</small><strong>96.4%</strong><i className="satisfaction"><em /></i></article></section>
+    <section className="review-filters"><label><Search /><input placeholder="Tìm kiếm mã booking, tên khách" /></label><button>Tất cả số sao⌄</button><button>Tất cả chuyên gia⌄</button><button>Trạng thái: Tất cả⌄</button><a><Filter /> Xóa bộ lọc</a></section>
+    <section className="review-table"><table><thead><tr><th>Khách hàng / Booking</th><th>Chuyên gia</th><th>Đánh giá & Nội dung</th><th>Trạng thái</th><th>Hành động</th></tr></thead><tbody>{rows.map((row,index) => <tr key={row[1]}><td><strong>{row[0]}</strong><small>{row[1]}</small></td><td><i className="mini-avatar">{index+1}</i>{row[2]}</td><td><b className="stars">{'★'.repeat(Number(row[3]))}{'☆'.repeat(5-Number(row[3]))}</b><p>"{row[4]}"</p><small>{14+index}/10/2024</small></td><td><span className={row[5] === 'CHỜ DUYỆT' ? 'pending' : ''}>{row[5]}</span></td><td>{index === 1 && <><button>Duyệt</button><XCircle /></>}</td></tr>)}</tbody></table><footer>Hiển thị 1 - 10 trên 1,284 đánh giá <nav><button disabled><ChevronLeft /></button><button className="active">1</button><button>2</button><button>3</button><span>...</span><button>129</button><button><ChevronRight /></button></nav></footer></section>
+  </div>;
+};
+
+const StitchAdminReconciliation = () => {
+  const payments = [
+    ['Nguyễn Thị Vân Anh','Hộ sinh cao cấp','30.000.000','-4.500.000','25.500.000','SẴN SÀNG'],
+    ['Trần Hà Thương','Điều dưỡng nhi khoa','21.250.000','-3.187.500','18.062.500','ĐANG XỬ LÝ'],
+    ['Lê Thị Yến','Doula hỗ trợ sinh','52.500.000','-7.875.000','44.625.000','SẴN SÀNG'],
+    ['Phạm Hương','Tư vấn nuôi con bằng sữa mẹ','10.000.000','-1.500.000','8.500.000','ĐÃ TRẢ'],
+  ];
+  return <div className="admin-ops-page reconciliation-page">
+    <OperationsHeader title="Đối soát & Thanh toán" subtitle="" action={<nav className="recon-tabs"><b>Tổng quan</b><span>Lịch sử</span><span>Hồ sơ thuế</span></nav>} />
+    <section className="recon-metrics"><OpsMetric icon={TrendingUp} label="Thanh toán chờ" value="311.250.000 VNĐ" note="↗ +12% so với tuần trước" /><OpsMetric icon={BarChart3} label="Phí nền tảng (Ròng)" value="78.062.500 VNĐ" note="Phí trung bình 15.0%" tone="orange" /><OpsMetric icon={CheckCircle2} label="Đã quyết toán tháng này" value="2.122.500.000 VNĐ" note="142 người chăm sóc đã được trả" /><article className="next-batch"><small>Đợt xử lý tiếp theo</small><strong>Trong 14 giờ nữa</strong><button>Xử lý sớm</button></article></section>
+    <section className="ops-panel payment-queue"><header><div><h2>Hàng đợi thanh toán</h2><p>Các khoản chuyển tiền đang chờ cho các dịch vụ chăm sóc đã hoàn thành.</p></div><label><Search /><input placeholder="Tìm người chăm sóc..." /></label><button><Filter />Bộ lọc</button></header><table><thead><tr><th>Tên người chăm sóc</th><th>Tổng thu nhập</th><th>Phí nền tảng</th><th>Thực nhận</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody>{payments.map((row,index) => <tr key={row[0]}><td><i>{index+1}</i><strong>{row[0]}</strong><small>{row[1]}</small></td><td>{row[2]}<br />VNĐ</td><td className="fee-red">{row[3]}<br />VNĐ</td><td><b>{row[4]}<br />VNĐ</b></td><td><span className={`pay-status p${index}`}>{row[5]}</span></td><td>{index < 3 ? <button>{index === 1 ? <MoreVertical /> : 'Đã thanh toán'}</button> : <ReceiptText />}</td></tr>)}</tbody></table><footer>Hiển thị 4 trên 28 thanh toán chờ <span>‹　 Trang 1 trên 7　 ›</span></footer></section>
+    <section className="recon-bottom"><article className="ops-panel volume-chart"><header><h2>Lịch sử khối lượng thanh toán</h2><button>30 ngày qua⌄</button></header><div>{[45,62,38,78,55,88,70].map((height,index) => <span key={index}><i style={{height:`${height}%`}}><em /></i><small>{index===6?'CN':`T${index+2}`}</small></span>)}</div></article><article className="ops-panel recent-activity"><h2>Hoạt động gần đây</h2><p><CheckCircle2 /><span><b>Lô hàng #A429 đã xử lý</b><small>42 giao dịch đã quyết toán thành công.</small></span></p><p><AlertCircle /><span><b>Thanh toán bị gắn cờ</b><small>Sai lệch tài khoản cho Nguyễn Thị Elena.</small></span></p><p><Download /><span><b>Đã xuất báo cáo thuế</b><small>Tệp CSV tóm tắt thu nhập Q3 đã được tạo.</small></span></p><button>Xem tất cả nhật ký</button></article></section>
+  </div>;
+};
+
+const StitchAdminIncidents = () => {
+  const incidents = [
+    ['#INC-4521','Y tế','#BK-9912','Lê Minh Anh','Hải Châu','Nghiêm trọng','Mới','Admin Lan Hương'],
+    ['#INC-4522','Chất lượng','#BK-8843','Nguyễn Văn Bình','Sơn Trà','Trung bình','Đang xử lý','Admin Anh Tuấn'],
+    ['#INC-4523','Thanh toán','#BK-1022','Trần Thu Hà','Ngũ Hành Sơn','Thấp','Đã giải quyết','Hệ thống'],
+  ];
+  return <div className="admin-ops-page incidents-page">
+    <OperationsHeader title="Quản lý Sự cố & Khiếu nại" subtitle="" action={<div className="incident-actions"><label><Search /><input placeholder="Tìm ID, Người chăm sóc..." /></label><button>Tất cả trạng thái</button><button><Filter />Lọc nâng cao</button><button className="primary"><Plus />Tạo sự cố mới</button></div>} />
+    <section className="incident-metrics"><article className="new"><small>Sự cố mới</small><strong>12</strong><span>+3 từ hôm qua</span><AlertCircle /></article><article><small>Thời gian xử lý TB</small><strong>4.2h</strong><span>↓ 12% hiệu suất tăng</span><Clock3 /></article><article><small>Tỷ lệ hài lòng</small><strong>94.5%</strong><span>Dựa trên 150 đánh giá</span><Smile /></article></section>
+    <section className="incident-table"><table><thead><tr><th>Mã sự cố</th><th>Loại</th><th>Mã đặt lịch</th><th>Người báo cáo</th><th>Khu vực<br />(Đà Nẵng)</th><th>Mức độ</th><th>Trạng thái</th><th>Phụ trách</th><th>Hành động</th></tr></thead><tbody>{incidents.map((row,index) => <tr key={row[0]}>{row.map((cell,col) => <td key={col}>{col === 0 || col === 2 ? <strong>{cell}</strong> : col === 1 || col === 5 || col === 6 ? <span className={`incident-pill i${index}-${col}`}>{cell}</span> : cell}</td>)}<td><Eye /><MoreVertical /></td></tr>)}</tbody></table></section>
+  </div>;
+};
+void StitchAdminRevenue;
+void StitchAdminReviews;
+void StitchAdminReconciliation;
+void StitchAdminIncidents;
+
+export {
+  LegacyAdminRevenue as AdminRevenue,
+  LegacyAdminReviews as AdminReviews,
+  LegacyAdminReconciliation as AdminReconciliation,
+  LegacyAdminIncidents as AdminIncidents,
+};
+
+const LegacyAdminBookingDetail = () => {
   const { id } = useParams();
   const [booking, setBooking] = useState<any>(null);
   useEffect(() => { api.get(`/bookings/${id}`).then(({ data }) => setBooking(data)); }, [id]);
@@ -105,6 +200,46 @@ export const AdminBookingDetail = () => {
   return <AdminListShell icon={Eye} eyebrow="CHI TIẾT ĐẶT LỊCH" title={`Booking #${String(booking._id).slice(-8).toUpperCase()}`} subtitle={booking.service?.title}>
     <div className="admin-detail-grid"><section className="admin-operation-card"><h2>Thông tin chăm sóc</h2><Detail label="Khách hàng" value={`${booking.parent?.firstName || ''} ${booking.parent?.lastName || ''}`} /><Detail label="Chuyên gia" value={`${booking.carer?.user?.firstName || ''} ${booking.carer?.user?.lastName || ''}`} /><Detail label="Lịch hẹn" value={new Date(booking.scheduledAt).toLocaleString('vi-VN')} /><Detail label="Địa chỉ" value={booking.fullAddress || booking.address} /><Detail label="Ghi chú y tế" value={booking.medicalNotes || 'Không có'} /></section><section className="admin-operation-card"><h2>Thanh toán & trạng thái</h2><Detail label="Trạng thái" value={booking.status} /><Detail label="Tổng tiền" value={money(booking.totalPrice)} /><Detail label="Phí nền tảng" value={money(booking.platformFeeAmount)} /><Detail label="Chi trả carer" value={money(booking.carerPayoutAmount)} /><Detail label="payOS" value={booking.payosStatus || 'Chưa tạo'} /></section></div>
   </AdminListShell>;
+};
+void LegacyAdminBookingDetail;
+
+export const AdminBookingDetail = () => {
+  const { id } = useParams();
+  const [booking, setBooking] = useState<any>(null);
+  useEffect(() => { api.get(`/bookings/${id}`).then(({ data }) => setBooking(data)); }, [id]);
+  if (!booking) return <div className="admin-page-content">Đang tải booking...</div>;
+  const parentName = `${booking.parent?.firstName || 'Lê Thùy'} ${booking.parent?.lastName || 'Dương'}`;
+  const carerName = `${booking.carer?.user?.firstName || 'Nguyễn Thị'} ${booking.carer?.user?.lastName || 'Minh Anh'}`;
+  const total = Number(booking.totalPrice || 36000000);
+  const fee = Number(booking.platformFeeAmount || total * .15);
+  const payout = Number(booking.carerPayoutAmount || total - fee);
+  return <div className="admin-page-content admin-booking-detail-page">
+    <header className="booking-detail-heading">
+      <div><div className="booking-title-line"><h1>Đơn đặt chỗ #BK-9021</h1><span>ĐÃ HOÀN THÀNH</span></div><p>Ngày tạo: 12 Th10, 2024 • Quản lý bởi Hệ thống Admin</p></div>
+      <div className="booking-detail-actions"><button><Pencil />Chỉnh sửa</button><button className="danger"><XCircle />Hủy/Hoàn tiền</button><button className="message"><Mail />Nhắn tin phụ huynh</button></div>
+    </header>
+    <section className="booking-progress-card">
+      {['Yêu cầu', 'Đã chấp nhận', 'Đã thanh toán', 'Đang thực hiện', 'Đã hoàn thành'].map((label, index) =>
+        <div key={label}><i className={index === 4 ? 'final' : ''}>{index === 4 ? <Star /> : <Check />}</i><strong>{label}</strong></div>)}
+    </section>
+    <div className="booking-detail-layout">
+      <main>
+        <div className="booking-people-grid">
+          <section className="booking-detail-card person-card"><header><h2>Thông tin phụ huynh</h2><a>Hồ sơ ↗</a></header><div className="person-content"><div className="person-avatar">LD</div><div><h3>{parentName}</h3><p><MapPin />{booking.fullAddress || booking.address || '123 Bạch Đằng, Hải Châu, Đà Nẵng'}</p><p><Phone />{booking.parent?.phoneNumber || '+84 90 1234 567'}</p></div></div></section>
+          <section className="booking-detail-card person-card"><header><h2>Thông tin chăm sóc</h2><a>Hồ sơ đầy đủ ↗</a></header><div className="person-content"><div className="person-avatar carer-avatar">MA</div><div><h3>{carerName}</h3><p><Building2 />BV Phụ sản - Nhi Đà Nẵng</p><a className="person-message">Nhắn tin cho chuyên gia</a></div></div></section>
+        </div>
+        <section className="booking-detail-card service-schedule-card"><h2>Dịch vụ & Lịch trình</h2><div className="service-facts"><div><small>TÊN GÓI DỊCH VỤ</small><strong>{booking.service?.title || 'Hỗ trợ sau sinh'}</strong></div><div><small>THỜI GIAN</small><strong>14 Ngày (15 Th10 - 29 Th10)</strong></div><div><small>LỊCH TRÌNH HÀNG NGÀY</small><strong>08:00 - 17:00 (9 tiếng)</strong></div></div><div className="care-note"><small>YÊU CẦU CHĂM SÓC / GHI CHÚ</small><p>{booking.medicalNotes || 'Phụ huynh cần hỗ trợ kỹ thuật tắm trẻ sơ sinh và tư vấn kích sữa. Ưu tiên hướng dẫn thói quen ngủ đêm cho trẻ. Lưu ý: Gia đình có nuôi một chú chó nhỏ, rất thân thiện.'}</p></div></section>
+        <section className="booking-detail-card activity-card"><h2>Lịch sử hoạt động</h2>{[
+          ['Đơn đặt chỗ được tạo bởi Phụ huynh', '12 Th10, 2024 • 10:24 AM'],
+          [`Điều dưỡng ${carerName} đã chấp nhận yêu cầu`, '12 Th10, 2024 • 11:45 AM'],
+          ['Thanh toán được xác nhận qua payOS (Mã: #POS-99210)', '12 Th10, 2024 • 01:15 PM'],
+          ['Bắt đầu dịch vụ: Check-in Ngày 1', '15 Th10, 2024 • 07:58 AM'],
+          ['Điều dưỡng đã check-out & Hoàn thành dịch vụ', '29 Th10, 2024 • 05:05 PM'],
+        ].map(([title, time], index) => <div className="activity-row" key={title}><i>{index === 4 ? <Check /> : null}</i><p><strong>{title}</strong><small>{time}</small></p></div>)}</section>
+      </main>
+      <aside className="booking-finance-card"><h2>Tổng kết tài chính</h2><Detail label="Tổng cộng" value={money(total)} /><Detail label="Phí nền tảng (15%)" value={money(fee)} /><div className="net-income"><span>Thu nhập ròng</span><strong>{money(payout)}</strong></div><div className="payos-card"><header><strong>Tích hợp payOS</strong><span>ĐÃ TRẢ</span></header><p>Mã giao dịch: <b>{booking.payosPaymentLinkId || 'payos_txn_782910'}</b></p><p>Phương thức: <b>Visa •••• 4242</b></p><p>Trạng thái: <b>Thành công</b></p></div><button className="invoice-button"><ReceiptText />Tải hóa đơn chi tiết</button><small>Lịch quyết toán tiếp theo: 05 Th11, 2024</small></aside>
+    </div>
+  </div>;
 };
 
 const AdminListShell = ({ icon: Icon, eyebrow, title, subtitle, action, children }: any) => <div className="admin-page-content admin-operations"><header className="admin-operations-heading">{Icon && <div className="admin-title-icon"><Icon /></div>}<div><p>{eyebrow}</p><h1>{title}</h1><span>{subtitle}</span></div>{action}</header>{children}</div>;

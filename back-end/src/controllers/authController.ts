@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
-import generateToken from '../utils/generateToken.js';
+import { generateAccessToken, generateRefreshToken } from '../utils/generateToken.js';
 import type { AuthRequest } from '../middleware/auth.js';
 import { getFirebaseAuth } from '../config/firebaseAdmin.js';
+import jwt from 'jsonwebtoken';
 
 const authResponse = (user: any) => ({
   _id: user._id,
@@ -12,8 +13,25 @@ const authResponse = (user: any) => ({
   email: user.email,
   role: user.role,
   mustChangePassword: user.mustChangePassword,
-  token: generateToken(String(user._id)),
+  token: generateAccessToken(String(user._id), user.role),
 });
+
+const refreshCookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' as const : 'lax' as const,
+  maxAge: 30 * 24 * 60 * 60 * 1000,
+  path: '/api/auth',
+};
+
+const issueSession = async (res: Response, user: any, status = 200) => {
+  const fullUser = await User.findById(user._id).select('+refreshTokenVersion');
+  if (!fullUser) return res.status(404).json({ message: 'User not found' });
+  fullUser.lastLoginAt = new Date();
+  await fullUser.save();
+  res.cookie('mommate_refresh', generateRefreshToken(String(fullUser._id), fullUser.refreshTokenVersion || 0), refreshCookieOptions);
+  return res.status(status).json(authResponse(fullUser));
+};
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
@@ -39,15 +57,7 @@ export const registerUser = async (req: Request, res: Response) => {
     });
 
     if (user) {
-      res.status(201).json({
-        _id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        role: user.role,
-        mustChangePassword: user.mustChangePassword,
-        token: generateToken(String(user._id)),
-      });
+      return issueSession(res, user, 201);
     } else {
       res.status(400).json({ message: 'Invalid user data' });
     }
@@ -63,37 +73,13 @@ export const loginUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
-    // Check for hardcoded Admin login
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@mommate.com';
-    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
-
-    if (email === adminEmail && password === adminPassword) {
-      return res.json({
-        _id: 'admin-id',
-        firstName: 'System',
-        lastName: 'Admin',
-        email: adminEmail,
-        role: 'admin',
-        mustChangePassword: false,
-        token: generateToken('admin-id'),
-      });
-    }
-
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: String(email || '').trim().toLowerCase() });
 
     if (user && (await bcrypt.compare(password, user.password))) {
       if ((user as any).accountStatus === 'suspended') {
         return res.status(403).json({ message: 'Tài khoản đã bị tạm khóa. Vui lòng liên hệ MomMate.' });
       }
-      res.json({
-        _id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        role: user.role,
-        mustChangePassword: user.mustChangePassword,
-        token: generateToken(String(user._id)),
-      });
+      return issueSession(res, user);
     } else {
       res.status(401).json({ message: 'Invalid email or password' });
     }
@@ -139,7 +125,7 @@ export const firebaseGoogleAuth = async (req: Request, res: Response) => {
       }
       await user.save();
 
-      return res.json(authResponse(user));
+      return issueSession(res, user);
     }
 
     const displayName = decodedToken.name || email.split('@')[0] || 'MomMate User';
@@ -160,7 +146,7 @@ export const firebaseGoogleAuth = async (req: Request, res: Response) => {
       mustChangePassword: false,
     });
 
-    return res.status(201).json(authResponse(user));
+    return issueSession(res, user, 201);
   } catch (error) {
     res.status(401).json({ message: 'Google authentication failed' });
   }
@@ -193,19 +179,43 @@ export const changePasswordFirstLogin = async (req: AuthRequest, res: Response) 
     user.mustChangePassword = false;
     await user.save();
 
-    res.json({
-      _id: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      role: user.role,
-      mustChangePassword: user.mustChangePassword,
-      token: generateToken(String(user._id)),
-    });
+    return issueSession(res, user);
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+export const refreshSession = async (req: Request, res: Response) => {
+  try {
+    const token = (req as any).cookies?.mommate_refresh;
+    if (!token || !process.env.JWT_REFRESH_SECRET) return res.status(401).json({ message: 'Refresh token missing' });
+    const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET) as { id: string; version: number; type: string };
+    if (decoded.type !== 'refresh') return res.status(401).json({ message: 'Invalid refresh token' });
+    const user = await User.findById(decoded.id).select('+refreshTokenVersion');
+    if (!user || user.accountStatus === 'suspended' || decoded.version !== (user.refreshTokenVersion || 0)) {
+      return res.status(401).json({ message: 'Refresh session expired' });
+    }
+    return issueSession(res, user);
+  } catch {
+    return res.status(401).json({ message: 'Refresh session expired' });
+  }
+};
+
+export const logoutUser = async (req: Request, res: Response) => {
+  const token = (req as any).cookies?.mommate_refresh;
+  if (token && process.env.JWT_REFRESH_SECRET) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET) as { id: string };
+      await User.findByIdAndUpdate(decoded.id, { $inc: { refreshTokenVersion: 1 } });
+    } catch {
+      // Clearing an already invalid cookie is still a successful logout.
+    }
+  }
+  res.clearCookie('mommate_refresh', refreshCookieOptions);
+  res.status(204).send();
+};
+
+export const getSession = async (req: AuthRequest, res: Response) => res.json(authResponse(req.user));
 
 // @desc    Start password reset flow
 // @route   POST /api/auth/forgot-password

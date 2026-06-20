@@ -6,6 +6,13 @@ import Service from '../models/Service.js';
 import type { AuthRequest } from '../middleware/auth.js';
 import { hasSignedContractForCarer } from '../utils/contracts.js';
 import { escapeRegex, getPagination, paginationPayload } from '../utils/pagination.js';
+import CareJournal from '../models/CareJournal.js';
+import { createNotification } from '../services/notificationService.js';
+import { writeAudit } from '../utils/audit.js';
+import PaymentTransaction from '../models/PaymentTransaction.js';
+import BookingChangeRequest from '../models/BookingChangeRequest.js';
+import Refund from '../models/Refund.js';
+import { calculateBookingPrice, distanceMeters, isOutsideFreeCancellationWindow, isWithinCheckInWindow } from '../utils/bookingRules.js';
 
 const PAYOS_PAID_STATUSES = new Set(['PAID', '00']);
 
@@ -33,7 +40,24 @@ const populateBooking = (query: any) =>
     .populate('service', 'title category duration price image');
 
 const getCarerForUser = async (userId: any) =>
-  Carer.findOne({ user: userId, isDeleted: false }).select('_id platformFeePercent');
+  Carer.findOne({ user: userId, isDeleted: false }).select('_id user platformFeePercent isVerified verificationStatus acceptingBookings');
+
+const activeBookingStatuses = [
+  BookingStatus.ACCEPTED_PENDING_PAYMENT,
+  BookingStatus.PAID_CONFIRMED,
+  BookingStatus.CONFIRMED,
+  BookingStatus.IN_PROGRESS,
+];
+
+const hasScheduleConflict = async (carerId: unknown, start: Date, end: Date, excludeId?: unknown) =>
+  Boolean(await Booking.findOne({
+    _id: excludeId ? { $ne: excludeId } : { $exists: true },
+    carer: carerId,
+    status: { $in: activeBookingStatuses },
+    scheduledAt: { $lt: end },
+    scheduledEndAt: { $gt: start },
+    isDeleted: false,
+  } as any).select('_id').lean());
 
 const calculatePayoutAmounts = (booking: any, carer: any) => {
   const totalPrice = Number(booking.totalPrice || 0);
@@ -45,9 +69,25 @@ const calculatePayoutAmounts = (booking: any, carer: any) => {
   booking.carerPayoutAmount = carerPayoutAmount;
 };
 
-const ensureBookingOwner = (booking: any, userId: any) => String(booking.parent) === String(userId);
+const referenceId = (value: any) => value?._id || value;
+const ensureBookingOwner = (booking: any, userId: any) => String(referenceId(booking.parent)) === String(referenceId(userId));
 
-const ensureCarerOwner = (booking: any, carerId: any) => String(booking.carer) === String(carerId);
+const ensureCarerOwner = (booking: any, carerId: any) => String(referenceId(booking.carer)) === String(referenceId(carerId));
+
+const canAccessBooking = async (booking: any, req: AuthRequest) => {
+  if (req.user!.role === 'admin' || ensureBookingOwner(booking, req.user!._id)) return true;
+  if (req.user!.role !== 'carer') return false;
+  const carer = await getCarerForUser(req.user!._id);
+  return Boolean(carer && ensureCarerOwner(booking, carer._id));
+};
+
+const escapeHtml = (value: unknown) =>
+  String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
 
 const ensureCarerCanOperateBookings = async (carerId: any, res: Response) => {
   const hasSignedContract = await hasSignedContractForCarer(carerId);
@@ -58,6 +98,42 @@ const ensureCarerCanOperateBookings = async (carerId: any, res: Response) => {
   }
 
   return true;
+};
+
+export const quoteBooking = async (req: AuthRequest, res: Response) => {
+  const { carerId, serviceId, scheduledAt, hours, numSessions } = req.body;
+  const start = new Date(scheduledAt);
+  if (!carerId || !serviceId || Number.isNaN(start.getTime()) || start.getTime() <= Date.now()) {
+    return res.status(400).json({ message: 'Carer, service and a future scheduled time are required' });
+  }
+  const [carer, service] = await Promise.all([
+    Carer.findOne({ _id: carerId, isDeleted: false, isVerified: true, verificationStatus: 'verified', acceptingBookings: true }),
+    Service.findOne({ _id: serviceId, isActive: true }),
+  ]);
+  if (!carer || !service) return res.status(404).json({ message: 'Service or available carer not found' });
+  if (carer.services.length && !carer.services.some((id) => String(id) === String(service._id))) {
+    return res.status(400).json({ message: 'Carer does not provide this service' });
+  }
+  const safeHours = Math.max(1, Number(hours) || 1);
+  const safeSessions = Math.max(1, Number(numSessions) || 1);
+  const end = new Date(start.getTime() + safeHours * 3_600_000);
+  const available = !(await hasScheduleConflict(carer._id, start, end));
+  const unitPrice = Number(service.price || service.basePrice);
+  const platformFeePercent = Number(carer.platformFeePercent || 10);
+  const pricing = calculateBookingPrice({ unitPrice, hours: safeHours, sessions: safeSessions, platformFeePercent });
+  const totalPrice = pricing.totalPrice;
+  res.json({
+    available,
+    scheduledAt: start,
+    scheduledEndAt: end,
+    unitPrice,
+    hours: safeHours,
+    sessions: safeSessions,
+    totalPrice,
+    platformFeePercent,
+    platformFeeAmount: pricing.platformFeeAmount,
+    expiresAt: new Date(Date.now() + 5 * 60_000),
+  });
 };
 
 // @desc    Create new booking
@@ -84,9 +160,11 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
     allergies,
     medicalNotes,
     notes,
-    totalPrice,
     numSessions,
     hours,
+    serviceMode,
+    latitude,
+    longitude,
   } = req.body;
 
   try {
@@ -125,8 +203,12 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
 
     const safeSessions = Math.max(1, Number(numSessions) || 1);
     const safeHours = Math.max(1, Number(hours) || 1);
-    const submittedTotal = Number(totalPrice);
-    const fallbackTotal = Number(service.price || service.basePrice || 0) * safeHours * safeSessions;
+    const unitPrice = Number(service.price || service.basePrice || 0);
+    const calculatedTotal = unitPrice * safeHours * safeSessions;
+    const scheduledEndAt = new Date(scheduledDate.getTime() + safeHours * 3_600_000);
+    if (await hasScheduleConflict(carer._id, scheduledDate, scheduledEndAt)) {
+      return res.status(409).json({ message: 'The selected carer is no longer available for this time slot' });
+    }
 
     const booking = await Booking.create({
       parent: req.user!._id,
@@ -134,6 +216,11 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
       service: serviceId,
       status: BookingStatus.PENDING_CARER,
       scheduledAt: scheduledDate,
+      scheduledEndAt,
+      serviceMode: serviceMode === 'online' ? 'online' : 'at_home',
+      location: Number.isFinite(Number(latitude)) && Number.isFinite(Number(longitude))
+        ? { type: 'Point', coordinates: [Number(longitude), Number(latitude)] }
+        : undefined,
       address: resolvedAddress,
       contactName,
       contactPhone: resolvedPhone,
@@ -150,13 +237,21 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
       allergies,
       medicalNotes,
       notes,
-      totalPrice: Number.isFinite(submittedTotal) && submittedTotal > 0 ? submittedTotal : fallbackTotal,
+      totalPrice: calculatedTotal,
       numSessions: safeSessions,
       hours: safeHours,
+      priceSnapshot: {
+        unitPrice,
+        hours: safeHours,
+        sessions: safeSessions,
+        platformFeePercent: Number(carer.platformFeePercent ?? 10),
+      },
+      statusHistory: [{ status: BookingStatus.PENDING_CARER, changedAt: new Date(), changedBy: req.user!._id }],
     });
 
     calculatePayoutAmounts(booking, carer);
     await booking.save();
+    await createNotification({ userId: carer.user, type: 'booking_new', title: 'Yêu cầu chăm sóc mới', body: 'Bạn có một yêu cầu đặt lịch mới cần phản hồi.', data: { bookingId: booking._id } });
 
     res.status(201).json(booking);
   } catch (error: any) {
@@ -182,8 +277,22 @@ export const getMyBookings = async (req: AuthRequest, res: Response) => {
       filter = { carer: carer._id, isDeleted: false };
     }
 
-    const bookings = await populateBooking(Booking.find(filter).sort({ createdAt: -1 }));
-    res.json(bookings);
+    if (req.query.status) filter.status = String(req.query.status).includes(',')
+      ? { $in: String(req.query.status).split(',') }
+      : req.query.status;
+    if (req.query.from || req.query.to) {
+      filter.scheduledAt = {};
+      if (req.query.from) filter.scheduledAt.$gte = new Date(String(req.query.from));
+      if (req.query.to) filter.scheduledAt.$lte = new Date(String(req.query.to));
+    }
+    const pagination = getPagination(req.query, 20);
+    const query = populateBooking(Booking.find(filter).sort({ scheduledAt: -1 }));
+    if (!pagination.enabled) return res.json(await query);
+    const [items, total] = await Promise.all([
+      populateBooking(Booking.find(filter).sort({ scheduledAt: -1 }).skip(pagination.skip).limit(pagination.limit)),
+      Booking.countDocuments(filter),
+    ]);
+    res.json(paginationPayload(items, total, pagination.page, pagination.limit));
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -245,16 +354,27 @@ export const acceptBooking = async (req: AuthRequest, res: Response) => {
     if (!(await ensureCarerCanOperateBookings(carer._id, res))) {
       return;
     }
+    if (!carer.isVerified || carer.verificationStatus !== 'verified' || !carer.acceptingBookings) {
+      return res.status(403).json({ message: 'Carer must be verified and accepting bookings' });
+    }
 
     if (booking.status !== BookingStatus.PENDING_CARER && booking.status !== BookingStatus.PENDING) {
       return res.status(400).json({ message: 'Only pending bookings can be accepted' });
     }
 
+    const end = booking.scheduledEndAt || new Date(booking.scheduledAt.getTime() + Math.max(1, booking.hours) * 3_600_000);
+    if (await hasScheduleConflict(carer._id, booking.scheduledAt, end, booking._id)) {
+      return res.status(409).json({ message: 'Booking conflicts with another accepted appointment' });
+    }
+    booking.scheduledEndAt = end;
     booking.status = BookingStatus.ACCEPTED_PENDING_PAYMENT;
     booking.acceptedAt = new Date();
+    booking.statusHistory.push({ status: booking.status, changedAt: new Date(), changedBy: req.user!._id });
     calculatePayoutAmounts(booking, carer);
 
     const updatedBooking = await booking.save();
+    await createNotification({ userId: booking.parent, type: 'booking_accepted', title: 'Yêu cầu đã được chấp nhận', body: 'Chuyên gia đã chấp nhận lịch chăm sóc của bạn.', data: { bookingId: booking._id } });
+    await writeAudit(req, 'booking.accept', 'Booking', booking._id, { after: { status: booking.status } });
     res.json(await populateBooking(Booking.findById(updatedBooking._id)));
   } catch (error: any) {
     res.status(500).json({ message: error.message || 'Server error' });
@@ -288,9 +408,13 @@ export const rejectBooking = async (req: AuthRequest, res: Response) => {
 
     booking.status = BookingStatus.REJECTED;
     booking.rejectedAt = new Date();
-    booking.rejectionReason = req.body.rejectionReason || req.body.reason || '';
+    booking.rejectionReason = String(req.body.rejectionReason || req.body.reason || '').trim();
+    if (!booking.rejectionReason) return res.status(400).json({ message: 'Rejection reason is required' });
+    booking.statusHistory.push({ status: booking.status, changedAt: new Date(), changedBy: req.user!._id, reason: booking.rejectionReason });
 
     const updatedBooking = await booking.save();
+    await createNotification({ userId: booking.parent, type: 'booking_rejected', title: 'Yêu cầu chưa được nhận', body: booking.rejectionReason, data: { bookingId: booking._id } });
+    await writeAudit(req, 'booking.reject', 'Booking', booking._id, { metadata: { reason: booking.rejectionReason } });
     res.json(await populateBooking(Booking.findById(updatedBooking._id)));
   } catch (error: any) {
     res.status(500).json({ message: error.message || 'Server error' });
@@ -383,6 +507,59 @@ export const createPaymentLink = async (req: AuthRequest, res: Response) => {
   }
 };
 
+export const getPaymentStatus = async (req: AuthRequest, res: Response) => {
+  const booking = await populateBooking(Booking.findOne({ _id: req.params.id, isDeleted: false }));
+  if (!booking) return res.status(404).json({ message: 'Booking not found' });
+  if (!(await canAccessBooking(booking, req))) return res.status(403).json({ message: 'Not authorized to view this payment' });
+
+  const transaction = await PaymentTransaction.findOne({ booking: booking._id })
+    .sort({ processedAt: -1 })
+    .select('provider orderCode paymentLinkId amount status processedAt createdAt')
+    .lean();
+  const paid = [BookingStatus.PAID_CONFIRMED, BookingStatus.CONFIRMED, BookingStatus.IN_PROGRESS, BookingStatus.COMPLETED].includes(booking.status);
+
+  res.json({
+    bookingId: booking._id,
+    bookingStatus: booking.status,
+    paymentStatus: booking.payosStatus || (paid ? 'PAID' : 'NOT_CREATED'),
+    paid,
+    paidAt: booking.paidAt,
+    amount: booking.totalPrice,
+    transaction,
+  });
+};
+
+export const downloadInvoice = async (req: AuthRequest, res: Response) => {
+  const booking = await populateBooking(Booking.findOne({ _id: req.params.id, isDeleted: false }));
+  if (!booking) return res.status(404).json({ message: 'Booking not found' });
+  if (!(await canAccessBooking(booking, req))) return res.status(403).json({ message: 'Not authorized to view this invoice' });
+  if (![BookingStatus.PAID_CONFIRMED, BookingStatus.CONFIRMED, BookingStatus.IN_PROGRESS, BookingStatus.COMPLETED].includes(booking.status)) {
+    return res.status(409).json({ message: 'Invoice is available after payment is confirmed' });
+  }
+
+  const transaction = await PaymentTransaction.findOne({ booking: booking._id }).sort({ processedAt: -1 }).lean();
+  const invoiceNumber = `MM-${String(booking._id).slice(-8).toUpperCase()}`;
+  const parentName = `${booking.parent?.firstName || ''} ${booking.parent?.lastName || ''}`.trim();
+  const carerName = `${booking.carer?.user?.firstName || ''} ${booking.carer?.user?.lastName || ''}`.trim();
+  const issuedAt = booking.paidAt || booking.paymentConfirmedAt || new Date();
+  const html = `<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Hóa đơn ${escapeHtml(invoiceNumber)}</title>
+<style>body{font:14px Arial,sans-serif;color:#18332b;margin:40px;max-width:780px}header{display:flex;justify-content:space-between;border-bottom:2px solid #20835e;padding-bottom:18px}h1{margin:0;color:#16724f}.meta{text-align:right}.row{display:flex;justify-content:space-between;border-bottom:1px solid #e1e8e5;padding:12px 0}.total{font-size:20px;font-weight:700}.note{margin-top:28px;color:#66756f}</style></head>
+<body><header><div><h1>MomMate</h1><p>Hóa đơn dịch vụ chăm sóc</p></div><div class="meta"><strong>${escapeHtml(invoiceNumber)}</strong><br>${escapeHtml(new Date(issuedAt).toLocaleString('vi-VN'))}</div></header>
+<h2>Thông tin giao dịch</h2>
+<div class="row"><span>Khách hàng</span><strong>${escapeHtml(parentName)}</strong></div>
+<div class="row"><span>Dịch vụ</span><strong>${escapeHtml(booking.service?.title)}</strong></div>
+<div class="row"><span>Chuyên gia</span><strong>${escapeHtml(carerName)}</strong></div>
+<div class="row"><span>Lịch chăm sóc</span><strong>${escapeHtml(new Date(booking.scheduledAt).toLocaleString('vi-VN'))}</strong></div>
+<div class="row"><span>Mã giao dịch PayOS</span><strong>${escapeHtml(transaction?.paymentLinkId || booking.payosPaymentLinkId || booking.payosOrderCode)}</strong></div>
+<div class="row total"><span>Tổng thanh toán</span><strong>${escapeHtml(Number(booking.totalPrice).toLocaleString('vi-VN'))} VNĐ</strong></div>
+<p class="note">Hóa đơn điện tử được tạo từ dữ liệu thanh toán đã xác minh của MomMate.</p></body></html>`;
+
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="${invoiceNumber}.html"`);
+  res.send(html);
+};
+
 // @desc    payOS payment webhook
 // @route   POST /api/bookings/payos/webhook
 // @access  Public
@@ -404,6 +581,9 @@ export const handlePayOSWebhook = async (req: AuthRequest, res: Response) => {
       return res.json({ success: true, message: 'Booking not found, webhook acknowledged' });
     }
 
+    const eventKey = `${webhookData.orderCode}:${webhookData.paymentLinkId || ''}:${webhookData.code}`;
+    const existingEvent = await PaymentTransaction.exists({ eventKey });
+    if (existingEvent) return res.json({ success: true, duplicate: true });
     booking.payosStatus = webhookData.code === '00' ? 'PAID' : webhookData.code;
     booking.payosPaymentLinkId = webhookData.paymentLinkId || booking.payosPaymentLinkId;
 
@@ -415,6 +595,19 @@ export const handlePayOSWebhook = async (req: AuthRequest, res: Response) => {
     }
 
     await booking.save();
+    await PaymentTransaction.create({
+      booking: booking._id,
+      orderCode: webhookData.orderCode,
+      paymentLinkId: webhookData.paymentLinkId,
+      amount: booking.totalPrice,
+      status: booking.payosStatus,
+      eventKey,
+      providerPayload: webhookData,
+    });
+    if (PAYOS_PAID_STATUSES.has(webhookData.code) || req.body.success === true) {
+      const carer = await Carer.findById(booking.carer).select('user');
+      if (carer) await createNotification({ userId: carer.user, type: 'booking_paid', title: 'Booking đã thanh toán', body: 'Phụ huynh đã hoàn tất thanh toán. Lịch chăm sóc đã được xác nhận.', data: { bookingId: booking._id } });
+    }
     res.json({ success: true });
   } catch (error: any) {
     console.error('payOS webhook verification failed:', error);
@@ -565,10 +758,34 @@ export const checkInBooking = async (req: AuthRequest, res: Response) => {
     if (booking.status !== BookingStatus.PAID_CONFIRMED && booking.status !== BookingStatus.CONFIRMED) {
       return res.status(400).json({ message: 'Only paid bookings can be checked in' });
     }
+    if (process.env.ATTENDANCE_ALLOW_ANYTIME !== 'true' && !isWithinCheckInWindow(booking.scheduledAt)) {
+      return res.status(400).json({ message: 'Check-in is only available from 15 minutes before to 30 minutes after the scheduled start' });
+    }
+    if (booking.serviceMode !== 'online') {
+      const latitude = Number(req.body.latitude);
+      const longitude = Number(req.body.longitude);
+      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+        return res.status(400).json({ message: 'GPS location is required for at-home check-in' });
+      }
+      const coordinates = booking.location?.coordinates;
+      if (coordinates?.length === 2) {
+        const distance = distanceMeters(
+          { latitude, longitude },
+          { latitude: coordinates[1], longitude: coordinates[0] }
+        );
+        if (distance > Number(process.env.ATTENDANCE_RADIUS_METERS || 300)) {
+          return res.status(403).json({ message: 'You are outside the allowed check-in radius', distanceMeters: Math.round(distance) });
+        }
+      }
+      booking.checkInLocation = { latitude, longitude, accuracy: Number(req.body.accuracy) || undefined };
+    }
 
     booking.status = BookingStatus.IN_PROGRESS;
     booking.checkInAt = new Date();
+    booking.statusHistory.push({ status: booking.status, changedAt: new Date(), changedBy: req.user!._id });
     const updatedBooking = await booking.save();
+    await createNotification({ userId: booking.parent, type: 'booking_check_in', title: 'Chuyên gia đã check-in', body: 'Ca chăm sóc đã bắt đầu.', data: { bookingId: booking._id }, email: false });
+    await writeAudit(req, 'booking.check_in', 'Booking', booking._id, { after: { checkInAt: booking.checkInAt } });
     res.json(await populateBooking(Booking.findById(updatedBooking._id)));
   } catch (error: any) {
     res.status(500).json({ message: error.message || 'Server error' });
@@ -594,15 +811,125 @@ export const checkOutBooking = async (req: AuthRequest, res: Response) => {
     if (booking.status !== BookingStatus.IN_PROGRESS) {
       return res.status(400).json({ message: 'Only in-progress bookings can be checked out' });
     }
+    const journal = await CareJournal.findOne({ booking: booking._id, carer: carer._id });
+    if (!journal?.checklist?.safetyChecked || !journal.notes.trim()) {
+      return res.status(400).json({ message: 'Care journal notes and safety checklist are required before check-out' });
+    }
 
     booking.status = BookingStatus.COMPLETED;
     booking.checkOutAt = new Date();
+    if (booking.serviceMode !== 'online' && Number.isFinite(Number(req.body.latitude)) && Number.isFinite(Number(req.body.longitude))) {
+      booking.checkOutLocation = { latitude: Number(req.body.latitude), longitude: Number(req.body.longitude), accuracy: Number(req.body.accuracy) || undefined };
+    }
     booking.carerPayoutStatus = CarerPayoutStatus.READY;
+    booking.statusHistory.push({ status: booking.status, changedAt: new Date(), changedBy: req.user!._id });
+    journal.completedAt = new Date();
+    await journal.save();
     const updatedBooking = await booking.save();
+    await createNotification({ userId: booking.parent, type: 'booking_completed', title: 'Ca chăm sóc đã hoàn thành', body: 'Nhật ký chăm sóc đã sẵn sàng để bạn xem.', data: { bookingId: booking._id } });
+    await writeAudit(req, 'booking.check_out', 'Booking', booking._id, { after: { checkOutAt: booking.checkOutAt, payoutStatus: booking.carerPayoutStatus } });
     res.json(await populateBooking(Booking.findById(updatedBooking._id)));
   } catch (error: any) {
     res.status(500).json({ message: error.message || 'Server error' });
   }
+};
+
+export const getCareJournal = async (req: AuthRequest, res: Response) => {
+  const booking = await Booking.findOne({ _id: req.params.id, isDeleted: false });
+  if (!booking) return res.status(404).json({ message: 'Booking not found' });
+  const carer = req.user!.role === 'carer' ? await getCarerForUser(req.user!._id) : null;
+  const authorized = req.user!.role === 'admin'
+    || String(booking.parent) === String(req.user!._id)
+    || Boolean(carer && String(booking.carer) === String(carer._id));
+  if (!authorized) return res.status(403).json({ message: 'Forbidden' });
+  const journal = await CareJournal.findOne({ booking: booking._id });
+  res.json(journal);
+};
+
+export const upsertCareJournal = async (req: AuthRequest, res: Response) => {
+  const carer = await getCarerForUser(req.user!._id);
+  const booking = await Booking.findOne({ _id: req.params.id, isDeleted: false });
+  if (!carer || !booking || String(booking.carer) !== String(carer._id)) {
+    return res.status(404).json({ message: 'Booking not found' });
+  }
+  if (![BookingStatus.PAID_CONFIRMED, BookingStatus.CONFIRMED, BookingStatus.IN_PROGRESS].includes(booking.status)) {
+    return res.status(400).json({ message: 'Care journal is not available for this booking status' });
+  }
+  const journal = await CareJournal.findOneAndUpdate(
+    { booking: booking._id },
+    {
+      $set: {
+        carer: carer._id,
+        weightKg: req.body.weightKg,
+        notes: String(req.body.notes || '').trim(),
+        checklist: {
+          medicationChecked: Boolean(req.body.checklist?.medicationChecked),
+          safetyChecked: Boolean(req.body.checklist?.safetyChecked),
+        },
+        images: Array.isArray(req.body.images) ? req.body.images : [],
+      },
+    },
+    { new: true, upsert: true, runValidators: true }
+  );
+  res.json(journal);
+};
+
+export const requestBookingChange = async (req: AuthRequest, res: Response) => {
+  const booking = await Booking.findOne({ _id: req.params.id, isDeleted: false });
+  if (!booking) return res.status(404).json({ message: 'Booking not found' });
+  const carer = req.user!.role === 'carer' ? await getCarerForUser(req.user!._id) : null;
+  const authorized = String(booking.parent) === String(req.user!._id)
+    || Boolean(carer && String(booking.carer) === String(carer._id));
+  if (!authorized) return res.status(403).json({ message: 'Forbidden' });
+  const type = req.body.type === 'cancel' ? 'cancel' : 'reschedule';
+  const reason = String(req.body.reason || '').trim();
+  if (!reason) return res.status(400).json({ message: 'Reason is required' });
+  const outside24Hours = isOutsideFreeCancellationWindow(booking.scheduledAt);
+  let requestedScheduledAt: Date | undefined;
+  if (type === 'reschedule') {
+    requestedScheduledAt = new Date(req.body.scheduledAt);
+    if (Number.isNaN(requestedScheduledAt.getTime()) || requestedScheduledAt <= new Date()) {
+      return res.status(400).json({ message: 'A future scheduled time is required' });
+    }
+  }
+  const changeRequest = await BookingChangeRequest.create({
+    booking: booking._id,
+    requestedBy: req.user!._id,
+    type,
+    requestedScheduledAt,
+    reason,
+    status: outside24Hours ? 'auto_approved' : 'pending',
+  });
+  if (outside24Hours) {
+    if (type === 'reschedule' && requestedScheduledAt) {
+      const end = new Date(requestedScheduledAt.getTime() + Math.max(1, booking.hours) * 3_600_000);
+      if (await hasScheduleConflict(booking.carer, requestedScheduledAt, end, booking._id)) {
+        changeRequest.status = 'pending';
+        await changeRequest.save();
+      } else {
+        booking.scheduledAt = requestedScheduledAt;
+        booking.scheduledEndAt = end;
+        await booking.save();
+      }
+    } else if (type === 'cancel') {
+      booking.status = BookingStatus.CANCELLED;
+      booking.cancellationStatus = 'approved';
+      booking.statusHistory.push({ status: booking.status, changedAt: new Date(), changedBy: req.user!._id, reason });
+      if (booking.paidAt) {
+        booking.refundStatus = 'pending';
+        await Refund.create({ booking: booking._id, requestedBy: req.user!._id, amount: booking.totalPrice, reason });
+      }
+      await booking.save();
+    }
+  } else {
+    booking.cancellationStatus = 'requested';
+    await booking.save();
+  }
+  const otherUser = String(booking.parent) === String(req.user!._id)
+    ? (await Carer.findById(booking.carer).select('user'))?.user
+    : booking.parent;
+  if (otherUser) await createNotification({ userId: otherUser, type: 'booking_change', title: 'Yêu cầu thay đổi lịch', body: reason, data: { bookingId: booking._id, changeRequestId: changeRequest._id } });
+  res.status(201).json(changeRequest);
 };
 
 // @desc    Get all bookings (Admin)
@@ -663,11 +990,16 @@ export const markPayoutPaid = async (req: AuthRequest, res: Response) => {
     if (booking.status !== BookingStatus.COMPLETED) {
       return res.status(400).json({ message: 'Chỉ ca chăm sóc đã hoàn tất mới được đối soát' });
     }
+    const reference = String(req.body.reference || '').trim();
+    if (!reference) return res.status(400).json({ message: 'Payout reference is required' });
     booking.carerPayoutStatus = CarerPayoutStatus.PAID;
     booking.payoutPaidAt = new Date();
-    booking.payoutReference = String(req.body.reference || '').trim();
+    booking.payoutReference = reference;
     booking.payoutNote = String(req.body.note || '').trim();
     await booking.save();
+    const carer = await Carer.findById(booking.carer).select('user');
+    if (carer) await createNotification({ userId: carer.user, type: 'payout_paid', title: 'Khoản đối soát đã được thanh toán', body: `Mã tham chiếu: ${reference}`, data: { bookingId: booking._id } });
+    await writeAudit(req, 'payout.mark_paid', 'Booking', booking._id, { after: { payoutStatus: booking.carerPayoutStatus, reference } });
     res.json(await populateBooking(Booking.findById(booking._id)));
   } catch (error: any) {
     res.status(400).json({ message: error.message || 'Cannot update payout' });

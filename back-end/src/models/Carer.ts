@@ -33,6 +33,11 @@ export interface ICarer extends Document {
   applicationStatus: 'draft' | 'submitted' | 'verified' | 'rejected';
   isVerified: boolean;
   isDeleted: boolean;
+  timezone: string;
+  acceptingBookings: boolean;
+  serviceRadiusKm: number;
+  coordinates?: { type: 'Point'; coordinates: [number, number] };
+  verificationRejectionReason?: string;
 }
 
 const CarerSchema: Schema = new Schema({
@@ -79,7 +84,17 @@ const CarerSchema: Schema = new Schema({
     default: 'draft'
   },
   isVerified: { type: Boolean, default: false },
+  timezone: { type: String, default: 'Asia/Ho_Chi_Minh' },
+  acceptingBookings: { type: Boolean, default: true, index: true },
+  serviceRadiusKm: { type: Number, default: 15, min: 1, max: 100 },
+  coordinates: { type: new Schema({
+    type: { type: String, enum: ['Point'] },
+    coordinates: [{ type: Number }],
+  }, { _id: false }), default: undefined },
+  verificationRejectionReason: { type: String },
   isDeleted: { type: Boolean, default: false }
 }, { timestamps: true });
 
+CarerSchema.index({ coordinates: '2dsphere' }, { sparse: true });
+CarerSchema.index({ user: 1, isDeleted: 1 }, { unique: true });
 export default mongoose.model<ICarer>('Carer', CarerSchema);

@@ -10,7 +10,7 @@
 }
 
 .payment-content .breadcrumb {
-  margin-bottom: 32px;
+  display: none;
 }
 
 .payment-layout {
@@ -360,3 +360,6 @@
   .stitch-qr-column { border-right: 0; border-bottom: 1px dashed #c1c9be; }
   .stitch-card-column { padding-inline: 8px; }
 }
+
+.public-app .payment-page .payment-content { padding-top: 48px; padding-bottom: 62px; }
+.public-app .payment-success-page .payment-success-shell { min-height: 1169px; }

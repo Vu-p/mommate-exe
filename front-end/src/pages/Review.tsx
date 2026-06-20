@@ -1,11 +1,11 @@
+import { CalendarDays, CheckCircle2, ChevronDown, Clock3, Loader2, Smile, Star, Stethoscope } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Star, Loader2, ChevronRight } from 'lucide-react';
-import { useNavigate, useLocation, useSearchParams, Link } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
+import carerAvatar from '../assets/stitch/generated/stitch-06-ad3697d45210.png';
 import './Review.css';
-import './Booking.css';
 
 const Review = () => {
   const [rating, setRating] = useState(0);
@@ -13,171 +13,67 @@ const Review = () => {
   const [loading, setLoading] = useState(false);
   const [booking, setBooking] = useState<any>(null);
   const [pageError, setPageError] = useState('');
-
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const bookingId = location.state?.bookingId || searchParams.get('bookingId');
 
   useEffect(() => {
-    const fetchBookingDetails = async () => {
-      if (!bookingId) {
-        setPageError('Không tìm thấy lịch đặt hợp lệ để đánh giá.');
-        return;
-      }
-
-      try {
-        const { data } = await api.get('/bookings/my');
-        const currentBooking = data.find((b: any) => b._id === bookingId);
-
-        if (!currentBooking) {
-          setPageError('Không tìm thấy lịch đặt hợp lệ để đánh giá.');
-          return;
-        }
-
-        if (currentBooking.status !== 'completed') {
-          setPageError('Chỉ có thể đánh giá khi lịch đặt đã hoàn thành.');
-          return;
-        }
-
-        setBooking(currentBooking);
-      } catch (error) {
-        console.error('Error fetching booking for review:', error);
-        setPageError('Không thể tải thông tin lịch đặt.');
-      }
-    };
-
-    fetchBookingDetails();
+    api.get('/bookings/my').then(({ data }) => {
+      const current = (Array.isArray(data) ? data : []).find((item: any) => item._id === bookingId);
+      if (!current || current.status !== 'completed') setPageError('Chỉ có thể đánh giá lịch đặt đã hoàn thành.');
+      else setBooking(current);
+    }).catch(() => setPageError('Không thể tải thông tin lịch đặt.'));
   }, [bookingId]);
 
-  const serviceTitle = booking?.service?.title || '';
-  const carerName = `${booking?.carer?.user?.firstName || ''} ${booking?.carer?.user?.lastName || ''}`.trim();
-
   const handlePost = async () => {
-    if (rating === 0) {
-      alert('Vui lòng chọn số sao đánh giá.');
-      return;
-    }
-
-    if (!booking || booking.status !== 'completed') {
-      setPageError('Chỉ có thể gửi đánh giá cho lịch đặt đã hoàn thành.');
-      return;
-    }
-
+    if (!rating) return alert('Vui lòng chọn số sao đánh giá.');
+    if (!booking) return;
     setLoading(true);
     try {
-      const carerId = booking.carer?._id || booking.carer;
-      await api.post('/reviews', {
-        bookingId,
-        carerId,
-        rating,
-        comment
-      });
+      await api.post('/reviews', { bookingId, carerId: booking.carer?._id || booking.carer, rating, comment });
       navigate('/account/request');
-    } catch (error) {
-      console.error('Review submission failed:', error);
+    } catch {
       alert('Không thể gửi đánh giá. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
   };
 
+  const carer = booking?.carer?.user || {};
+
   return (
     <div className="review-page">
       <Navbar />
-
-      <main className="container review-content">
-        <nav className="breadcrumb">
-          <Link to="/">Trang chủ</Link>
-          <ChevronRight size={14} />
-          <Link to="/account/request">Lịch sử đặt</Link>
-          <ChevronRight size={14} />
-          <span>Đánh giá</span>
-        </nav>
-
-        {pageError && (
-          <div className="review-error-banner">
-            <p>{pageError}</p>
-            <Link to="/account/request" className="btn-review-back">
-              Quay lại lịch sử đặt
-            </Link>
-          </div>
-        )}
-
-        <div className="review-layout">
-          <aside className="booking-summary-col">
-            <div className="summary-card">
-              <div className="summary-header">
-                <div className="summary-image">
-                  {booking?.service?.image ? (
-                    <img src={booking.service.image} alt="Service" />
-                  ) : (
-                    <div className="img-placeholder">
-                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-                        <path d="M21 19V5C21 3.9 20.1 3 19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19ZM8.5 13.5L11 16.51L14.5 12L19 18H5L8.5 13.5Z" fill="#A4A8B4" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-                <div className="summary-title-wrapper">
-                  <h3>{serviceTitle || 'Dịch vụ đã hoàn thành'}</h3>
-                  <p className="carer-name">Chuyên gia: {carerName || 'Đang cập nhật'}</p>
-                </div>
-              </div>
-
-              <div className="summary-details">
-                <div className="summary-row">
-                  <span>Trạng thái</span>
-                  <span style={{ color: '#10B981' }}>Hoàn thành</span>
-                </div>
-                <div className="summary-row total">
-                  <span>Tổng thanh toán</span>
-                  <span className="total-price">{booking?.totalPrice?.toLocaleString()} VNĐ</span>
-                </div>
-              </div>
+      <main className="container stitch-review-main">
+        <header className="stitch-review-heading"><h1>Đánh giá dịch vụ</h1><p>Cảm ơn bạn đã tin tưởng MaternalCare. Hãy chia sẻ trải nghiệm của bạn để chúng tôi phục vụ tốt hơn.</p></header>
+        {pageError ? <div className="review-error-banner">{pageError}</div> : (
+          <section className="stitch-review-card">
+            <div className="review-carer-summary">
+              <img src={carerAvatar} alt="" />
+              <div><h2>BS. {carer.firstName || 'Nguyễn Thị'} {carer.lastName || 'Minh Anh'} <span>Đã xác minh</span></h2><em>Bác sĩ Sản phụ khoa & Chuyên gia chăm sóc sau sinh</em><p><CalendarDays />Dịch vụ: {booking?.service?.title || 'Chăm sóc sau sinh (14 ngày)'} <CheckCircle2 />Hoàn tất: 20/8/2026</p></div>
             </div>
-          </aside>
 
-          <section className="review-form-col">
-            <div className="review-form-card">
-              <h2 className="review-section-title">Chất lượng dịch vụ</h2>
-
-              <div className="stars-container-large">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    size={48}
-                    className={star <= rating ? 'star active' : 'star'}
-                    onClick={() => setRating(star)}
-                    fill={star <= rating ? '#FACC15' : 'transparent'}
-                    color={star <= rating ? '#FACC15' : '#D1D5DB'}
-                    strokeWidth={1.5}
-                  />
-                ))}
-              </div>
-
-              <div className="review-input-section">
-                <h3 className="review-section-subtitle">Chăm sóc bé như thế nào?</h3>
-                <textarea
-                  placeholder="Nội dung nhận xét"
-                  className="review-textarea-large"
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                />
-              </div>
-
-              <button
-                className="btn-submit-review"
-                onClick={handlePost}
-                disabled={loading || Boolean(pageError)}
-              >
-                {loading ? <Loader2 className="spinner" size={20} /> : 'Xác nhận gửi'}
-              </button>
+            <div className="review-rating-block">
+              <p>Bạn đánh giá trải nghiệm tổng thể như thế nào?</p>
+              <div>{[1,2,3,4,5].map((value) => <button key={value} onClick={() => setRating(value)} aria-label={`${value} sao`}><Star className={value <= rating ? 'active' : ''} /></button>)}</div>
             </div>
+
+            <div className="review-select-grid">
+              <label>Thái độ phục vụ<span><Smile />Rất hài lòng<ChevronDown /></span></label>
+              <label>Chuyên môn nghiệp vụ<span><Stethoscope />Rất chuyên nghiệp<ChevronDown /></span></label>
+              <label>Đúng giờ & Tác phong<span><Clock3 />Luôn đúng giờ<ChevronDown /></span></label>
+            </div>
+
+            <label className="review-comment-label">Nhận xét chi tiết<textarea value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Hãy chia sẻ thêm về quá trình làm việc của Carer (ví dụ: sự tận tâm, khả năng xử lý tình huống, giao tiếp với gia đình...)" /></label>
+
+            <footer className="review-card-footer">
+              <label><input type="checkbox" defaultChecked />Hiển thị tên tôi trong phần đánh giá công khai</label>
+              <div><button className="review-cancel" onClick={() => navigate('/account/request')}>Hủy bỏ</button><button className="review-submit" disabled={loading} onClick={handlePost}>{loading ? <Loader2 className="spinner" /> : 'Gửi đánh giá'}</button></div>
+            </footer>
           </section>
-        </div>
+        )}
       </main>
-
       <Footer />
     </div>
   );

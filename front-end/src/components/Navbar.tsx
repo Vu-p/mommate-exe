@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext.tsx';
 import logo from '../assets/images/logo.png';
 import './Navbar.css';
 import './NavbarAdmin.css';
+import NotificationBell from './NotificationBell';
 
 interface NavbarProps {
   currentMode?: 'login' | 'signup';
@@ -77,6 +78,7 @@ const Navbar = ({ currentMode }: NavbarProps) => {
             <div className="nav-group right desktop-only">
               {user ? (
                 <div className="user-profile-nav" ref={dropdownRef}>
+                  <NotificationBell />
                   <button className="user-dropdown-toggle" onClick={() => setAccountOpen(!accountOpen)}>
                     <span className="user-avatar"><UserIcon size={18} /></span>
                     <span className="user-name">{user.firstName}</span>

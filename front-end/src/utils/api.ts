@@ -19,6 +19,7 @@ const resolveBaseURL = () => {
 
 const api = axios.create({
   baseURL: resolveBaseURL(),
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -38,6 +39,31 @@ api.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
+  }
+);
+
+let refreshPromise: Promise<string | undefined> | null = null;
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const original = error.config;
+    if (error.response?.status !== 401 || original?._retry || String(original?.url || '').includes('/auth/refresh')) {
+      return Promise.reject(error);
+    }
+    original._retry = true;
+    refreshPromise ||= api.post('/auth/refresh')
+      .then(({ data }) => {
+        const current = JSON.parse(localStorage.getItem('userInfo') || '{}');
+        const next = { ...current, ...data };
+        localStorage.setItem('userInfo', JSON.stringify(next));
+        return data.token as string | undefined;
+      })
+      .finally(() => { refreshPromise = null; });
+    const token = await refreshPromise;
+    if (!token) return Promise.reject(error);
+    original.headers.Authorization = `Bearer ${token}`;
+    return api(original);
   }
 );
 

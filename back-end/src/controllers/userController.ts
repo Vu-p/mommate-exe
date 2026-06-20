@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import type { AuthRequest } from '../middleware/auth.js';
 import { escapeRegex, getPagination, paginationPayload } from '../utils/pagination.js';
+import { writeAudit } from '../utils/audit.js';
 
 // @desc    Get users for admin management
 // @route   GET /api/users
@@ -136,6 +137,10 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
     }
 
     await user.save();
+    await writeAudit(req, 'user.update', 'User', user._id, {
+      after: { role: user.role, accountStatus: user.accountStatus },
+      metadata: { suspendedReason: user.suspendedReason },
+    });
 
     const safeUser = await User.findById(user._id).select('-password');
     res.json(safeUser);

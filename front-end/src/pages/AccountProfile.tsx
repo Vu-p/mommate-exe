@@ -21,6 +21,8 @@ type Profile = {
   firstName?: string;
   lastName?: string;
   email?: string;
+  phoneNumber?: string;
+  address?: string;
 };
 
 const AccountProfile = () => {
@@ -28,6 +30,7 @@ const AccountProfile = () => {
   const { user, loading: authLoading } = useAuth();
   const [profile, setProfile] = useState<Profile>({});
   const [loading, setLoading] = useState(true);
+  const [careProfiles, setCareProfiles] = useState<any[]>([]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -36,8 +39,8 @@ const AccountProfile = () => {
       return;
     }
 
-    api.get('/users/me')
-      .then(({ data }) => setProfile(data))
+    Promise.all([api.get('/users/me'), api.get('/care-profiles')])
+      .then(([userResponse, careResponse]) => { setProfile(userResponse.data); setCareProfiles(Array.isArray(careResponse.data) ? careResponse.data : careResponse.data.items || []); })
       .catch(() => setProfile(user))
       .finally(() => setLoading(false));
   }, [authLoading, navigate, user]);
@@ -51,7 +54,23 @@ const AccountProfile = () => {
     );
   }
 
-  const parentName = `${profile.firstName || user?.firstName || 'Thuỳ'} ${profile.lastName || user?.lastName || 'Dương'}`.trim();
+  const parentName = `${profile.firstName || user?.firstName || 'Thùy'} ${profile.lastName || user?.lastName || 'Dương'}`.trim();
+  const updateProfile = async () => {
+    const phoneNumber = window.prompt('Số điện thoại', profile.phoneNumber || '');
+    if (phoneNumber === null) return;
+    const address = window.prompt('Địa chỉ', profile.address || '');
+    if (address === null) return;
+    const { data } = await api.put('/users/me', { phoneNumber, address });
+    setProfile(data);
+  };
+  const addBaby = async () => {
+    const displayName = window.prompt('Tên hoặc biệt danh của bé');
+    if (!displayName?.trim()) return;
+    const birthDate = window.prompt('Ngày sinh (YYYY-MM-DD)');
+    const { data } = await api.post('/care-profiles', { type: 'baby', displayName: displayName.trim(), birthDate: birthDate || undefined });
+    setCareProfiles((items) => [...items, data]);
+  };
+  const babyProfiles = careProfiles.filter((item) => item.type === 'baby');
 
   return (
     <div className="care-profile-page">
@@ -63,7 +82,7 @@ const AccountProfile = () => {
             <h1>Hồ sơ chăm sóc</h1>
             <p>Lưu trữ và quản lý thông tin sức khỏe cho cả gia đình.</p>
           </div>
-          <button type="button" className="care-profile-edit">Cập nhật hồ sơ</button>
+          <button type="button" className="care-profile-edit" onClick={updateProfile}>Cập nhật hồ sơ</button>
         </header>
 
         <div className="care-profile-grid">
@@ -73,11 +92,8 @@ const AccountProfile = () => {
               <span><UserRound size={23} /></span>
               <div><strong>Mẹ {parentName}</strong><small>Chính chủ</small></div>
             </button>
-            <button type="button" className="family-profile">
-              <span className="baby-avatar"><Baby size={23} /></span>
-              <div><strong>Bé Bơ</strong><small>12 ngày tuổi</small></div>
-            </button>
-            <button type="button" className="family-profile add">
+            {babyProfiles.map((baby) => <button type="button" className="family-profile" key={baby._id}><span className="baby-avatar"><Baby size={23} /></span><div><strong>{baby.displayName}</strong><small>{baby.birthDate ? new Date(baby.birthDate).toLocaleDateString('vi-VN') : 'Chưa có ngày sinh'}</small></div></button>)}
+            <button type="button" className="family-profile add" onClick={addBaby}>
               <span><Plus size={23} /></span>
               <strong>Thêm hồ sơ bé</strong>
             </button>
@@ -126,15 +142,15 @@ const AccountProfile = () => {
                 </div>
                 <div className="baby-special-note">
                   <strong><AlertTriangle size={18} /> Tình trạng đặc biệt & lưu ý</strong>
-                  <p>Bé đang trong giai đoạn thích nghi sau sinh, có thể quấy nhẹ vào buổi tối. Theo dõi lịch ăn ngủ và tránh các sản phẩm có dấu hiệu gây không dung nạp lactose.</p>
+                  <p>Bé đang trong giai đoạn mọc răng hàm, có thể sốt nhẹ vào buổi tối. Cần lưu ý không dùng các sản phẩm từ sữa bò do có dấu hiệu không dung nạp Lactose nhẹ. Ưu tiên các loại sữa hạt hoặc sữa thủy phân.</p>
                 </div>
               </div>
             </section>
 
             <section className="care-recommendation">
               <div>
-                <h2>Lời khuyên cho tuần phục hồi</h2>
-                <p>Gia đình hãy chuẩn bị không gian nghỉ ngơi yên tĩnh và ghi lại các thay đổi sức khỏe của mẹ và bé mỗi ngày.</p>
+                <h2>Lời khuyên cho tuần 28</h2>
+                <p>Bố mẹ hãy bắt đầu chuẩn bị giỏ đồ đi sinh và dành thời gian thư giãn mỗi tối nhé.</p>
                 <button type="button">Xem chi tiết lộ trình</button>
               </div>
             </section>

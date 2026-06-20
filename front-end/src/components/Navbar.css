@@ -433,3 +433,12 @@
     height: 52px;
   }
 }
+.notification-bell { position: relative; display: inline-flex; margin-right: 10px; }
+.notification-bell > button { position: relative; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; background: #f1f5ef; }
+.notification-bell > button i { position: absolute; top: -4px; right: -4px; min-width: 17px; height: 17px; display: grid; place-items: center; padding: 0 4px; border-radius: 10px; color: #fff; background: #ba1a1a; font-size: 10px; font-style: normal; }
+.notification-bell > section { position: absolute; top: 46px; right: 0; z-index: 1000; width: 340px; max-height: 430px; overflow: auto; padding: 12px; border: 1px solid #ccd4ca; border-radius: 12px; background: #fff; box-shadow: 0 12px 35px #0002; }
+.notification-bell section header { display: flex; justify-content: space-between; align-items: center; padding: 4px 6px 10px; }
+.notification-bell section > button { width: 100%; display: block; padding: 12px 8px; border-top: 1px solid #ecefec; text-align: left; background: transparent; }
+.notification-bell section > button.unread { background: #edf6ee; }
+.notification-bell section > button strong,.notification-bell section > button small { display: block; }
+.notification-bell section > button small { margin-top: 4px; color: #697169; }

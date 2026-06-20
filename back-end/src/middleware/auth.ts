@@ -16,20 +16,11 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
       if (!token) {
         return res.status(401).json({ message: 'Not authorized, token missing' });
       }
-      const secret: string = process.env.JWT_SECRET || 'secret';
+      const secret = process.env.JWT_SECRET;
+      if (!secret) throw new Error('JWT_SECRET is required');
       const decoded = jwt.verify(token, secret) as any;
-
-      if (decoded.id === 'admin-id') {
-        req.user = {
-          _id: 'admin-id',
-          firstName: 'System',
-          lastName: 'Admin',
-          email: process.env.ADMIN_EMAIL || 'admin@mommate.com',
-          role: 'admin',
-        } as any;
-      } else {
-        req.user = await User.findById(decoded.id).select('-password') as IUser;
-      }
+      if (decoded.type && decoded.type !== 'access') throw new Error('Invalid token type');
+      req.user = await User.findById(decoded.id).select('-password') as IUser;
 
       if (!req.user) {
         return res.status(401).json({ message: 'User not found, please login again' });

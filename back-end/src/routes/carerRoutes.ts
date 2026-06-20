@@ -7,6 +7,8 @@ import {
   deleteCarer,
   getMyCarerProfile,
   updateMyCarerProfile,
+  saveCarerOverview,
+  saveCarerJobProfile,
 } from '../controllers/carerController.js';
 import { protect, authorize } from '../middleware/auth.js';
 
@@ -15,6 +17,8 @@ const router = express.Router();
 router.get('/', getCarers);
 router.get('/me', protect, getMyCarerProfile);
 router.put('/me', protect, updateMyCarerProfile);
+router.post('/apply/overview', protect, saveCarerOverview);
+router.post('/apply/job', protect, saveCarerJobProfile);
 router.get('/:id', getCarerById);
 
 router.post('/', protect, authorize('admin'), createCarer);

@@ -45,7 +45,7 @@ const AdminServices = () => {
     try {
       setLoading(true);
       const { data } = await api.get('/services?admin=true');
-      setServices(data);
+      setServices(Array.isArray(data) ? data : data.items || data.services || []);
     } catch (error) {
       console.error('Error fetching services:', error);
     } finally {
@@ -126,7 +126,7 @@ const AdminServices = () => {
   );
 
   return (
-    <div className="admin-page-content">
+    <div className="admin-page-content admin-services-page">
       <div className="page-header">
         <div className="header-text">
           <h1>Platform Services</h1>

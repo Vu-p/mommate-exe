@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronRight, ChevronDown } from 'lucide-react';
+import { ArrowRight, CheckCircle2, ChevronDown, ClipboardList, MapPin, ShieldCheck, UsersRound, CalendarDays, FileHeart } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -17,7 +17,6 @@ const Booking = () => {
   const serviceId = state.serviceId || query.get('serviceId');
   const serviceTitle = state.serviceTitle || query.get('serviceTitle');
   const carerId = state.carerId || query.get('carerId');
-  const carerName = state.carerName || query.get('carerName');
   const hasRequiredBookingData = Boolean(serviceId && carerId);
 
   const [formData, setFormData] = useState({
@@ -38,10 +37,11 @@ const Booking = () => {
     allergies: '',
     medicalNotes: '',
     notes: '',
-    numSessions: 1,
+    numSessions: 10,
     hours: 4
   });
   const [service, setService] = useState<any>(null);
+  const [quote, setQuote] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const today = new Date();
   const minimumBookingDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
@@ -74,10 +74,29 @@ const Booking = () => {
     fetchService();
   }, [hasRequiredBookingData, serviceId, user]);
 
-  const pricePerHour = service?.price || 150000; // default 150k if missing
-  const serviceFee = 5000;
-  const subTotal = pricePerHour * formData.hours * formData.numSessions;
-  const totalPrice = subTotal + serviceFee;
+  const pricePerHour = quote?.unitPrice ?? service?.price ?? 0;
+  const subTotal = quote?.totalPrice ?? pricePerHour * formData.hours * formData.numSessions;
+  const serviceFee = quote?.platformFeeAmount ?? 0;
+  const totalPrice = quote?.totalPrice ?? subTotal;
+
+  useEffect(() => {
+    if (!carerId || !serviceId || !formData.date || !formData.time) {
+      setQuote(null);
+      return;
+    }
+    const scheduledAt = new Date(`${formData.date}T${formData.time}:00`);
+    if (Number.isNaN(scheduledAt.getTime()) || scheduledAt <= new Date()) return;
+    const timer = window.setTimeout(() => {
+      api.post('/bookings/quote', {
+        carerId,
+        serviceId,
+        scheduledAt: scheduledAt.toISOString(),
+        numSessions: formData.numSessions,
+        hours: formData.hours,
+      }).then(({ data }) => setQuote(data)).catch(() => setQuote(null));
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [carerId, serviceId, formData.date, formData.time, formData.numSessions, formData.hours]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,12 +145,15 @@ const Booking = () => {
         medicalNotes: formData.medicalNotes,
         notes: formData.notes,
         numSessions: formData.numSessions,
-        hours: formData.hours,
-        totalPrice: totalPrice
+        hours: formData.hours
       };
       
-      await api.post('/bookings', payload);
-      navigate('/account/request');
+      if (!quote?.available) {
+        alert('Khung giờ này không còn trống. Vui lòng chọn thời gian khác.');
+        return;
+      }
+      const { data } = await api.post('/bookings', payload);
+      navigate(`/account/request/${data._id}`);
     } catch (error) {
       console.error('Booking failed:', error);
       const message = axios.isAxiosError(error)
@@ -167,23 +189,17 @@ const Booking = () => {
       <Navbar />
 
       <main className="container booking-content">
-        <nav className="breadcrumb">
-          <Link to="/">Trang chủ</Link>
-          <ChevronRight size={14} />
-          <span>Đặt lịch</span>
-        </nav>
-
         <header className="stitch-booking-heading">
-          <span>ĐĂNG KÝ DỊCH VỤ</span>
+          <div><span>ĐĂNG KÝ DỊCH VỤ</span><span>XÁC MINH Y TẾ</span></div>
           <h1>Thông tin đặt lịch chăm sóc</h1>
-          <p>Vui lòng cung cấp thông tin để chuyên gia chuẩn bị buổi chăm sóc phù hợp nhất.</p>
+          <p>Vui lòng cung cấp chi tiết thông tin để chúng tôi có thể điều phối nhân viên y tế (Điều dưỡng/Nữ hộ sinh) phù hợp nhất với nhu cầu của gia đình.</p>
         </header>
 
         <div className="booking-layout">
           {/* Left Form Column */}
           <form id="booking-request-form" className="booking-form-col" onSubmit={handleSubmit}>
             <div className="booking-form-section">
-              <h2><span>1</span> Thông tin liên hệ & Địa chỉ</h2>
+              <h2><MapPin /> <span>1.</span> Thông tin liên hệ & Địa chỉ</h2>
               <div className="form-row-2">
                 <div className="input-field">
                   <label>Họ và Tên</label>
@@ -242,7 +258,7 @@ const Booking = () => {
             </div>
 
             <div className="booking-form-section">
-              <h2><span>2</span> Đối tượng chăm sóc</h2>
+              <h2><UsersRound /> <span>2.</span> Đối tượng chăm sóc</h2>
               <div className="stitch-care-options">
                 {[['pregnant_mom', 'Mẹ bầu'], ['postpartum_mom', 'Mẹ sau sinh'], ['baby', 'Em bé'], ['mom_and_baby', 'Mẹ & bé']].map(([value, label]) => (
                   <button type="button" key={value} className={formData.careFor === value ? 'active' : ''} onClick={() => setFormData({...formData, careFor: value})}>
@@ -253,7 +269,7 @@ const Booking = () => {
             </div>
 
             <div className="booking-form-section">
-              <h2><span>3</span> Hồ sơ sức khỏe</h2>
+              <h2><FileHeart /> <span>3.</span> Hồ sơ sức khỏe</h2>
               <div className="form-row-2">
                 <div className="input-field">
                   <label>Tuần thai</label>
@@ -307,7 +323,7 @@ const Booking = () => {
             </div>
 
             <div className="booking-form-section">
-              <h2><span>4</span> Lịch trình chăm sóc</h2>
+              <h2><CalendarDays /> <span>4.</span> Lịch trình chăm sóc</h2>
               <div className="form-row-2">
                 <div className="input-field"><label>Ngày hẹn</label><input type="date" min={minimumBookingDate} required value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} /></div>
                 <div className="input-field"><label>Giờ hẹn</label><div className="select-wrapper"><select value={formData.time} onChange={e => setFormData({...formData, time: e.target.value})}>
@@ -325,48 +341,33 @@ const Booking = () => {
           {/* Right Summary Column */}
           <aside className="booking-summary-col">
             <div className="summary-card">
-              <div className="summary-header">
-                <div className="summary-image">
-                  {service?.image ? (
-                    <img src={service.image} alt="Service" />
-                  ) : (
-                    <div className="img-placeholder">
-                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-                        <path d="M21 19V5C21 3.9 20.1 3 19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19ZM8.5 13.5L11 16.51L14.5 12L19 18H5L8.5 13.5Z" fill="#A4A8B4" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-                <div className="summary-title-wrapper">
-                  <h3>{serviceTitle || service?.title || 'Tên dịch vụ'}</h3>
-                  <p className="carer-name">Chuyên gia: {carerName || 'Đang cập nhật'}</p>
-                </div>
-              </div>
+              <h2 className="booking-summary-title"><ClipboardList />Tổng hợp chi phí</h2>
 
               <div className="summary-details">
                 <div className="summary-row">
-                  <span>Giá dịch vụ</span>
-                  <span>{pricePerHour.toLocaleString()} VNĐ / giờ</span>
+                  <span>Gói chăm sóc</span>
+                  <strong>{serviceTitle || service?.title || 'Chăm sóc mẹ sau sinh'}</strong>
                 </div>
                 <div className="summary-row">
-                  <span>Thời lượng</span>
-                  <span>{formData.numSessions} buổi x {formData.hours} giờ</span>
+                  <span>Đơn giá/giờ</span>
+                  <span>{pricePerHour.toLocaleString('vi-VN')}đ</span>
                 </div>
                 <div className="summary-row">
-                  <span>Tạm tính</span>
-                  <span>{subTotal.toLocaleString()} VNĐ</span>
+                  <span>Số buổi ({formData.numSessions} buổi)</span>
+                  <span>x{formData.numSessions}</span>
                 </div>
                 <div className="summary-row">
-                  <span>Phí dịch vụ</span>
-                  <span>{serviceFee.toLocaleString()} VNĐ</span>
+                  <span>Thời gian ({formData.hours}h/buổi)</span>
+                  <span>x{formData.hours}</span>
                 </div>
                 
                 <div className="summary-divider"></div>
 
                 <div className="summary-row total">
-                  <span>Tổng thanh toán</span>
-                  <span className="total-price">{totalPrice.toLocaleString()} VNĐ</span>
+                  <span>Tổng cộng</span>
+                  <span className="total-price">{subTotal.toLocaleString('vi-VN')}đ</span>
                 </div>
+                <em>*Đã bao gồm VAT và dụng cụ y tế cơ bản</em>
               </div>
 
               <button 
@@ -375,8 +376,14 @@ const Booking = () => {
                 className="btn-booking-submit" 
                 disabled={loading}
               >
-                {loading ? 'Đang xử lý...' : 'Gửi yêu cầu cho carer'}
+                {loading ? 'Đang xử lý...' : 'Xác nhận đặt lịch'} <ArrowRight />
               </button>
+            </div>
+            <div className="booking-trust-card">
+              <header><ShieldCheck /><div><strong>Cam kết tin cậy</strong><span>An tâm cho cả mẹ và bé</span></div></header>
+              <p><CheckCircle2 />100% Nhân viên có bằng cấp y khoa</p>
+              <p><CheckCircle2 />Kiểm tra sức khỏe định kỳ 2 lần/tháng</p>
+              <p><CheckCircle2 />Hỗ trợ 24/7 qua hotline y tế</p>
             </div>
           </aside>
         </div>

@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import Review from '../models/Review.js';
 import Booking, { BookingStatus } from '../models/Booking.js';
 import Carer from '../models/Carer.js';
+import { writeAudit } from '../utils/audit.js';
 import type { AuthRequest } from '../middleware/auth.js';
 import { escapeRegex, getPagination, paginationPayload } from '../utils/pagination.js';
 
@@ -17,7 +18,7 @@ export const getReviews = async (req: Request, res: Response) => {
     if (req.query.carerId) {
       filter.carer = req.query.carerId;
     }
-    if (req.query.admin !== 'true') filter.moderationStatus = { $ne: 'hidden' };
+    if (req.query.admin !== 'true') filter.moderationStatus = 'published';
     if (req.query.status) filter.moderationStatus = req.query.status;
     if (req.query.search) {
       const search = escapeRegex(req.query.search);
@@ -53,7 +54,7 @@ export const getReviews = async (req: Request, res: Response) => {
 export const moderateReview = async (req: AuthRequest, res: Response) => {
   try {
     const { moderationStatus, moderationNote } = req.body;
-    if (!['published', 'hidden'].includes(moderationStatus)) {
+    if (!['pending', 'published', 'hidden'].includes(moderationStatus)) {
       return res.status(400).json({ message: 'Invalid moderation status' });
     }
     const review = await Review.findByIdAndUpdate(
@@ -67,6 +68,7 @@ export const moderateReview = async (req: AuthRequest, res: Response) => {
       { new: true }
     );
     if (!review) return res.status(404).json({ message: 'Review not found' });
+    await writeAudit(req, 'review.moderate', 'Review', review._id, { after: { moderationStatus: review.moderationStatus }, metadata: { moderationNote: review.moderationNote } });
     res.json(review);
   } catch (error: any) {
     res.status(400).json({ message: error.message || 'Cannot moderate review' });
@@ -110,7 +112,7 @@ export const createReview = async (req: AuthRequest, res: Response) => {
     });
 
     const stats = await Review.aggregate([
-      { $match: { carer: review.carer } },
+      { $match: { carer: review.carer, moderationStatus: 'published' } },
       { $group: { _id: '$carer', averageRating: { $avg: '$score' }, reviewCount: { $sum: 1 } } },
     ]);
 

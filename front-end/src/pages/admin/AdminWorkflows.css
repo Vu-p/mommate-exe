@@ -1,0 +1,35 @@
+.admin-workflows { padding: 34px; color: #18332b; }
+.admin-workflows > header { margin-bottom: 24px; }
+.admin-workflows > header p { color: #20835e; font-size: 12px; font-weight: 800; letter-spacing: .12em; margin: 0 0 8px; }
+.admin-workflows > header h1 { font-size: 32px; margin: 0 0 8px; }
+.admin-workflows > header span { color: #66756f; }
+.workflow-tabs { display: flex; gap: 10px; margin-bottom: 18px; }
+.workflow-tabs button { align-items: center; background: #fff; border: 1px solid #dbe6e1; border-radius: 10px; color: #51645d; cursor: pointer; display: flex; gap: 8px; padding: 11px 16px; }
+.workflow-tabs button.active { background: #e8f7f0; border-color: #46a77f; color: #16724f; font-weight: 700; }
+.workflow-tabs svg, .workflow-actions svg { height: 17px; width: 17px; }
+.workflow-filter { align-items: end; display: flex; justify-content: space-between; margin-bottom: 14px; }
+.workflow-filter label { color: #5c6d67; display: grid; font-size: 13px; gap: 6px; }
+.workflow-filter select { background: #fff; border: 1px solid #d8e2de; border-radius: 8px; min-width: 190px; padding: 9px 12px; }
+.workflow-table-wrap { background: #fff; border: 1px solid #e0e8e5; border-radius: 14px; overflow-x: auto; }
+.workflow-table-wrap table { border-collapse: collapse; min-width: 920px; width: 100%; }
+.workflow-table-wrap th { background: #f5f9f7; color: #64736e; font-size: 12px; letter-spacing: .04em; padding: 13px 15px; text-align: left; text-transform: uppercase; }
+.workflow-table-wrap td { border-top: 1px solid #edf1ef; padding: 14px 15px; vertical-align: top; }
+.workflow-table-wrap td small { color: #7a8984; display: block; margin-top: 5px; }
+.workflow-table-wrap code { color: #4b5f57; font-size: 12px; white-space: normal; }
+.workflow-status { background: #edf1ef; border-radius: 999px; display: inline-block; font-size: 11px; font-weight: 800; padding: 5px 9px; text-transform: uppercase; }
+.workflow-status.pending, .workflow-status.processing { background: #fff2d8; color: #9b6500; }
+.workflow-status.approved, .workflow-status.auto_approved, .workflow-status.completed { background: #dff5ea; color: #13704b; }
+.workflow-status.rejected, .workflow-status.failed { background: #ffe4e4; color: #a62d2d; }
+.workflow-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.workflow-actions button { background: #fff; border: 1px solid #d8e2de; border-radius: 7px; cursor: pointer; padding: 7px 9px; }
+.workflow-actions .approve { align-items: center; border-color: #68b794; color: #126b49; display: flex; gap: 5px; }
+.workflow-actions .reject { align-items: center; border-color: #e4a7a7; color: #a22c2c; display: flex; gap: 5px; }
+.workflow-pagination { align-items: center; display: flex; gap: 14px; justify-content: flex-end; margin-top: 16px; }
+.workflow-pagination button { background: #fff; border: 1px solid #d8e2de; border-radius: 8px; padding: 8px 12px; }
+.workflow-empty, .workflow-error { background: #fff; border: 1px solid #e1e8e5; border-radius: 12px; padding: 28px; text-align: center; }
+.workflow-error { background: #fff1f1; border-color: #f3c2c2; color: #9e2929; margin-bottom: 12px; }
+@media (max-width: 800px) {
+  .admin-workflows { padding: 20px; }
+  .workflow-tabs { overflow-x: auto; }
+  .workflow-tabs button { flex: 0 0 auto; }
+}

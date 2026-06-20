@@ -3,6 +3,7 @@ import Booking from '../models/Booking.js';
 import Carer from '../models/Carer.js';
 import Incident from '../models/Incident.js';
 import type { AuthRequest } from '../middleware/auth.js';
+import { writeAudit } from '../utils/audit.js';
 import { escapeRegex, getPagination, paginationPayload } from '../utils/pagination.js';
 
 const populateIncident = (query: any) =>
@@ -79,6 +80,7 @@ export const updateIncident = async (req: AuthRequest, res: Response) => {
     incident.severity = severity ?? incident.severity;
     if (['resolved', 'closed'].includes(incident.status)) incident.resolvedAt = incident.resolvedAt || new Date();
     await incident.save();
+    await writeAudit(req, 'incident.update', 'Incident', incident._id, { after: { status: incident.status, severity: incident.severity, assignedTo: incident.assignedTo }, metadata: { resolution: incident.resolution } });
     res.json(await populateIncident(Incident.findById(incident._id)));
   } catch (error: any) {
     res.status(400).json({ message: error.message || 'Cannot update incident' });

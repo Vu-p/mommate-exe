@@ -51,7 +51,7 @@ const AdminCarers = () => {
     try {
       setLoading(true);
       const { data } = await api.get('/carers?admin=true');
-      setCarers(data);
+      setCarers(Array.isArray(data) ? data : data.items || data.carers || []);
     } catch (error) {
       console.error('Error fetching carers:', error);
     } finally {
@@ -154,9 +154,8 @@ const AdminCarers = () => {
   const handleToggleVerifyFromList = async (carer: Carer) => {
     try {
       const nextVerified = !carer.isVerified;
-      const { data } = await api.put(`/carers/${carer._id}`, {
-        isVerified: nextVerified,
-        verificationStatus: nextVerified ? 'verified' : 'pending',
+      const { data } = await api.patch(`/admin/carers/${carer._id}/verification`, {
+        status: nextVerified ? 'verified' : 'pending',
       });
       setCarers(carers.map(c => c._id === data._id ? data : c));
     } catch (error) {
@@ -170,7 +169,7 @@ const AdminCarers = () => {
   );
 
   return (
-    <div className="admin-page-content">
+    <div className="admin-page-content admin-carers-page">
       <div className="page-header">
         <div className="header-text">
           <h1>Medical Carers</h1>

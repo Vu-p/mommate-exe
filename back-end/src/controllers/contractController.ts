@@ -3,6 +3,8 @@ import Contract, { ContractStatus } from '../models/Contract.js';
 import Carer from '../models/Carer.js';
 import type { AuthRequest } from '../middleware/auth.js';
 import { ensureContractForCarer } from '../utils/contracts.js';
+import { createNotification } from '../services/notificationService.js';
+import { writeAudit } from '../utils/audit.js';
 
 const getClientIp = (req: AuthRequest) => {
   const forwardedFor = req.headers['x-forwarded-for'];
@@ -75,6 +77,14 @@ export const signMyContract = async (req: AuthRequest, res: Response) => {
     contract.signedUserAgent = req.get('user-agent') || '';
 
     const signedContract = await contract.save();
+    await createNotification({
+      userId: req.user!._id,
+      type: 'contract_signed',
+      title: 'Hợp đồng đã được ký',
+      body: `Hợp đồng ${contract.templateTitle} đã được ghi nhận thành công.`,
+      data: { contractId: contract._id },
+    });
+    await writeAudit(req, 'contract.sign', 'Contract', contract._id, { after: { status: contract.status, signedAt: contract.signedAt } });
     res.json(signedContract);
   } catch (error: any) {
     res.status(500).json({ message: error.message || 'Server error' });

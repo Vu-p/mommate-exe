@@ -9,7 +9,7 @@ export interface IReview extends Document {
   content: string;
   tags: string[];
   images: string[];
-  moderationStatus: 'published' | 'hidden';
+  moderationStatus: 'pending' | 'published' | 'hidden';
   moderationNote?: string;
   moderatedBy?: mongoose.Types.ObjectId;
   moderatedAt?: Date;
@@ -24,7 +24,7 @@ const ReviewSchema: Schema = new Schema({
   content: { type: String, required: true },
   tags: [{ type: String }],
   images: [{ type: String }],
-  moderationStatus: { type: String, enum: ['published', 'hidden'], default: 'published', index: true },
+  moderationStatus: { type: String, enum: ['pending', 'published', 'hidden'], default: 'pending', index: true },
   moderationNote: { type: String },
   moderatedBy: { type: Schema.Types.ObjectId, ref: 'User' },
   moderatedAt: { type: Date },

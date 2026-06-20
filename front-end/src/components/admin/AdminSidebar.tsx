@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
-  BarChart3, CircleHelp, ClipboardList, LayoutDashboard, LogOut,
+  BarChart3, CircleHelp, ClipboardCheck, ClipboardList, LayoutDashboard, LogOut,
   Package, Settings, ShieldAlert, Star, Users, WalletCards,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -12,6 +12,7 @@ const links = [
   ['/admin/services', 'Dịch vụ', Package],
   ['/admin/carers', 'Chuyên gia', Users],
   ['/admin/bookings', 'Đặt lịch', ClipboardList],
+  ['/admin/workflows', 'Yêu cầu xử lý', ClipboardCheck],
   ['/admin/reconciliation', 'Thanh toán', WalletCards],
   ['/admin/reviews', 'Đánh giá', Star],
   ['/admin/incidents', 'Sự cố', ShieldAlert],
@@ -31,7 +32,7 @@ const AdminSidebar = () => {
     <aside className="admin-sidebar">
       <div className="sidebar-header">
         <div className="admin-logo">MomMate</div>
-        <p>Bảng Quản Trị</p>
+        <p>Bảng quản trị</p>
       </div>
       <nav className="sidebar-nav">
         {links.map(([to, label, Icon]) => (
@@ -40,10 +41,12 @@ const AdminSidebar = () => {
             <span>{label}</span>
           </NavLink>
         ))}
-        <span className="nav-item settings-item"><Settings size={20} /><span>Cài đặt</span></span>
+        <NavLink to="/admin/workflows" className="nav-item settings-item">
+          <Settings size={20} /><span>Cài đặt vận hành</span>
+        </NavLink>
       </nav>
       <div className="sidebar-footer">
-        <a href="#support" className="sidebar-help"><CircleHelp size={20} /><span>Trung tâm hỗ trợ</span></a>
+        <NavLink to="/admin/workflows" className="sidebar-help"><CircleHelp size={20} /><span>Trung tâm hỗ trợ</span></NavLink>
         <button onClick={handleLogout} className="logout-btn"><LogOut size={20} /><span>Đăng xuất</span></button>
       </div>
     </aside>

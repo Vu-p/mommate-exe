@@ -69,8 +69,11 @@ const Payment = () => {
 
     const intervalId = window.setInterval(async () => {
       attempts += 1;
-      const latestBooking = await fetchBookingDetails(false);
-      if (['paid_confirmed', 'confirmed'].includes(latestBooking?.status) || attempts >= 15) {
+      const { data: paymentStatus } = await api.get(`/bookings/${bookingId}/payment-status`);
+      if (paymentStatus.paid) {
+        await fetchBookingDetails(false);
+      }
+      if (paymentStatus.paid || attempts >= 15) {
         setIsWaitingForWebhook(false);
         window.clearInterval(intervalId);
       }

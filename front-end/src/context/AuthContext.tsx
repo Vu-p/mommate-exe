@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import api from '../utils/api';
 
 interface User {
   _id: string;
@@ -38,6 +39,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (userInfo) {
       setUser(JSON.parse(userInfo));
     }
+    if (!userInfo) {
+      api.post('/auth/refresh').then(({ data }) => {
+        setUser(data);
+        localStorage.setItem('userInfo', JSON.stringify(data));
+      }).catch(() => undefined).finally(() => setLoading(false));
+      return;
+    }
     setLoading(false);
   }, []);
 
@@ -56,6 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
+    void api.post('/auth/logout').catch(() => undefined);
     setUser(null);
     localStorage.removeItem('userInfo');
   };

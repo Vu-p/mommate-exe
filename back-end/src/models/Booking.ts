@@ -78,6 +78,27 @@ export interface IBooking extends Document {
   numSessions: number;
   hours: number;
   isDeleted: boolean;
+  scheduledEndAt?: Date;
+  serviceMode: 'at_home' | 'online';
+  location?: { type: 'Point'; coordinates: [number, number] };
+  priceSnapshot?: {
+    unitPrice: number;
+    hours: number;
+    sessions: number;
+    platformFeePercent: number;
+  };
+  statusHistory: {
+    status: BookingStatus;
+    changedAt: Date;
+    changedBy?: mongoose.Types.ObjectId;
+    reason?: string;
+  }[];
+  checkInLocation?: { latitude: number; longitude: number; accuracy?: number };
+  checkOutLocation?: { latitude: number; longitude: number; accuracy?: number };
+  cancellationStatus: 'none' | 'requested' | 'approved' | 'rejected';
+  refundStatus: 'none' | 'pending' | 'processing' | 'completed' | 'failed';
+  quarantinedAt?: Date;
+  quarantineReason?: string;
 }
 
 const BookingSchema: Schema = new Schema({
@@ -86,6 +107,12 @@ const BookingSchema: Schema = new Schema({
   service: { type: Schema.Types.ObjectId, ref: 'Service', required: true },
   status: { type: String, enum: Object.values(BookingStatus), default: BookingStatus.PENDING_CARER },
   scheduledAt: { type: Date, required: true },
+  scheduledEndAt: { type: Date },
+  serviceMode: { type: String, enum: ['at_home', 'online'], default: 'at_home' },
+  location: { type: new Schema({
+    type: { type: String, enum: ['Point'] },
+    coordinates: [{ type: Number }],
+  }, { _id: false }), default: undefined },
   address: { type: String, required: true },
   contactName: { type: String },
   contactPhone: { type: String },
@@ -126,7 +153,36 @@ const BookingSchema: Schema = new Schema({
   payoutNote: { type: String },
   numSessions: { type: Number, default: 1 },
   hours: { type: Number, default: 1 },
+  priceSnapshot: {
+    unitPrice: { type: Number },
+    hours: { type: Number },
+    sessions: { type: Number },
+    platformFeePercent: { type: Number },
+  },
+  statusHistory: [{
+    status: { type: String, enum: Object.values(BookingStatus), required: true },
+    changedAt: { type: Date, default: Date.now },
+    changedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    reason: { type: String },
+  }],
+  checkInLocation: {
+    latitude: Number,
+    longitude: Number,
+    accuracy: Number,
+  },
+  checkOutLocation: {
+    latitude: Number,
+    longitude: Number,
+    accuracy: Number,
+  },
+  cancellationStatus: { type: String, enum: ['none', 'requested', 'approved', 'rejected'], default: 'none' },
+  refundStatus: { type: String, enum: ['none', 'pending', 'processing', 'completed', 'failed'], default: 'none' },
+  quarantinedAt: Date,
+  quarantineReason: String,
   isDeleted: { type: Boolean, default: false },
 }, { timestamps: true });
 
+BookingSchema.index({ carer: 1, scheduledAt: 1, scheduledEndAt: 1, status: 1 });
+BookingSchema.index({ parent: 1, createdAt: -1 });
+BookingSchema.index({ location: '2dsphere' }, { sparse: true });
 export default mongoose.model<IBooking>('Booking', BookingSchema);

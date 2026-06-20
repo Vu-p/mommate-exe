@@ -91,3 +91,32 @@ export const getReconciliation = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: error.message || 'Cannot load reconciliation' });
   }
 };
+
+const csvCell = (value: unknown) => `"${String(value ?? '').replaceAll('"', '""')}"`;
+
+export const exportReconciliationCsv = async (req: AuthRequest, res: Response) => {
+  const filter: Record<string, any> = { isDeleted: false, status: BookingStatus.COMPLETED };
+  if (req.query.status) filter.carerPayoutStatus = req.query.status;
+  Object.assign(filter, dateFilter(req.query.from, req.query.to));
+  const bookings = await Booking.find(filter)
+    .sort({ checkOutAt: -1 })
+    .populate({ path: 'carer', populate: { path: 'user', select: 'firstName lastName email' } })
+    .populate('service', 'title')
+    .lean();
+  const header = ['Booking', 'Chuyên gia', 'Email', 'Dịch vụ', 'Tổng giá trị', 'Phí nền tảng', 'Phải trả', 'Trạng thái', 'Mã đối soát'];
+  const rows = bookings.map((item: any) => [
+    item._id,
+    `${item.carer?.user?.firstName || ''} ${item.carer?.user?.lastName || ''}`.trim(),
+    item.carer?.user?.email,
+    item.service?.title,
+    item.totalPrice,
+    item.platformFeeAmount,
+    item.carerPayoutAmount,
+    item.carerPayoutStatus,
+    item.payoutReference,
+  ]);
+  const csv = `\uFEFF${[header, ...rows].map((row) => row.map(csvCell).join(',')).join('\r\n')}`;
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="mommate-reconciliation-${new Date().toISOString().slice(0, 10)}.csv"`);
+  res.send(csv);
+};

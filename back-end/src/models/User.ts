@@ -25,6 +25,13 @@ export interface IUser extends Document {
   identityImages?: string[];
   mustChangePassword: boolean;
   accountStatus: 'active' | 'suspended';
+  emailVerified: boolean;
+  refreshTokenVersion: number;
+  lastLoginAt?: Date;
+  notificationPreferences: {
+    inApp: boolean;
+    email: boolean;
+  };
   suspendedAt?: Date;
   suspendedReason?: string;
   createdAt: Date;
@@ -50,6 +57,13 @@ const UserSchema: Schema = new Schema({
   identityImages: [{ type: String }],
   mustChangePassword: { type: Boolean, default: false },
   accountStatus: { type: String, enum: ['active', 'suspended'], default: 'active', index: true },
+  emailVerified: { type: Boolean, default: false },
+  refreshTokenVersion: { type: Number, default: 0, select: false },
+  lastLoginAt: { type: Date },
+  notificationPreferences: {
+    inApp: { type: Boolean, default: true },
+    email: { type: Boolean, default: true },
+  },
   suspendedAt: { type: Date },
   suspendedReason: { type: String },
 }, { timestamps: true });

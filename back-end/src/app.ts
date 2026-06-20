@@ -12,6 +12,13 @@ import uploadRoutes from './routes/uploadRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import incidentRoutes from './routes/incidentRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
+import messagingRoutes from './routes/messagingRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
+import careProfileRoutes from './routes/careProfileRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import cookieParser from 'cookie-parser';
+import rateLimit from 'express-rate-limit';
+import { errorHandler, notFound } from './middleware/errorHandler.js';
 
 dotenv.config();
 
@@ -68,9 +75,14 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+app.use(cookieParser());
+app.set('trust proxy', 1);
+
+const authLimiter = rateLimit({ windowMs: 15 * 60_000, limit: 30, standardHeaders: true, legacyHeaders: false });
+const sensitiveLimiter = rateLimit({ windowMs: 60_000, limit: 60, standardHeaders: true, legacyHeaders: false });
 
 // Routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/carers', carerRoutes);
 app.use('/api/bookings', bookingRoutes);
@@ -80,9 +92,15 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/incidents', incidentRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/messages', sensitiveLimiter, messagingRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/care-profiles', careProfileRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/', (req, res) => {
   res.send('Mommate API is running...');
 });
 
+app.use(notFound);
+app.use(errorHandler);
 export default app;

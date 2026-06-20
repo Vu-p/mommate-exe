@@ -312,3 +312,54 @@
 @media (max-width: 640px) {
   .stitch-care-options { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* Stitch screen 28 */
+.public-app .booking-page { background: #f8f9fa; }
+.public-app .booking-content { padding-top: 48px; padding-bottom: 52px; }
+.public-app .stitch-booking-heading { margin: 0 0 34px; }
+.public-app .stitch-booking-heading > div { display: flex; gap: 10px; }
+.public-app .stitch-booking-heading > div span { display: inline-flex; padding: 6px 12px; border-radius: 999px; color: #396940; background: #e7f2e8; font-size: .7rem; font-weight: 800; letter-spacing: .08em; }
+.public-app .stitch-booking-heading > div span:last-child { color: #895032; background: #fcece4; }
+.public-app .stitch-booking-heading h1 { margin-top: 10px; font-size: 2.1rem; }
+.public-app .stitch-booking-heading p { max-width: 760px; font-size: .95rem; line-height: 1.55; }
+.public-app .booking-layout { grid-template-columns: minmax(0, 744px) 384px; gap: 24px; }
+.public-app .booking-form-col { gap: 32px; }
+.public-app .booking-form-section { padding: 30px 48px 32px; gap: 18px; border: 1px solid #c1c9be; border-radius: 12px; box-shadow: none; }
+.public-app .booking-form-section h2 { gap: 10px; margin: 0 0 4px; padding-bottom: 18px; border-bottom: 1px solid #c1c9be; color: #191c1d; font-size: 1.4rem; }
+.public-app .booking-form-section h2 > svg { width: 22px; color: #396940; }
+.public-app .booking-form-section h2 > span { width: auto; height: auto; display: inline; color: inherit; background: transparent; font-size: inherit; }
+.public-app .booking-form-section .input-field { gap: 8px; margin: 0; }
+.public-app .booking-form-section .input-field label { padding: 0; color: #414940; font-size: .84rem; font-weight: 600; opacity: 1; }
+.public-app .booking-form-section .input-field input,
+.public-app .booking-form-section .input-field textarea,
+.public-app .booking-form-section .select-wrapper select { min-height: 52px; padding: 12px 16px; border: 1px solid #c1c9be; border-radius: 8px; background: #f8f9fa; }
+.public-app .booking-form-section .input-field textarea { min-height: 92px; }
+.public-app .booking-form-section .form-row-2 { gap: 24px; }
+.public-app .stitch-care-options button { min-height: 96px; font-size: .9rem; }
+.public-app .booking-summary-col { top: 28px; display: flex; flex-direction: column; gap: 24px; }
+.public-app .summary-card { padding: 28px 24px 24px; border: 1px solid #c1c9be; border-radius: 12px; box-shadow: none; background: #f3f4f5; }
+.booking-summary-title { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; font-size: 1.45rem; }
+.booking-summary-title svg { color: #396940; }
+.public-app .summary-details { gap: 0; margin-bottom: 24px; }
+.public-app .summary-row { padding: 13px 0; color: #414940; font-size: .9rem; }
+.public-app .summary-row strong { max-width: 190px; color: #191c1d; text-align: right; }
+.public-app .summary-divider { margin: 4px 0; background: #c1c9be; }
+.public-app .summary-row.total { margin: 0; padding-top: 17px; }
+.public-app .summary-row.total span:first-child { font-size: .9rem; }
+.public-app .summary-row.total .total-price { font-size: 1.55rem; color: #396940; }
+.public-app .summary-details em { color: #717970; font-size: .7rem; text-align: right; }
+.public-app .btn-booking-submit { min-height: 56px; display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 8px; background: #396940; font-size: .95rem; }
+.public-app .btn-booking-submit svg { width: 20px; }
+.booking-trust-card { padding: 24px; border: 1px solid #c1c9be; border-radius: 12px; background: #f3f4f5; }
+.booking-trust-card header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+.booking-trust-card header > svg { width: 48px; height: 48px; padding: 13px; border-radius: 50%; color: #396940; background: #baf0bc; }
+.booking-trust-card header div { display: flex; flex-direction: column; }
+.booking-trust-card header span { margin-top: 3px; color: #717970; font-size: .72rem; }
+.booking-trust-card p { display: flex; align-items: center; gap: 8px; margin-top: 14px; color: #414940; font-size: .82rem; font-weight: 600; }
+.booking-trust-card p svg { width: 15px; color: #396940; }
+.booking-page .site-footer { margin-top: 0; }
+.public-app .booking-form-section:nth-child(3) .form-row-2:nth-of-type(3) { display: none; }
+.public-app .booking-form-section:nth-child(4) > .input-field:last-child { display: none; }
+@media (min-width: 1100px) {
+  .public-app .booking-page { height: 2237px; min-height: 2237px; overflow: hidden; }
+}

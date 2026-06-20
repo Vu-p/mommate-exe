@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
+import { downloadBookingInvoice } from '../utils/invoice';
 
 const formatCurrency = (value: number) => `${Number(value || 0).toLocaleString('vi-VN')} VNĐ`;
 
@@ -24,11 +25,12 @@ const PaymentSuccess = () => {
       }
 
       try {
-        const { data } = await api.get(`/bookings/${bookingId}`);
-        if (!['paid_confirmed', 'confirmed'].includes(data.status)) {
+        const { data: paymentStatus } = await api.get(`/bookings/${bookingId}/payment-status`);
+        if (!paymentStatus.paid) {
           navigate(`/payment?bookingId=${bookingId}&payment=success`, { replace: true });
           return;
         }
+        const { data } = await api.get(`/bookings/${bookingId}`);
         setBooking(data);
       } catch (err: any) {
         setError(err.response?.data?.message || 'Không thể tải thông tin thanh toán.');
@@ -77,7 +79,7 @@ const PaymentSuccess = () => {
             </div>
             <div className="payment-success-actions">
               <Link className="btn-primary" to="/account/request">Xem chi tiết lịch hẹn <ArrowRight size={16} /></Link>
-              <button className="btn-secondary"><Download size={16} /> Tải hóa đơn</button>
+              <button className="btn-secondary" onClick={() => bookingId && downloadBookingInvoice(bookingId)}><Download size={16} /> Tải hóa đơn</button>
               <Link className="stitch-home-link" to="/">Về trang chủ</Link>
             </div>
             <aside className="stitch-success-tip"><div /><p><strong>Mẹo cho bạn</strong><span>Chuẩn bị sẵn hồ sơ sức khỏe của mẹ và bé để buổi tư vấn đầu tiên diễn ra thuận lợi nhất.</span><Link to="/account/profile">Xem hướng dẫn chuẩn bị</Link></p></aside>

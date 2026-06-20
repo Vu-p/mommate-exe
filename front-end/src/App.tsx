@@ -19,6 +19,11 @@ import ChangePassword from './pages/ChangePassword';
 import BookingDetail from './pages/BookingDetail';
 import IncidentReport from './pages/IncidentReport';
 import NotFound from './pages/NotFound';
+import Messages from './pages/Messages';
+import CaregiverApplyOverview from './pages/CaregiverApplyOverview';
+import CaregiverApplyJob from './pages/CaregiverApplyJob';
+import BookingChange from './pages/BookingChange';
+import InfoPage from './pages/InfoPage';
 import PublicMotion from './components/common/PublicMotion';
 import './styles/global.css';
 import './styles/public-redesign.css';
@@ -28,6 +33,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminServices from './pages/admin/AdminServices';
 import AdminCarers from './pages/admin/AdminCarers';
 import AdminBookings from './pages/admin/AdminBookings';
+import AdminWorkflows from './pages/admin/AdminWorkflows';
 import {
   AdminBookingDetail,
   AdminIncidents,
@@ -87,6 +93,7 @@ function App() {
             <Route path="incidents" element={<AdminIncidents />} />
             <Route path="revenue" element={<AdminRevenue />} />
             <Route path="reconciliation" element={<AdminReconciliation />} />
+            <Route path="workflows" element={<AdminWorkflows />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
@@ -109,6 +116,7 @@ function App() {
         <Route path="/booking" element={<Booking />} />
         <Route path="/account/request" element={<AccountRequests />} />
         <Route path="/account/request/:id" element={<BookingDetail />} />
+        <Route path="/bookings/:id/change" element={<BookingChange />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/payment/success" element={<PaymentSuccess />} />
         <Route path="/review" element={<Review />} />
@@ -118,10 +126,14 @@ function App() {
         <Route path="/signup" element={<Auth defaultMode="signup" />} />
         <Route path="/login" element={<Auth defaultMode="login" />} />
         <Route path="/carer/profile" element={<CarerProfile />} />
+        <Route path="/carer/apply" element={<CaregiverApplyOverview />} />
+        <Route path="/carer/apply/job" element={<CaregiverApplyJob />} />
         <Route path="/carer/bookings" element={<CarerBookings />} />
         <Route path="/carer/bookings/:id" element={<BookingDetail />} />
         <Route path="/carer/contract" element={<CarerContract />} />
         <Route path="/incidents/new" element={<IncidentReport />} />
+        <Route path="/messages/:id" element={<Messages />} />
+        {['privacy','terms','help','contact','careers','faq','guide'].map((path) => <Route key={path} path={`/${path}`} element={<InfoPage />} />)}
         <Route path="/admin/*" element={<Navigate to="/" replace />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
