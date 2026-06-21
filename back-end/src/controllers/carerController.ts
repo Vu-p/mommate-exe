@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import Carer from '../models/Carer.js';
 import Contract from '../models/Contract.js';
 import Review from '../models/Review.js';
@@ -7,6 +8,7 @@ import bcrypt from 'bcryptjs';
 import type { AuthRequest } from '../middleware/auth.js';
 import { ensureContractForCarer } from '../utils/contracts.js';
 import { escapeRegex, getPagination, paginationPayload } from '../utils/pagination.js';
+import { PUBLISHED_REVIEW_MATCH } from '../utils/reviewStats.js';
 
 const calculateAge = (birthDate?: Date | string) => {
   if (!birthDate) return undefined;
@@ -44,7 +46,7 @@ const applyReviewStats = async (carers: any[]) => {
   }
 
   const stats = await Review.aggregate([
-    { $match: { carer: { $in: carerIds } } },
+    { $match: { carer: { $in: carerIds }, ...PUBLISHED_REVIEW_MATCH } },
     { $group: { _id: '$carer', averageRating: { $avg: '$score' }, reviewCount: { $sum: 1 } } },
   ]);
 
@@ -69,6 +71,49 @@ const applyReviewStats = async (carers: any[]) => {
   });
 };
 
+const carerPublicAggregation = () => ([
+  { $lookup: { from: 'users', localField: 'user', foreignField: '_id', as: 'user' } },
+  { $unwind: '$user' },
+  { $lookup: { from: 'services', localField: 'services', foreignField: '_id', as: 'services' } },
+  {
+    $lookup: {
+      from: 'reviews',
+      let: { carerId: '$_id' },
+      pipeline: [
+        { $match: { ...PUBLISHED_REVIEW_MATCH, $expr: { $eq: ['$carer', '$$carerId'] } } },
+        { $group: { _id: null, rating: { $avg: '$score' }, reviewCount: { $sum: 1 } } },
+      ],
+      as: 'reviewStats',
+    },
+  },
+  {
+    $lookup: {
+      from: 'bookings',
+      let: { carerId: '$_id' },
+      pipeline: [
+        { $match: { status: 'completed', isDeleted: false, $expr: { $eq: ['$carer', '$$carerId'] } } },
+        { $count: 'value' },
+      ],
+      as: 'bookingStats',
+    },
+  },
+  {
+    $addFields: {
+      rating: {
+        $cond: [
+          { $gt: [{ $ifNull: [{ $first: '$reviewStats.reviewCount' }, 0] }, 0] },
+          { $round: [{ $ifNull: [{ $first: '$reviewStats.rating' }, 0] }, 1] },
+          null,
+        ],
+      },
+      reviewCount: { $ifNull: [{ $first: '$reviewStats.reviewCount' }, 0] },
+      completedBookingCount: { $ifNull: [{ $first: '$bookingStats.value' }, 0] },
+      displayName: { $trim: { input: { $concat: [{ $ifNull: ['$user.firstName', ''] }, ' ', { $ifNull: ['$user.lastName', ''] }] } } },
+    },
+  },
+  { $project: { reviewStats: 0, bookingStats: 0, 'user.password': 0, 'user.refreshTokenVersion': 0 } },
+]) as any[];
+
 // @desc    Get all carers
 // @route   GET /api/carers
 // @access  Public
@@ -82,81 +127,73 @@ export const getCarers = async (req: Request, res: Response) => {
       filter.$or = [{ verificationStatus: 'verified' }, { verificationStatus: { $exists: false } }];
     }
 
-    if (req.query.serviceId) {
-      filter.services = req.query.serviceId;
+    if (req.query.serviceId && mongoose.isValidObjectId(req.query.serviceId)) {
+      filter.services = new mongoose.Types.ObjectId(String(req.query.serviceId));
     }
 
     if (req.query.area) {
       filter.location = { $regex: String(req.query.area), $options: 'i' };
     }
-    if (req.query.search) {
-      const search = escapeRegex(req.query.search);
-      const matchingUsers = await User.find({
-        $or: [
-          { firstName: { $regex: search, $options: 'i' } },
-          { lastName: { $regex: search, $options: 'i' } },
-        ],
-      }).select('_id');
-      filter.$and = [
-        ...(filter.$and || []),
-        {
-          $or: [
-            { user: { $in: matchingUsers.map((user) => user._id) } },
-            { bio: { $regex: search, $options: 'i' } },
-            { location: { $regex: search, $options: 'i' } },
-            { workplaceName: { $regex: search, $options: 'i' } },
-          ],
-        },
-      ];
-    }
-
     if (req.query.maxPrice) {
       filter.hourlyRate = { $lte: Number(req.query.maxPrice) };
     }
 
-    if (req.query.minRating) {
-      filter.rating = { $gte: Number(req.query.minRating) };
-    }
-
     const scheduleSlots = parseScheduleSlots(req.query.scheduleSlots);
     if (scheduleSlots.length > 0) {
-      filter.$and = scheduleSlots.map(({ day, slot }) => ({
+      filter.$and = [
+        ...(filter.$and || []),
+        ...scheduleSlots.map(({ day, slot }) => ({
         availability: {
           $elemMatch: {
             day,
             slots: slot,
           },
         },
-      }));
+        })),
+      ];
     }
-
-    const carers = await Carer.find(filter)
-      .populate('user', 'firstName lastName avatar')
-      .populate('services', 'title category')
-      .lean();
-
-    let carersWithReviewStats = await applyReviewStats(carers);
-    if (req.query.minRating) {
-      carersWithReviewStats = carersWithReviewStats.filter((carer) => Number(carer.rating || 0) >= Number(req.query.minRating));
+    const afterLookupMatch: Record<string, any> = {};
+    if (req.query.search) {
+      const search = escapeRegex(req.query.search);
+      afterLookupMatch.$or = [
+        { displayName: { $regex: search, $options: 'i' } },
+        { bio: { $regex: search, $options: 'i' } },
+        { location: { $regex: search, $options: 'i' } },
+        { workplaceName: { $regex: search, $options: 'i' } },
+        { 'services.title': { $regex: search, $options: 'i' } },
+        { 'services.category': { $regex: search, $options: 'i' } },
+      ];
     }
-
-    const sort = String(req.query.sort || '');
-    carersWithReviewStats.sort((first: any, second: any) => {
-      if (sort === 'rating-desc') return Number(second.rating || 0) - Number(first.rating || 0);
-      if (sort === 'price-asc') return Number(first.hourlyRate || 0) - Number(second.hourlyRate || 0);
-      if (sort === 'price-desc') return Number(second.hourlyRate || 0) - Number(first.hourlyRate || 0);
-      if (sort === 'experience-desc') return Number(second.experienceYears || 0) - Number(first.experienceYears || 0);
-      if (sort === 'name-asc') {
-        const firstName = `${first.user?.firstName || ''} ${first.user?.lastName || ''}`;
-        const secondName = `${second.user?.firstName || ''} ${second.user?.lastName || ''}`;
-        return firstName.localeCompare(secondName, 'vi');
-      }
-      return Number(second.rating || 0) - Number(first.rating || 0);
-    });
+    if (req.query.minRating) afterLookupMatch.rating = { $gte: Number(req.query.minRating) };
+    const sortMap: Record<string, Record<string, 1 | -1>> = {
+      'rating-desc': { rating: -1, reviewCount: -1 },
+      'price-asc': { hourlyRate: 1 },
+      'price-desc': { hourlyRate: -1 },
+      'experience-desc': { experienceYears: -1 },
+      'name-asc': { displayName: 1 },
+    };
+    const sort = sortMap[String(req.query.sort)] || { rating: -1, reviewCount: -1, completedBookingCount: -1 };
+    const basePipeline: any[] = [
+      { $match: filter },
+      ...carerPublicAggregation(),
+      ...(Object.keys(afterLookupMatch).length ? [{ $match: afterLookupMatch }] : []),
+      { $sort: sort },
+    ];
+    const result = await Carer.aggregate([
+      ...basePipeline,
+      {
+        $facet: {
+          items: pagination.enabled ? [{ $skip: pagination.skip }, { $limit: pagination.limit }] : [],
+          total: [{ $count: 'value' }],
+        },
+      },
+    ]);
+    let carersWithReviewStats = result[0]?.items || [];
+    const total = result[0]?.total?.[0]?.value || 0;
 
     if (req.query.admin === 'true') {
       const contracts = await Contract.find({
-        carer: { $in: carersWithReviewStats.map((carer) => carer._id) },
+        carer: { $in: carersWithReviewStats.map((carer: any) => carer._id) },
         status: { $ne: 'voided' },
       })
         .sort({ createdAt: -1 })
@@ -164,17 +201,30 @@ export const getCarers = async (req: Request, res: Response) => {
         .lean();
 
       const contractsByCarerId = new Map(contracts.map((contract) => [String(contract.carer), contract]));
-      carersWithReviewStats = carersWithReviewStats.map((carer) => ({
+      carersWithReviewStats = carersWithReviewStats.map((carer: any) => ({
           ...carer,
           contractStatus: contractsByCarerId.get(String(carer._id))?.status || 'pending',
           contractSignedAt: contractsByCarerId.get(String(carer._id))?.signedAt,
         }));
     }
 
-    if (!pagination.enabled) return res.json(carersWithReviewStats);
-    const total = carersWithReviewStats.length;
-    const items = carersWithReviewStats.slice(pagination.skip, pagination.skip + pagination.limit);
-    res.json(paginationPayload(items, total, pagination.page, pagination.limit));
+    if (!pagination.enabled) {
+      carersWithReviewStats = await Carer.aggregate(basePipeline);
+      return res.json(carersWithReviewStats);
+    }
+    const minimumAreaCarers = Math.max(1, Number(process.env.MIN_AREA_CARERS) || 3);
+    const areaRows = await Carer.aggregate([
+      { $match: { isDeleted: false, isVerified: true, acceptingBookings: true } },
+      { $group: { _id: '$location', count: { $sum: 1 } } },
+      { $match: { count: { $gte: minimumAreaCarers } } },
+      { $sort: { count: -1, _id: 1 } },
+    ]);
+    res.json({
+      ...paginationPayload(carersWithReviewStats, total, pagination.page, pagination.limit),
+      facets: {
+        areas: areaRows.map((row) => ({ value: row._id, label: row._id, count: row.count })),
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -185,14 +235,16 @@ export const getCarers = async (req: Request, res: Response) => {
 // @access  Public
 export const getCarerById = async (req: Request, res: Response) => {
   try {
-    const carer = await Carer.findOne({ _id: req.params.id, isDeleted: false })
-      .populate('user', 'firstName lastName avatar')
-      .populate('services')
-      .lean();
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).json({ message: 'Carer not found' });
+    }
+    const [carer] = await Carer.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(String(req.params.id)), isDeleted: false } },
+      ...carerPublicAggregation(),
+    ]);
     
     if (carer) {
-      const [carerWithReviewStats] = await applyReviewStats([carer]);
-      res.json(carerWithReviewStats);
+      res.json(carer);
     } else {
       res.status(404).json({ message: 'Carer not found' });
     }

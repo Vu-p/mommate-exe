@@ -5,7 +5,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
-import fallbackAvatar from '../assets/stitch/generated/stitch-06-ad3697d45210.png';
+import { defaultCarerAvatar as fallbackAvatar } from '../utils/carerDisplay';
 import './CarerWorkspace.css';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];

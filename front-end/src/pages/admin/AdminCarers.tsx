@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Edit2, Trash2, Eye, CheckCircle, XCircle, Plus } from 'lucide-react';
 import api from '../../utils/api';
+import { defaultCarerAvatar } from '../../utils/carerDisplay';
 import Modal from '../../components/common/Modal';
 import ImageUpload from '../../components/common/ImageUpload';
 import './AdminTable.css';
@@ -213,7 +214,7 @@ const AdminCarers = () => {
                   <tr key={carer._id}>
                     <td>
                       <div className="td-with-img">
-                        <img src={carer.user.avatar || 'https://via.placeholder.com/150'} alt="" className="td-thumb" />
+                        <img src={carer.user.avatar || defaultCarerAvatar} alt="" className="td-thumb" />
                         <div>
                           <div className="td-title">{carer.user.firstName} {carer.user.lastName}</div>
                           <div className="sub-info">{carer.workplaceName || carer.location}</div>

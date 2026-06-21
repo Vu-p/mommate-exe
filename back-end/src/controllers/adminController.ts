@@ -8,6 +8,7 @@ import Refund from '../models/Refund.js';
 import { createNotification } from '../services/notificationService.js';
 import { writeAudit } from '../utils/audit.js';
 import { getPagination, paginationPayload } from '../utils/pagination.js';
+import { processRefund } from '../services/refundService.js';
 
 export const verifyCarer = async (req: AuthRequest, res: Response) => {
   const status = String(req.body.status);
@@ -131,21 +132,36 @@ export const reviewRefund = async (req: AuthRequest, res: Response) => {
   if (!refund) return res.status(404).json({ message: 'Refund not found' });
   const status = String(req.body.status);
   if (!['processing', 'completed', 'failed', 'rejected'].includes(status)) return res.status(400).json({ message: 'Invalid refund status' });
-  if (status === 'completed' && !String(req.body.providerReference || '').trim()) {
-    return res.status(400).json({ message: 'Provider reference is required for a completed refund' });
+  if (['completed', 'rejected'].includes(refund.status)) {
+    return res.status(409).json({ message: 'Refund is already in a terminal state' });
   }
-  refund.status = status as any;
-  refund.providerReference = String(req.body.providerReference || refund.providerReference || '').trim();
+  let nextStatus = status;
+  let providerReference = String(req.body.providerReference || refund.providerReference || '').trim();
+  if (status === 'completed') {
+    const result = await processRefund({ amount: refund.amount, providerReference, reason: refund.reason });
+    nextStatus = result.status;
+    providerReference = result.providerReference;
+    refund.provider = result.provider;
+  }
+  refund.status = nextStatus as any;
+  refund.providerReference = providerReference;
+  refund.failureReason = status === 'failed' ? String(req.body.note || '').trim() : undefined;
   refund.reviewedBy = req.user!._id;
   refund.reviewedAt = new Date();
+  refund.statusHistory.push({
+    status: nextStatus,
+    changedAt: new Date(),
+    changedBy: req.user!._id,
+    note: String(req.body.note || '').trim(),
+  });
   await refund.save();
   const booking = await Booking.findById(refund.booking);
   if (booking) {
-    booking.refundStatus = status === 'completed' ? 'completed' : status === 'failed' ? 'failed' : status === 'processing' ? 'processing' : 'none';
+    booking.refundStatus = nextStatus === 'completed' ? 'completed' : nextStatus === 'failed' ? 'failed' : nextStatus === 'processing' ? 'processing' : 'none';
     await booking.save();
-    await createNotification({ userId: booking.parent, type: 'refund_update', title: 'Cập nhật hoàn tiền', body: `Trạng thái hoàn tiền: ${status}`, data: { bookingId: booking._id, refundId: refund._id } });
+    await createNotification({ userId: booking.parent, type: 'refund_update', title: 'Cập nhật hoàn tiền', body: `Trạng thái hoàn tiền: ${nextStatus}`, data: { bookingId: booking._id, refundId: refund._id } });
   }
-  await writeAudit(req, 'refund.review', 'Refund', refund._id, { after: { status, providerReference: refund.providerReference } });
+  await writeAudit(req, 'refund.review', 'Refund', refund._id, { after: { status: nextStatus, provider: refund.provider, providerReference: refund.providerReference } });
   res.json(refund);
 };
 

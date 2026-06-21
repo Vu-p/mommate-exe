@@ -12,6 +12,8 @@ export interface IIncident extends Document {
   assignedTo?: mongoose.Types.ObjectId;
   resolution?: string;
   resolvedAt?: Date;
+  internalNotes: { author: mongoose.Types.ObjectId; note: string; createdAt: Date }[];
+  timeline: { status: string; changedBy?: mongoose.Types.ObjectId; note?: string; createdAt: Date }[];
 }
 
 const IncidentSchema = new Schema<IIncident>({
@@ -30,6 +32,17 @@ const IncidentSchema = new Schema<IIncident>({
   assignedTo: { type: Schema.Types.ObjectId, ref: 'User' },
   resolution: { type: String },
   resolvedAt: { type: Date },
+  internalNotes: [{
+    author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    note: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now },
+  }],
+  timeline: [{
+    status: { type: String, enum: ['open', 'investigating', 'resolved', 'closed'], required: true },
+    changedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    note: String,
+    createdAt: { type: Date, default: Date.now },
+  }],
 }, { timestamps: true });
 
 export default mongoose.model<IIncident>('Incident', IncidentSchema);

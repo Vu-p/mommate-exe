@@ -10,6 +10,7 @@
     "build:admin": "vite build --mode admin --outDir dist-admin",
     "lint": "eslint .",
     "test:visual": "playwright test tests/visual.spec.ts",
+    "test:functional": "playwright test tests/functional.spec.ts",
     "test:visual:update-assets": "node scripts/sync-stitch-assets.mjs",
     "test:visual:render-baselines": "node scripts/render-stitch-baselines.mjs",
     "preview": "vite preview"

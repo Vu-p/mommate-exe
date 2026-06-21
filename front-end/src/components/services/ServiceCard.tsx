@@ -29,6 +29,7 @@ const ServiceCard = ({ service, onSelect, carerId, carerName }: ServiceCardProps
   const displayPrice = typeof service.price === 'number'
     ? service.price.toLocaleString('vi-VN')
     : service.price;
+  const hasReviews = Number(service.reviewCount || 0) > 0 && Number(service.rating || 0) > 0;
 
   const handleAction = () => {
     if (onSelect) {
@@ -65,7 +66,9 @@ const ServiceCard = ({ service, onSelect, carerId, carerName }: ServiceCardProps
 
         <div className="card-content">
           <h3>{service.title}</h3>
-          <p className="service-rating"><Star fill="currentColor" /> <strong>{service.rating || 4.9}</strong> <span>({service.reviewCount || 0} đánh giá)</span></p>
+          <p className="service-rating">
+            {hasReviews ? <><Star fill="currentColor" /><strong>{Number(service.rating).toFixed(1)}</strong><span>({service.reviewCount} đánh giá)</span></> : <span>Chưa có đánh giá</span>}
+          </p>
           <div className="service-card-bottom">
             <p className="price"><small>Giá từ</small><strong>{displayPrice}đ</strong><span>/{service.priceUnit || 'buổi'}</span></p>
             <span className="learn-more">{carerId ? 'Chọn' : 'Xem chi tiết'}</span>

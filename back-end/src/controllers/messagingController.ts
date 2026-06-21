@@ -7,6 +7,7 @@ import Message from '../models/Message.js';
 import { emitToConversation } from '../socket.js';
 import { createNotification } from '../services/notificationService.js';
 import { getPagination, paginationPayload } from '../utils/pagination.js';
+import Incident from '../models/Incident.js';
 
 const canAccess = (conversation: any, req: AuthRequest) =>
   req.user!.role === 'admin' || conversation.participants.some((id: any) => String(id) === String(req.user!._id));
@@ -24,6 +25,26 @@ export const getOrCreateBookingConversation = async (req: AuthRequest, res: Resp
     { booking: booking._id },
     { $setOnInsert: { booking: booking._id, participants } },
     { new: true, upsert: true }
+  ).populate('participants', 'firstName lastName avatar role');
+  res.json(conversation);
+};
+
+export const getOrCreateIncidentConversation = async (req: AuthRequest, res: Response) => {
+  if (req.user!.role !== 'admin') return res.status(403).json({ message: 'Only admin can access incident conversations' });
+  const incident = await Incident.findById(req.params.incidentId).select('booking');
+  if (!incident) return res.status(404).json({ message: 'Incident not found' });
+  const booking = await Booking.findOne({ _id: incident.booking, isDeleted: false });
+  if (!booking) return res.status(404).json({ message: 'Booking not found' });
+  const carer = await Carer.findById(booking.carer).select('user');
+  if (!carer) return res.status(404).json({ message: 'Carer not found' });
+  const participants = [booking.parent, carer.user];
+  const conversation = await Conversation.findOneAndUpdate(
+    { booking: booking._id },
+    {
+      $set: { incident: incident._id },
+      $setOnInsert: { booking: booking._id, participants },
+    },
+    { new: true, upsert: true },
   ).populate('participants', 'firstName lastName avatar role');
   res.json(conversation);
 };

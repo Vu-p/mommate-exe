@@ -55,7 +55,7 @@ const ChangePassword = () => {
               {passwordInput('Mật khẩu mới', newPassword, setNewPassword, 'Chọn một mật khẩu mạnh')}
               <div className="password-strength"><i /><i /><i /><i /></div>
               {passwordInput('Xác nhận mật khẩu mới', confirmPassword, setConfirmPassword, 'Nhập lại mật khẩu mới của bạn')}
-              <div className="password-actions"><button type="submit" disabled={submitting}>{submitting && <Loader2 className="spinner" />}Cập nhật mật khẩu</button><a href="mailto:admin@maternalcare.vn">Liên hệ hỗ trợ Admin</a></div>
+              <div className="password-actions"><button type="submit" disabled={submitting}>{submitting && <Loader2 className="spinner" />}Cập nhật mật khẩu</button><a href="/contact">Liên hệ hỗ trợ</a></div>
             </form>
             <section className="password-rules"><p><span />Dài ít nhất 12 ký tự</p><p><span />Chữ hoa & chữ thường</p><p><span />Chứa ít nhất một số</p><p><span />Bao gồm ký tự đặc biệt (!@#)</p></section>
           </div>
@@ -65,7 +65,7 @@ const ChangePassword = () => {
           </aside>
         </div>
       </main>
-      <footer className="security-footer"><span>© 2024 MaternalCare Professional Services. Bảo lưu mọi quyền.</span><nav><a>Chính sách bảo mật</a><a>Điều khoản dịch vụ</a><a>Trung tâm bảo mật</a></nav></footer>
+      <footer className="security-footer"><span>© 2026 MomMate. Bảo lưu mọi quyền.</span><nav><a href="/privacy">Chính sách bảo mật</a><a href="/terms">Điều khoản dịch vụ</a><a href="/help">Trung tâm trợ giúp</a></nav></footer>
     </div>
   );
 };

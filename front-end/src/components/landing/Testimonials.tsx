@@ -20,7 +20,8 @@ const Testimonials = () => {
     const fetchReviews = async () => {
       try {
         const { data } = await api.get('/reviews', { params: { limit: 4 } });
-        const mapped: ReviewCard[] = data.map((review: any) => {
+        const items = Array.isArray(data) ? data : data.items || [];
+        const mapped: ReviewCard[] = items.map((review: any) => {
           const parent = review.parent || {};
           const carerUser = review.carer?.user || {};
 

@@ -2,6 +2,7 @@ import mongoose, { Schema, type Document } from 'mongoose';
 
 export interface IConversation extends Document {
   booking: mongoose.Types.ObjectId;
+  incident?: mongoose.Types.ObjectId;
   participants: mongoose.Types.ObjectId[];
   lockedAt?: Date;
   lockedBy?: mongoose.Types.ObjectId;
@@ -10,6 +11,7 @@ export interface IConversation extends Document {
 
 const ConversationSchema = new Schema<IConversation>({
   booking: { type: Schema.Types.ObjectId, ref: 'Booking', required: true, unique: true },
+  incident: { type: Schema.Types.ObjectId, ref: 'Incident', index: true },
   participants: [{ type: Schema.Types.ObjectId, ref: 'User', required: true }],
   lockedAt: Date,
   lockedBy: { type: Schema.Types.ObjectId, ref: 'User' },

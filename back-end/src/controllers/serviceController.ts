@@ -1,6 +1,64 @@
 import type { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import Service from '../models/Service.js';
+import Carer from '../models/Carer.js';
 import { escapeRegex, getPagination, paginationPayload } from '../utils/pagination.js';
+import { PUBLISHED_REVIEW_MATCH } from '../utils/reviewStats.js';
+
+const publicCarerMatch = {
+  isDeleted: false,
+  isVerified: true,
+  acceptingBookings: true,
+  $or: [{ verificationStatus: 'verified' }, { verificationStatus: { $exists: false } }],
+};
+
+const serviceStatsStages = [
+  {
+    $lookup: {
+      from: 'carers',
+      let: { serviceId: '$_id' },
+      pipeline: [
+        { $match: { ...publicCarerMatch, $expr: { $in: ['$$serviceId', '$services'] } } },
+        { $project: { location: 1 } },
+      ],
+      as: 'activeCarers',
+    },
+  },
+  {
+    $lookup: {
+      from: 'bookings',
+      let: { serviceId: '$_id' },
+      pipeline: [
+        { $match: { isDeleted: false, $expr: { $eq: ['$service', '$$serviceId'] } } },
+        {
+          $lookup: {
+            from: 'reviews',
+            localField: '_id',
+            foreignField: 'booking',
+            as: 'reviews',
+            pipeline: [{ $match: PUBLISHED_REVIEW_MATCH }, { $project: { score: 1 } }],
+          },
+        },
+        { $unwind: '$reviews' },
+        { $replaceWith: '$reviews' },
+      ],
+      as: 'publishedReviews',
+    },
+  },
+  {
+    $addFields: {
+      activeCarerCount: { $size: '$activeCarers' },
+      reviewCount: { $size: '$publishedReviews' },
+      rating: {
+        $cond: [
+          { $gt: [{ $size: '$publishedReviews' }, 0] },
+          { $round: [{ $avg: '$publishedReviews.score' }, 1] },
+          null,
+        ],
+      },
+    },
+  },
+] as any[];
 
 // @desc    Get all services
 // @route   GET /api/services
@@ -21,23 +79,63 @@ export const getServices = async (req: Request, res: Response) => {
       ];
     }
     if (req.query.category) filter.category = req.query.category;
+    if (req.query.carerId && mongoose.isValidObjectId(req.query.carerId)) {
+      const carer = await Carer.findOne({
+        _id: req.query.carerId,
+        ...(isAdmin ? {} : publicCarerMatch),
+      }).select('services');
+      filter._id = { $in: carer?.services || [] };
+    }
 
-    const sortMap: Record<string, any> = {
+    const sortMap: Record<string, Record<string, 1 | -1>> = {
       newest: { createdAt: -1 },
       'price-asc': { price: 1 },
       'price-desc': { price: -1 },
       'name-asc': { title: 1 },
+      'rating-desc': { rating: -1, reviewCount: -1 },
     };
-    const sort = sortMap[String(req.query.sort)] || { createdAt: -1 };
-    const query = Service.find(filter).sort(sort);
+    const sort = sortMap[String(req.query.sort)] || { activeCarerCount: -1, createdAt: -1 };
+    const area = String(req.query.area || '').trim();
+    const areaMatch = area
+      ? { activeCarers: { $elemMatch: { location: { $regex: escapeRegex(area), $options: 'i' } } } }
+      : {};
+    const pipeline: any[] = [
+      { $match: filter },
+      ...serviceStatsStages,
+      { $match: areaMatch },
+      { $sort: sort },
+    ];
 
-    if (!enabled) return res.json(await query);
+    if (!enabled) {
+      const items = await Service.aggregate([...pipeline, { $project: { activeCarers: 0, publishedReviews: 0 } }]);
+      return res.json(items);
+    }
 
-    const [items, total] = await Promise.all([
-      query.skip(skip).limit(limit),
-      Service.countDocuments(filter),
+    const [result, areaRows] = await Promise.all([
+      Service.aggregate([
+        ...pipeline,
+        {
+          $facet: {
+            items: [{ $skip: skip }, { $limit: limit }, { $project: { activeCarers: 0, publishedReviews: 0 } }],
+            total: [{ $count: 'value' }],
+          },
+        },
+      ]),
+      Carer.aggregate([
+        { $match: publicCarerMatch },
+        { $group: { _id: '$location', count: { $sum: 1 } } },
+        { $match: { count: { $gte: Math.max(1, Number(process.env.MIN_AREA_CARERS) || 3) } } },
+        { $sort: { count: -1, _id: 1 } },
+      ]),
     ]);
-    res.json(paginationPayload(items, total, page, limit));
+    const items = result[0]?.items || [];
+    const total = result[0]?.total?.[0]?.value || 0;
+    res.json({
+      ...paginationPayload(items, total, page, limit),
+      facets: {
+        areas: areaRows.map((row) => ({ value: row._id, label: row._id, count: row.count })),
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -48,7 +146,14 @@ export const getServices = async (req: Request, res: Response) => {
 // @access  Public
 export const getServiceById = async (req: Request, res: Response) => {
   try {
-    const service = await Service.findById(req.params.id);
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).json({ message: 'Service not found' });
+    }
+    const [service] = await Service.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(String(req.params.id)), isActive: true } },
+      ...serviceStatsStages,
+      { $project: { activeCarers: 0, publishedReviews: 0 } },
+    ]);
 
     if (service) {
       res.json(service);
@@ -64,7 +169,7 @@ export const getServiceById = async (req: Request, res: Response) => {
 // @route   POST /api/services
 // @access  Private/Admin
 export const createService = async (req: Request, res: Response) => {
-  const { title, description, basePrice, price, category, duration, image, tags, icon, steps } = req.body;
+  const { title, description, basePrice, price, category, duration, image, tags, icon, steps, careItems, faq, sessionOptions } = req.body;
 
   try {
     const service = await Service.create({
@@ -77,7 +182,10 @@ export const createService = async (req: Request, res: Response) => {
       image,
       tags,
       icon,
-      steps: steps || []
+      steps: steps || [],
+      careItems: careItems || [],
+      faq: faq || [],
+      sessionOptions: sessionOptions || [],
     });
     res.status(201).json(service);
   } catch (error) {
@@ -89,7 +197,7 @@ export const createService = async (req: Request, res: Response) => {
 // @route   PUT /api/services/:id
 // @access  Private/Admin
 export const updateService = async (req: Request, res: Response) => {
-  const { title, description, basePrice, price, category, duration, image, tags, icon, steps } = req.body;
+  const { title, description, basePrice, price, category, duration, image, tags, icon, steps, careItems, faq, sessionOptions } = req.body;
 
   try {
     const service = await Service.findById(req.params.id);
@@ -105,6 +213,9 @@ export const updateService = async (req: Request, res: Response) => {
       service.tags = tags || service.tags;
       service.icon = icon || service.icon;
       service.steps = steps !== undefined ? steps : service.steps;
+      service.careItems = careItems !== undefined ? careItems : service.careItems;
+      service.faq = faq !== undefined ? faq : service.faq;
+      service.sessionOptions = sessionOptions !== undefined ? sessionOptions : service.sessionOptions;
 
       const updatedService = await service.save();
       res.json(updatedService);

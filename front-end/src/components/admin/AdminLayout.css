@@ -1,6 +1,7 @@
 .admin-layout { min-height: 100vh; color: #191c1d; background: #f8f9fa; }
 .admin-main { min-height: 100vh; display: flex; flex-direction: column; margin-left: 256px; }
 .admin-content { flex: 1; width: 100%; max-width: 1536px; margin: 0 auto; padding: 32px; }
+.admin-main:has(.admin-ops-page) .admin-content { padding: 64px; }
 .admin-footer {
   width: calc(100% - 64px); max-width: 1472px; display: flex; align-items: flex-end;
   justify-content: space-between; gap: 28px; margin: 48px auto 0; padding: 48px 0 32px;

@@ -94,6 +94,7 @@ function App() {
             <Route path="revenue" element={<AdminRevenue />} />
             <Route path="reconciliation" element={<AdminReconciliation />} />
             <Route path="workflows" element={<AdminWorkflows />} />
+            <Route path="messages/:id" element={<Messages />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />

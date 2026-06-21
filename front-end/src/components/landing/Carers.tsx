@@ -3,7 +3,6 @@ import { Loader2, MapPin, ShieldCheck, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../../utils/api';
 import { formatReviewLabel, getCarerAvatar, getCarerFullName, getDisplayRating } from '../../utils/carerDisplay';
-import fallbackAvatar from '../../assets/stitch/carer-profile.jpg';
 import './Carers.css';
 
 const Carers = () => {
@@ -40,7 +39,7 @@ const Carers = () => {
               const rating = getDisplayRating(carer);
               return (
                 <Link to={`/carers/${carer._id}`} className="landing-carer-card" key={carer._id}>
-                  <img src={getCarerAvatar(carer) || fallbackAvatar} alt={name} />
+                  <img src={getCarerAvatar(carer)} alt={name} />
                   <div className="landing-carer-body">
                     {carer.verificationStatus === 'verified' && <span className="verified-chip"><ShieldCheck size={14} />Đã xác minh nơi làm việc</span>}
                     <h3>{name}</h3>

@@ -5,6 +5,7 @@ import Incident from '../models/Incident.js';
 import type { AuthRequest } from '../middleware/auth.js';
 import { writeAudit } from '../utils/audit.js';
 import { escapeRegex, getPagination, paginationPayload } from '../utils/pagination.js';
+import { createNotification } from '../services/notificationService.js';
 
 const populateIncident = (query: any) =>
   query
@@ -39,6 +40,7 @@ export const createIncident = async (req: AuthRequest, res: Response) => {
       title: req.body.title,
       description: req.body.description,
       evidence: req.body.evidence || [],
+      timeline: [{ status: 'open', changedBy: req.user!._id, note: 'Incident reported' }],
     });
     res.status(201).json(await populateIncident(Incident.findById(incident._id)));
   } catch (error: any) {
@@ -73,13 +75,40 @@ export const updateIncident = async (req: AuthRequest, res: Response) => {
   try {
     const incident = await Incident.findById(req.params.id);
     if (!incident) return res.status(404).json({ message: 'Incident not found' });
-    const { status, assignedTo, resolution, severity } = req.body;
+    const { status, assignedTo, resolution, severity, internalNote } = req.body;
+    const previousStatus = incident.status;
+    const transitions: Record<string, string[]> = {
+      open: ['open', 'investigating', 'closed'],
+      investigating: ['investigating', 'resolved', 'closed'],
+      resolved: ['resolved', 'investigating', 'closed'],
+      closed: ['closed', 'investigating'],
+    };
+    if (status && !(transitions[incident.status] || []).includes(status)) {
+      return res.status(409).json({ message: `Cannot transition incident from ${incident.status} to ${status}` });
+    }
+    if (['resolved', 'closed'].includes(status) && !String(resolution || incident.resolution || '').trim()) {
+      return res.status(400).json({ message: 'Resolution is required before resolving or closing an incident' });
+    }
     incident.status = status ?? incident.status;
-    incident.assignedTo = assignedTo ?? incident.assignedTo;
+    incident.assignedTo = assignedTo === 'self' ? req.user!._id : assignedTo ?? incident.assignedTo;
     incident.resolution = resolution ?? incident.resolution;
     incident.severity = severity ?? incident.severity;
+    if (String(internalNote || '').trim()) {
+      incident.internalNotes.push({ author: req.user!._id, note: String(internalNote).trim(), createdAt: new Date() });
+    }
+    if (incident.status !== previousStatus) {
+      incident.timeline.push({ status: incident.status, changedBy: req.user!._id, note: String(resolution || internalNote || '').trim(), createdAt: new Date() });
+    }
     if (['resolved', 'closed'].includes(incident.status)) incident.resolvedAt = incident.resolvedAt || new Date();
+    if (incident.status === 'investigating') incident.resolvedAt = undefined;
     await incident.save();
+    await createNotification({
+      userId: incident.reportedBy,
+      type: 'incident_update',
+      title: 'Cập nhật báo cáo sự cố',
+      body: `Trạng thái mới: ${incident.status}`,
+      data: { incidentId: incident._id, bookingId: incident.booking },
+    });
     await writeAudit(req, 'incident.update', 'Incident', incident._id, { after: { status: incident.status, severity: incident.severity, assignedTo: incident.assignedTo }, metadata: { resolution: incident.resolution } });
     res.json(await populateIncident(Incident.findById(incident._id)));
   } catch (error: any) {

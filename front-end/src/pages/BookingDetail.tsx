@@ -20,6 +20,7 @@ const BookingDetail = () => {
   const [loading, setLoading] = useState(true);
   const [journal, setJournal] = useState({ weightKg: '', notes: '', medicationChecked: false, safetyChecked: false });
   const [savingJournal, setSavingJournal] = useState(false);
+  const [refund, setRefund] = useState<any>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -37,6 +38,13 @@ const BookingDetail = () => {
         safetyChecked: Boolean(data.checklist?.safetyChecked),
       });
     }).catch(() => undefined);
+  }, [id, user?.role]);
+
+  useEffect(() => {
+    if (!id || user?.role === 'carer') return;
+    api.get(`/bookings/${id}/refund-status`)
+      .then(({ data }) => setRefund(data))
+      .catch(() => undefined);
   }, [id, user?.role]);
 
   const saveJournal = async () => {
@@ -140,10 +148,11 @@ const BookingDetail = () => {
           <aside className="booking-detail-right">
             <section className="booking-side-card payment-status">
               <h3>TRẠNG THÁI THANH TOÁN</h3>
-              <div><span><CheckCircle2 /></span><strong>Đã thanh toán</strong><small>Qua payOS</small></div>
+              <div><span><CheckCircle2 /></span><strong>{booking.paidAt ? 'Đã thanh toán' : 'Chưa thanh toán'}</strong><small>{booking.paidAt ? 'Qua payOS' : booking.status}</small></div>
               <p><span>Giá gói (14 ngày)</span><span>{(total + 500000).toLocaleString('vi-VN')}đ</span></p>
               <p className="payment-total"><strong>Tổng cộng</strong><b>{total.toLocaleString('vi-VN')}đ</b></p>
-              <button onClick={() => booking?._id && downloadBookingInvoice(booking._id)}><Download />Tải hóa đơn điện tử</button>
+              {booking.paidAt && <button onClick={() => booking?._id && downloadBookingInvoice(booking._id)}><Download />Tải hóa đơn điện tử</button>}
+              {refund?.refund && <div className="booking-refund-status"><strong>Hoàn tiền: {refund.refund.status}</strong><small>{refund.refund.providerReference ? `Mã tham chiếu: ${refund.refund.providerReference}` : refund.refund.reason}</small></div>}
               <small><LockKeyhole />Thanh toán được bảo mật bởi payOS</small>
             </section>
             <section className="booking-side-card location-card"><h3>ĐỊA ĐIỂM CHĂM SÓC</h3><p><MapPin />123 Bạch Đằng, Hải Châu,<br />Đà Nẵng</p><div><Map /></div></section>

@@ -21,6 +21,7 @@ import {
   requestBookingChange,
   getPaymentStatus,
   downloadInvoice,
+  getRefundStatus,
 } from '../controllers/bookingController.js';
 import { protect, authorize } from '../middleware/auth.js';
 
@@ -41,6 +42,7 @@ router.patch('/:id/reject', rejectBooking);
 router.post('/:id/payment-link', createPaymentLink);
 router.get('/:id/payment-status', getPaymentStatus);
 router.get('/:id/invoice', downloadInvoice);
+router.get('/:id/refund-status', getRefundStatus);
 router.patch('/:id/check-in', checkInBooking);
 router.patch('/:id/check-out', checkOutBooking);
 router.get('/:id/care-journal', getCareJournal);

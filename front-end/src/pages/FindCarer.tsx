@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronLeft, ChevronRight, Loader2, Search, Sparkles, Users } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -11,27 +11,8 @@ import './FindCarer.css';
 
 const CARERS_PER_PAGE = 5;
 
-const normalizeText = (value: unknown) => String(value || '').toLowerCase().trim();
 const getCarerName = (carer: any) =>
   `${carer.user?.firstName || carer.name?.split(' ')[0] || ''} ${carer.user?.lastName || carer.name?.split(' ').slice(1).join(' ') || ''}`.trim();
-
-const normalizeScheduleValue = (value: unknown) => String(value || '').trim();
-const carerMatchesSchedule = (
-  availability: { day: string; slots: string[] }[] | undefined,
-  selectedSlots: string[]
-) => {
-  if (selectedSlots.length === 0) return true;
-
-  const availableKeys = new Set(
-    (availability || []).flatMap((dayAvailability) =>
-      (dayAvailability.slots || []).map((slot) =>
-        `${normalizeScheduleValue(dayAvailability.day)}|${normalizeScheduleValue(slot)}`
-      )
-    )
-  );
-
-  return selectedSlots.every((selectedSlot) => availableKeys.has(normalizeScheduleValue(selectedSlot)));
-};
 
 const sortOptions = [
   { label: 'Phù hợp nhất', value: 'default' },
@@ -113,8 +94,9 @@ const FindCarer = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+  const [areaOptions, setAreaOptions] = useState<{ value: string; label: string; count?: number }[]>([]);
   const [filters, setFilters] = useState({
-    area: '',
+    area: 'Đà Nẵng',
     maxPrice: '',
     minRating: '',
     scheduleSlots: [] as string[],
@@ -147,6 +129,7 @@ const FindCarer = () => {
         setCarers(items);
         setTotalItems(data.pagination?.total ?? items.length);
         setTotalPages(data.pagination?.totalPages ?? 1);
+        setAreaOptions(data.facets?.areas || []);
       } catch (error) {
         console.error('Error fetching carers:', error);
       } finally {
@@ -161,55 +144,7 @@ const FindCarer = () => {
     setCurrentPage(1);
   }, [searchTerm, sortBy, filters.area, filters.maxPrice, filters.minRating, filters.scheduleSlots]);
 
-  const visibleCarers = useMemo(() => {
-    const keyword = normalizeText(searchTerm);
-    const nextCarers = carers.filter((carer) => {
-      const fullName = getCarerName(carer);
-      const searchableText = normalizeText([
-        fullName,
-        carer.bio,
-        carer.location,
-        carer.age,
-        carer.experienceYears,
-        ...(carer.certifications || []),
-        ...(carer.services || []).map((service: any) => service.title || service.category || ''),
-      ].join(' '));
-      const matchesSearch = !keyword || searchableText.includes(keyword);
-      const matchesArea = !filters.area || normalizeText(carer.location).includes(normalizeText(filters.area));
-      const matchesPrice = !filters.maxPrice || Number(carer.hourlyRate || 0) <= Number(filters.maxPrice);
-      const matchesRating = !filters.minRating || Number(carer.rating || 0) >= Number(filters.minRating);
-      const matchesSchedule = carerMatchesSchedule(carer.availability, filters.scheduleSlots);
-
-      return matchesSearch && matchesArea && matchesPrice && matchesRating && matchesSchedule;
-    });
-
-    return [...nextCarers].sort((first, second) => {
-      if (sortBy === 'rating-desc') {
-        return Number(second.rating || 0) - Number(first.rating || 0);
-      }
-
-      if (sortBy === 'price-asc') {
-        return Number(first.hourlyRate || 0) - Number(second.hourlyRate || 0);
-      }
-
-      if (sortBy === 'price-desc') {
-        return Number(second.hourlyRate || 0) - Number(first.hourlyRate || 0);
-      }
-
-      if (sortBy === 'experience-desc') {
-        return Number(second.experienceYears || 0) - Number(first.experienceYears || 0);
-      }
-
-      if (sortBy === 'name-asc') {
-        return getCarerName(first).localeCompare(getCarerName(second), 'vi');
-      }
-
-      return 0;
-    });
-  }, [carers, filters, searchTerm, sortBy]);
-
   const safeCurrentPage = Math.min(currentPage, totalPages);
-  const paginatedCarers = visibleCarers;
 
   const updateFilter = (name: string, value: string) => {
     setFilters((current) => ({ ...current, [name]: value }));
@@ -219,7 +154,7 @@ const FindCarer = () => {
     setSearchTerm('');
     setSortBy('default');
     setFilters({
-      area: '',
+      area: 'Đà Nẵng',
       maxPrice: '',
       minRating: '',
       scheduleSlots: [],
@@ -262,7 +197,7 @@ const FindCarer = () => {
             <p>{flowDescription}</p>
           </div>
           <div className="stitch-sort-tabs">
-            <button type="button" className={sortBy === 'default' ? 'active' : ''} onClick={() => setSortBy('default')}>Gần bạn nhất</button>
+            <button type="button" className={sortBy === 'default' ? 'active' : ''} onClick={() => setSortBy('default')}>Phù hợp nhất</button>
             <button type="button" className={sortBy === 'rating-desc' ? 'active' : ''} onClick={() => setSortBy('rating-desc')}>Được đánh giá cao</button>
             <button type="button" className={sortBy === 'price-asc' ? 'active' : ''} onClick={() => setSortBy('price-asc')}>Giá thấp nhất</button>
           </div>
@@ -289,6 +224,7 @@ const FindCarer = () => {
           <aside className="carer-sidebar-area">
             <CarerSidebar
               filters={filters}
+              areaOptions={areaOptions}
               onChange={updateFilter}
               onToggleSchedule={toggleSchedule}
               onClear={clearFilters}
@@ -325,7 +261,7 @@ const FindCarer = () => {
                 </div>
 
                 <div className="carers-list">
-                  {paginatedCarers.map((carer, index) => (
+                  {carers.map((carer, index) => (
                     <CarerListItem
                       key={carer._id || index}
                       carer={carer}
@@ -347,7 +283,7 @@ const FindCarer = () => {
                       }}
                     />
                   ))}
-                  {paginatedCarers.length === 0 && (
+                  {carers.length === 0 && (
                     <div className="empty-state">
                       <p>Không tìm thấy chuyên gia phù hợp với tiêu chí của bạn.</p>
                     </div>

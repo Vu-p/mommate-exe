@@ -39,6 +39,17 @@ const upsertService = (title: string, price: number, category: string, duration:
         category,
         duration,
         tags: ['MomMate', category],
+        careItems: [
+          'Đánh giá nhu cầu chăm sóc trước khi bắt đầu',
+          'Thực hiện quy trình phù hợp với hồ sơ mẹ và bé',
+          'Hướng dẫn gia đình theo dõi sau buổi chăm sóc',
+        ],
+        faq: [
+          {
+            question: 'Khi nào gia đình nên sử dụng dịch vụ?',
+            answer: 'Gia đình có thể đặt lịch khi mẹ và bé đã ổn định và không có chỉ định cấp cứu.',
+          },
+        ],
         sessionOptions: [1, 2, 4],
         isActive: true,
       },

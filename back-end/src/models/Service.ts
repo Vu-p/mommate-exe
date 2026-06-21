@@ -15,6 +15,11 @@ export interface IService extends Document {
     text: string;
     image?: string;
   }[];
+  careItems: string[];
+  faq: {
+    question: string;
+    answer: string;
+  }[];
   sessionOptions: number[];
   isActive: boolean;
 }
@@ -33,6 +38,11 @@ const ServiceSchema: Schema = new Schema({
     title: { type: String },
     text: { type: String },
     image: { type: String }
+  }],
+  careItems: [{ type: String }],
+  faq: [{
+    question: { type: String },
+    answer: { type: String }
   }],
   sessionOptions: [{ type: Number }],
   isActive: { type: Boolean, default: true },

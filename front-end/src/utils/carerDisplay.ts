@@ -1,5 +1,5 @@
 export const defaultCarerAvatar =
-  'https://images.pexels.com/photos/15752232/pexels-photo-15752232.jpeg?auto=compress&cs=tinysrgb&w=800';
+  'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320"%3E%3Crect width="320" height="320" fill="%23e7f2e8"/%3E%3Ccircle cx="160" cy="120" r="54" fill="%237bae7f"/%3E%3Cpath d="M65 286c12-66 49-99 95-99s83 33 95 99" fill="%237bae7f"/%3E%3C/svg%3E';
 
 export const getCarerFullName = (carer: any) => {
   const firstName = carer?.user?.firstName || carer?.name?.split(' ')[0] || 'Chuyên gia';

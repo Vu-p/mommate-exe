@@ -560,6 +560,23 @@ export const downloadInvoice = async (req: AuthRequest, res: Response) => {
   res.send(html);
 };
 
+export const getRefundStatus = async (req: AuthRequest, res: Response) => {
+  const booking = await Booking.findOne({ _id: req.params.id, isDeleted: false });
+  if (!booking) return res.status(404).json({ message: 'Booking not found' });
+  if (!(await canAccessBooking(booking, req))) return res.status(403).json({ message: 'Not authorized to view this refund' });
+
+  const refund = await Refund.findOne({ booking: booking._id })
+    .sort({ createdAt: -1 })
+    .select('amount reason provider status providerReference failureReason statusHistory reviewedAt createdAt updatedAt')
+    .lean();
+  res.json({
+    bookingId: booking._id,
+    cancellationStatus: booking.cancellationStatus,
+    refundStatus: booking.refundStatus,
+    refund,
+  });
+};
+
 // @desc    payOS payment webhook
 // @route   POST /api/bookings/payos/webhook
 // @access  Public
@@ -620,7 +637,8 @@ export const handlePayOSWebhook = async (req: AuthRequest, res: Response) => {
 // @access  Private
 export const updateBookingStatus = async (req: AuthRequest, res: Response) => {
   try {
-    const { status } = req.body;
+    const { status, override } = req.body;
+    const reason = String(req.body.reason || '').trim();
 
     if (!Object.values(BookingStatus).includes(status)) {
       return res.status(400).json({ message: 'Invalid booking status' });
@@ -636,6 +654,25 @@ export const updateBookingStatus = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ message: 'Only admin can update status directly' });
     }
 
+    const transitions: Record<BookingStatus, BookingStatus[]> = {
+      [BookingStatus.PENDING]: [BookingStatus.PENDING_CARER, BookingStatus.REJECTED, BookingStatus.CANCELLED],
+      [BookingStatus.PENDING_CARER]: [BookingStatus.ACCEPTED_PENDING_PAYMENT, BookingStatus.REJECTED, BookingStatus.CANCELLED],
+      [BookingStatus.ACCEPTED_PENDING_PAYMENT]: [BookingStatus.PAID_CONFIRMED, BookingStatus.CANCELLED],
+      [BookingStatus.PAID_CONFIRMED]: [BookingStatus.CONFIRMED, BookingStatus.IN_PROGRESS, BookingStatus.CANCELLED],
+      [BookingStatus.CONFIRMED]: [BookingStatus.IN_PROGRESS, BookingStatus.CANCELLED],
+      [BookingStatus.IN_PROGRESS]: [BookingStatus.COMPLETED],
+      [BookingStatus.COMPLETED]: [],
+      [BookingStatus.CANCELLED]: [],
+      [BookingStatus.REJECTED]: [],
+    };
+    const isNormalTransition = transitions[booking.status]?.includes(status);
+    if (!isNormalTransition && !override) {
+      return res.status(409).json({ message: `Transition from ${booking.status} to ${status} requires an audited override` });
+    }
+    if (override && !reason) {
+      return res.status(400).json({ message: 'Override reason is required' });
+    }
+    const beforeStatus = booking.status;
     booking.status = status;
     if (status === BookingStatus.PAID_CONFIRMED || status === BookingStatus.CONFIRMED) {
       booking.paymentConfirmedAt = booking.paymentConfirmedAt || new Date();
@@ -645,7 +682,27 @@ export const updateBookingStatus = async (req: AuthRequest, res: Response) => {
     if (status === BookingStatus.COMPLETED) {
       booking.carerPayoutStatus = CarerPayoutStatus.READY;
     }
+    booking.statusHistory.push({
+      status,
+      changedAt: new Date(),
+      changedBy: req.user!._id,
+      reason: reason || (override ? 'Admin override' : 'Admin state transition'),
+    });
     const updatedBooking = await booking.save();
+    const carer = await Carer.findById(booking.carer).select('user');
+    const recipients = [booking.parent, carer?.user].filter(Boolean);
+    await Promise.all(recipients.map((userId) => createNotification({
+      userId: userId!,
+      type: 'booking_status',
+      title: 'Cập nhật trạng thái booking',
+      body: `Trạng thái mới: ${status}`,
+      data: { bookingId: booking._id, status },
+    })));
+    await writeAudit(req, override ? 'booking.status_override' : 'booking.status_transition', 'Booking', booking._id, {
+      before: { status: beforeStatus },
+      after: { status },
+      metadata: { reason, override: Boolean(override) },
+    });
     res.json(updatedBooking);
   } catch (error) {
     res.status(500).json({ message: 'Server error' });

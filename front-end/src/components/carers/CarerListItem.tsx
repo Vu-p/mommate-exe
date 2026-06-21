@@ -47,7 +47,7 @@ const CarerListItem = ({ carer, onSelect, serviceId, serviceTitle }: CarerListIt
       <div className="carer-main-info">
         <div className="carer-avatar">
           <img src={avatar} alt={fullName} />
-          {carerId === 'carer-1' && <span className="top-rated-label">Top rated</span>}
+          {Number(carer.rating || 0) >= 4.8 && Number(carer.reviewCount || 0) >= 5 && <span className="top-rated-label">Được đánh giá cao</span>}
         </div>
         <div className="carer-details">
           <div className="name-rating">
@@ -59,16 +59,14 @@ const CarerListItem = ({ carer, onSelect, serviceId, serviceTitle }: CarerListIt
               <p className="carer-subtitle">{subtitle}</p>
             </div>
             <div className="rating">
-              <Star size={18} fill="currentColor" />
-              <span>{displayRating}</span>
-              <span className="reviews">({displayReviews.replace('bình luận', 'đánh giá')})</span>
+              {displayRating ? <><Star size={18} fill="currentColor" /><span>{displayRating}</span><span className="reviews">({displayReviews.replace('bình luận', 'đánh giá')})</span></> : <span className="reviews">{displayReviews}</span>}
             </div>
           </div>
           <div className="carer-card-facts">
             <span><BriefcaseBusiness />{displayExp}</span>
             <span><MapPin />Khu vực: {displayLoc}</span>
             <span><BriefcaseBusiness />Chuyên khoa: {specialty}</span>
-            <span><Languages />Ngôn ngữ: Tiếng Việt{carerId === 'carer-1' ? ', Tiếng Anh' : ''}</span>
+            <span><Languages />Ngôn ngữ: {(carer.languages || ['Tiếng Việt']).join(', ')}</span>
           </div>
           <div className="carer-card-footer">
             <div><small>Giá thuê theo giờ</small><strong>{displayPrice}</strong></div>

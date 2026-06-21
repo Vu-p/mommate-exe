@@ -6,6 +6,9 @@ import Carer from '../models/Carer.js';
 import User, { UserRole } from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import Service from '../models/Service.js';
+import Refund from '../models/Refund.js';
+import Incident from '../models/Incident.js';
+import Conversation from '../models/Conversation.js';
 
 dotenv.config();
 
@@ -32,9 +35,21 @@ const run = async () => {
     Carer.updateMany({ timezone: { $exists: false } }, { $set: { timezone: 'Asia/Ho_Chi_Minh' } }),
     Carer.updateMany({ acceptingBookings: { $exists: false } }, { $set: { acceptingBookings: true } }),
     Carer.updateMany({ serviceRadiusKm: { $exists: false } }, { $set: { serviceRadiusKm: 15 } }),
+    Service.updateMany({ careItems: { $exists: false } }, { $set: { careItems: [] } }),
+    Service.updateMany({ faq: { $exists: false } }, { $set: { faq: [] } }),
+    Service.updateMany({ sessionOptions: { $exists: false } }, { $set: { sessionOptions: [] } }),
     Booking.updateMany({ serviceMode: { $exists: false } }, { $set: { serviceMode: 'at_home' } }),
     Booking.updateMany({ cancellationStatus: { $exists: false } }, { $set: { cancellationStatus: 'none' } }),
     Booking.updateMany({ refundStatus: { $exists: false } }, { $set: { refundStatus: 'none' } }),
+    Refund.updateMany({ provider: { $exists: false } }, { $set: { provider: 'manual' } }),
+    Refund.collection.updateMany(
+      { statusHistory: { $exists: false } },
+      [{ $set: { statusHistory: [{ status: '$status', changedAt: { $ifNull: ['$updatedAt', '$createdAt'] } }] } }],
+    ),
+    Incident.collection.updateMany(
+      { timeline: { $exists: false } },
+      [{ $set: { timeline: [{ status: '$status', note: 'Migrated incident state', createdAt: { $ifNull: ['$updatedAt', '$createdAt'] } }], internalNotes: [] } }],
+    ),
   ]);
 
   if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
@@ -85,6 +100,13 @@ const run = async () => {
     Carer.distinct('_id'),
     Service.distinct('_id'),
   ]);
+  const incidents = await Incident.find({ booking: { $exists: true } }).select('_id booking');
+  for (const incident of incidents) {
+    await Conversation.updateOne(
+      { booking: incident.booking, incident: { $exists: false } },
+      { $set: { incident: incident._id } },
+    );
+  }
   const validUsers = new Set(userIds.map(String));
   const validCarers = new Set(carerIds.map(String));
   const validServices = new Set(serviceIds.map(String));

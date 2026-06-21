@@ -82,7 +82,7 @@ const AdminServices = () => {
       basePrice: 0,
       category: '',
       duration: '',
-      image: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2670&auto=format&fit=crop',
+      image: '',
       icon: 'HeartPulse',
       steps: []
     });

@@ -1,9 +1,11 @@
 import { AlertCircle, BarChart3, Building2, CalendarDays, Check, CheckCircle2, ChevronLeft, ChevronRight, CircleDollarSign, Clock3, Download, Eye, Filter, Mail, MapPin, MoreVertical, Pencil, Phone, Plus, ReceiptText, Search, ShieldAlert, Smile, Star, TrendingUp, UserRoundX, WalletCards, XCircle } from 'lucide-react';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import api from '../../utils/api';
+import { useAuth } from '../../context/AuthContext';
 import '../OperationalPages.css';
 import './AdminOperations.css';
+import { downloadBookingInvoice } from '../../utils/invoice';
 
 type Pagination = { page: number; limit: number; total: number; totalPages: number };
 const emptyPagination: Pagination = { page: 1, limit: 20, total: 0, totalPages: 1 };
@@ -60,16 +62,34 @@ const LegacyAdminReviews = () => {
 };
 
 const LegacyAdminIncidents = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [items, setItems] = useState<any[]>([]);
   const [pagination, setPagination] = useState(emptyPagination);
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState('');
   const load = () => api.get('/incidents', { params: { page, limit: 20, status: status || undefined } }).then(({ data }) => { setItems(data.items); setPagination(data.pagination); });
   useEffect(() => { void load(); }, [page, status]);
-  const update = async (id: string, next: string) => { await api.patch(`/incidents/${id}`, { status: next, resolution: next === 'resolved' ? 'Đã được quản trị viên xử lý' : undefined }); load(); };
+  const update = async (item: any, next: string) => {
+    const resolution = ['resolved', 'closed'].includes(next)
+      ? prompt('Nhập kết quả xử lý sự cố') || ''
+      : undefined;
+    if (['resolved', 'closed'].includes(next) && !resolution?.trim()) return;
+    const internalNote = prompt('Ghi chú nội bộ cho lần cập nhật này') || '';
+    await api.patch(`/incidents/${item._id}`, { status: next, resolution, internalNote });
+    load();
+  };
+  const assignSelf = async (item: any) => {
+    await api.patch(`/incidents/${item._id}`, { assignedTo: 'self', internalNote: `Admin ${user?.firstName || ''} nhận xử lý` });
+    load();
+  };
+  const openIncidentChat = async (item: any) => {
+    const { data } = await api.post(`/messages/incidents/${item._id}/conversation`);
+    navigate(`/admin/messages/${data._id}`);
+  };
   return <AdminListShell icon={ShieldAlert} eyebrow="AN TOÀN VẬN HÀNH" title="Quản lý sự cố" subtitle={`${pagination.total} báo cáo`}>
     <div className="admin-filter-row"><select value={status} onChange={(e) => setStatus(e.target.value)}><option value="">Tất cả</option><option value="open">Mới</option><option value="investigating">Đang xử lý</option><option value="resolved">Đã giải quyết</option></select></div>
-    <AdminTable headers={['Sự cố', 'Booking', 'Mức độ', 'Người báo cáo', 'Trạng thái', 'Thao tác']}>{items.map((item) => <tr key={item._id}><td><strong>{item.title}</strong><small>{item.category}</small></td><td>#{String(item.booking?._id || '').slice(-8)}</td><td><Status value={item.severity} /></td><td>{item.reportedBy?.firstName} {item.reportedBy?.lastName}</td><td><Status value={item.status} /></td><td><select value={item.status} onChange={(e) => update(item._id, e.target.value)}><option value="open">Mới</option><option value="investigating">Đang xử lý</option><option value="resolved">Đã giải quyết</option><option value="closed">Đóng</option></select></td></tr>)}</AdminTable>
+    <AdminTable headers={['Sự cố', 'Booking', 'Mức độ', 'Người báo cáo', 'Phụ trách', 'Trạng thái', 'Thao tác']}>{items.map((item) => <tr key={item._id}><td><strong>{item.title}</strong><small>{item.category}</small></td><td>#{String(item.booking?._id || '').slice(-8)}</td><td><Status value={item.severity} /></td><td>{item.reportedBy?.firstName} {item.reportedBy?.lastName}</td><td>{item.assignedTo ? `${item.assignedTo.firstName} ${item.assignedTo.lastName}` : <button className="admin-inline-action" onClick={() => assignSelf(item)}>Nhận xử lý</button>}</td><td><Status value={item.status} /></td><td><div className="workflow-actions"><button onClick={() => openIncidentChat(item)}>Chat</button><select value={item.status} onChange={(e) => update(item, e.target.value)}><option value="open">Mới</option><option value="investigating">Đang xử lý</option><option value="resolved">Đã giải quyết</option><option value="closed">Đóng</option></select></div></td></tr>)}</AdminTable>
     <PageNav pagination={pagination} onChange={setPage} />
   </AdminListShell>;
 };
@@ -107,8 +127,17 @@ const LegacyAdminReconciliation = () => {
     link.click();
     URL.revokeObjectURL(url);
   };
+  const exportPdf = async () => {
+    const response = await api.get('/analytics/reconciliation/export.pdf', { params: { status: status || undefined }, responseType: 'blob' });
+    const url = URL.createObjectURL(response.data);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `mommate-reconciliation-${new Date().toISOString().slice(0, 10)}.pdf`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
   const readyCount = data.items.filter((item: any) => item.carerPayoutStatus === 'ready').length;
-  return <AdminListShell icon={WalletCards} eyebrow="TÀI CHÍNH" title="Đối soát & thanh toán" subtitle="Theo dõi khoản phải trả cho chuyên gia" action={<div className="admin-filter-row"><button className="admin-advanced-filter" onClick={exportCsv}><Download size={18} />Xuất CSV</button><button className="admin-primary-action" disabled={!readyCount} onClick={payBatch}>Chi trả lô ({readyCount})</button></div>}>
+  return <AdminListShell icon={WalletCards} eyebrow="TÀI CHÍNH" title="Đối soát & thanh toán" subtitle="Theo dõi khoản phải trả cho chuyên gia" action={<div className="admin-filter-row"><button className="admin-advanced-filter" onClick={exportCsv}><Download size={18} />CSV</button><button className="admin-advanced-filter" onClick={exportPdf}><Download size={18} />PDF</button><button className="admin-primary-action" disabled={!readyCount} onClick={payBatch}>Chi trả lô ({readyCount})</button></div>}>
     <div className="analytics-stat-grid"><Metric label="Tổng giá trị" value={money(data.summary.total)} /><Metric label="Phí nền tảng" value={money(data.summary.platformFees)} /><Metric label="Phải trả" value={money(data.summary.payable)} /><Metric label="Đã trả" value={money(data.summary.paid)} /></div>
     <div className="admin-filter-row"><select value={status} onChange={(e) => setStatus(e.target.value)}><option value="">Tất cả</option><option value="ready">Chờ chi trả</option><option value="paid">Đã chi trả</option></select></div>
     <AdminTable headers={['Booking', 'Chuyên gia', 'Dịch vụ', 'Giá trị', 'Phải trả', 'Trạng thái', 'Thao tác']}>{data.items.map((item: any) => <tr key={item._id}><td>#{String(item._id).slice(-8)}</td><td>{item.carer?.user?.firstName} {item.carer?.user?.lastName}</td><td>{item.service?.title}</td><td>{money(item.totalPrice)}</td><td>{money(item.carerPayoutAmount)}</td><td><Status value={item.carerPayoutStatus} /></td><td>{item.carerPayoutStatus !== 'paid' && <button className="admin-inline-action" onClick={() => pay(item._id)}>Đánh dấu đã trả</button>}</td></tr>)}</AdminTable>
@@ -126,58 +155,94 @@ const OpsMetric = ({ icon: Icon, label, value, note, tone = 'green' }: any) =>
   <article className={`ops-metric ${tone}`}><div><Icon /></div><small>{label}</small><strong>{value}</strong>{note && <span>{note}</span>}</article>;
 
 const StitchAdminRevenue = () => {
-  const revenueBars = [42, 58, 50, 72, 66, 86];
+  const [data, setData] = useState<any>({ totals: {}, monthly: [], serviceBreakdown: [], districtBreakdown: [], topCarers: [] });
+  useEffect(() => { api.get('/analytics/dashboard').then(({ data }) => setData(data)); }, []);
+  const maxRevenue = Math.max(1, ...data.monthly.map((item: any) => Number(item.revenue || 0)));
+  const revenueBars = data.monthly.length ? data.monthly.map((item: any) => Math.max(8, Number(item.revenue || 0) / maxRevenue * 86)) : [8, 8, 8, 8, 8, 8];
+  const downloadReport = async (format: 'csv' | 'pdf') => {
+    const response = await api.get(`/analytics/reconciliation/export.${format}`, { responseType: 'blob' });
+    const url = URL.createObjectURL(response.data);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `mommate-report.${format}`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+  const services = data.serviceBreakdown.length ? data.serviceBreakdown : [{ label: 'Chưa có dữ liệu', percent: 0 }];
+  const districts = data.districtBreakdown.length ? data.districtBreakdown : [{ label: 'Chưa có dữ liệu', revenue: 0 }];
+  const maxDistrict = Math.max(1, ...districts.map((item: any) => Number(item.revenue || 0)));
+  const topCarers = data.topCarers.length ? data.topCarers : [{ name: 'Chưa có dữ liệu', revenue: 0, bookings: 0, rating: 0 }];
   return <div className="admin-ops-page revenue-page">
-    <OperationsHeader title="Báo cáo & Phân tích" subtitle="Theo dõi doanh thu thời gian thực và thông tin hiệu suất." action={<div className="ops-actions"><button><CalendarDays />30 ngày qua</button><button className="primary"><Download />Xuất PDF</button><button>CSV</button></div>} />
-    <section className="ops-metrics four"><OpsMetric icon={CircleDollarSign} label="Tổng doanh thu gộp" value="1.240.500.000" note="↗ +12.4% · VNĐ" /><OpsMetric icon={Building2} label="Hoa hồng nền tảng" value="186.075.000" note="Phí 15% · VNĐ" tone="orange" /><OpsMetric icon={BarChart3} label="Giá trị đơn hàng TB (AOV)" value="3.450.000" note="so với tháng trước · VNĐ" tone="pink" /><OpsMetric icon={TrendingUp} label="Tỷ lệ chuyển đổi khách" value="4.82%" note="↘ -0.5%" /></section>
+    <OperationsHeader title="Báo cáo & Phân tích" subtitle="Theo dõi doanh thu thời gian thực và thông tin hiệu suất." action={<div className="ops-actions"><button><CalendarDays />30 ngày qua</button><button className="primary" onClick={() => downloadReport('pdf')}><Download />Xuất PDF</button><button onClick={() => downloadReport('csv')}>CSV</button></div>} />
+    <section className="ops-metrics four"><OpsMetric icon={CircleDollarSign} label="Tổng doanh thu gộp" value={Number(data.totals.revenue || 0).toLocaleString('vi-VN')} note="VNĐ" /><OpsMetric icon={Building2} label="Hoa hồng nền tảng" value={Number(data.totals.platformFees || 0).toLocaleString('vi-VN')} note="VNĐ" tone="orange" /><OpsMetric icon={BarChart3} label="Giá trị đơn hàng TB (AOV)" value={Number(data.totals.bookings ? data.totals.revenue / data.totals.bookings : 0).toLocaleString('vi-VN')} note="VNĐ" tone="pink" /><OpsMetric icon={TrendingUp} label="Tổng booking" value={data.totals.bookings || 0} note="Đã ghi nhận" /></section>
     <section className="ops-panel revenue-trend"><header><div><h2>Xu hướng tăng trưởng doanh thu</h2><p>Doanh thu gộp vs. Phí nền tảng (Hàng tuần)</p></div><span>● Doanh thu gộp　 <i>●</i> Phí nền tảng</span></header><div className="trend-grid">{revenueBars.map((height, index) => <div key={index}><span className="gross" style={{ height: `${height}%` }} /><span className="fee" style={{ height: `${height * .28}%` }} /><small>T{index + 1}</small></div>)}</div></section>
     <section className="revenue-bottom-grid">
-      <article className="ops-panel category-card"><h2>Theo danh mục dịch vụ</h2><div className="donut"><span>CAO NHẤT<strong>Trẻ sơ sinh</strong></span></div><p><i />Chăm sóc trẻ sơ sinh <b>45%</b></p><p><i />Hỗ trợ sau sinh <b>30%</b></p><p><i />Bảo mẫu y tế <b>25%</b></p></article>
-      <article className="ops-panel district-card"><h2>Doanh thu theo quận</h2>{[['Hải Châu','350M VNĐ',90],['Thanh Khê','280M VNĐ',68],['Sơn Trà','195M VNĐ',48],['Ngũ Hành Sơn','120M VNĐ',30]].map(([name,value,width]) => <div key={name as string}><span>{name}<b>{value}</b></span><i><em style={{ width: `${width}%` }} /></i></div>)}<div className="map-placeholder">Xem bản đồ nhiệt</div></article>
-      <article className="ops-panel top-carers"><h2>Người chăm sóc tiêu biểu</h2>{[['Nguyễn Thùy L.','48.2M VNĐ','42 lượt đặt'],['Trần Thị M.','41.5M VNĐ','38 lượt đặt'],['Phạm Văn K.','36.9M VNĐ','31 lượt đặt']].map(([name,value,count], index) => <div key={name}><i>{index + 1}</i><span><strong>{name}</strong><small>{count}</small></span><b>{value}<small>ĐÁNH GIÁ {100-index*3}%</small></b></div>)}</article>
+      <article className="ops-panel category-card"><h2>Theo danh mục dịch vụ</h2><div className="donut"><span>CAO NHẤT<strong>{services[0].label}</strong></span></div>{services.slice(0, 3).map((item: any) => <p key={item.label}><i />{item.label} <b>{item.percent}%</b></p>)}</article>
+      <article className="ops-panel district-card"><h2>Doanh thu theo quận</h2>{districts.slice(0, 4).map((item: any) => <div key={item.label}><span>{item.label}<b>{Number(item.revenue || 0).toLocaleString('vi-VN')} VNĐ</b></span><i><em style={{ width: `${Number(item.revenue || 0) / maxDistrict * 90}%` }} /></i></div>)}<div className="map-placeholder">Xem bản đồ nhiệt</div></article>
+      <article className="ops-panel top-carers"><h2>Người chăm sóc tiêu biểu</h2>{topCarers.slice(0, 3).map((item: any, index: number) => <div key={`${item.name}-${index}`}><i>{index + 1}</i><span><strong>{item.name}</strong><small>{item.bookings} lượt đặt</small></span><b>{Number(item.revenue || 0).toLocaleString('vi-VN')} VNĐ<small>ĐÁNH GIÁ {item.rating}%</small></b></div>)}</article>
     </section>
   </div>;
 };
 
 const StitchAdminReviews = () => {
-  const rows = [
-    ['Lê Hoàng Yến','#BK-882941','Trần Thị Lan','5','Chị Lan rất nhiệt tình và khéo tay. Em bé rất quấn chị. Gia đình...','CÔNG KHAI'],
-    ['Nguyễn Văn Bình','#BK-882103','Nguyễn Minh Anh','4','Dịch vụ ổn nhưng chị Anh đến muộn 15p vào ngày đầu tiên. C...','CHỜ DUYỆT'],
-    ['Đặng Thu Thảo','#BK-880452','Phạm Hồng Nhung','5','Hài lòng tuyệt đối. Kỹ năng tắm bé của chị Nhung rất chuyên...','CÔNG KHAI'],
-  ];
+  const [items, setItems] = useState<any[]>([]);
+  const [pagination, setPagination] = useState(emptyPagination);
+  useEffect(() => { api.get('/reviews', { params: { admin: true, page: 1, limit: 10 } }).then(({ data }) => { setItems(data.items || []); setPagination(data.pagination || emptyPagination); }); }, []);
+  const average = items.length ? items.reduce((sum, item) => sum + Number(item.score || 0), 0) / items.length : 0;
+  const pending = items.filter((item) => item.moderationStatus === 'pending').length;
+  const moderate = async (id: string, moderationStatus: string) => {
+    await api.patch(`/reviews/${id}/moderation`, { moderationStatus });
+    setItems((current) => current.map((item) => item._id === id ? { ...item, moderationStatus } : item));
+  };
   return <div className="admin-ops-page reviews-page">
     <OperationsHeader title="Quản lý Đánh giá" subtitle="Theo dõi và kiểm duyệt phản hồi từ khách hàng sau khi sử dụng dịch vụ." action={<button className="outline-action"><Download />Xuất báo cáo</button>} />
-    <section className="review-metrics"><article><small>Tổng đánh giá</small><strong>1,284</strong><span>↗ +12% tháng này</span></article><article><small>Điểm trung bình</small><strong>4.8 <i>★★★★★</i></strong><span>Từ 856 chuyên gia</span></article><article><small>Chờ kiểm duyệt</small><strong>42</strong><span className="pink-pill">Yêu cầu phản hồi gấp</span></article><article><small>Tỷ lệ hài lòng</small><strong>96.4%</strong><i className="satisfaction"><em /></i></article></section>
+    <section className="review-metrics"><article><small>Tổng đánh giá</small><strong>{pagination.total}</strong><span>Dữ liệu thời gian thực</span></article><article><small>Điểm trung bình</small><strong>{average.toFixed(1)} <i>★★★★★</i></strong><span>Từ booking hoàn tất</span></article><article><small>Chờ kiểm duyệt</small><strong>{pending}</strong><span className="pink-pill">Yêu cầu phản hồi</span></article><article><small>Tỷ lệ hài lòng</small><strong>{Math.round(average / 5 * 100)}%</strong><i className="satisfaction"><em /></i></article></section>
     <section className="review-filters"><label><Search /><input placeholder="Tìm kiếm mã booking, tên khách" /></label><button>Tất cả số sao⌄</button><button>Tất cả chuyên gia⌄</button><button>Trạng thái: Tất cả⌄</button><a><Filter /> Xóa bộ lọc</a></section>
-    <section className="review-table"><table><thead><tr><th>Khách hàng / Booking</th><th>Chuyên gia</th><th>Đánh giá & Nội dung</th><th>Trạng thái</th><th>Hành động</th></tr></thead><tbody>{rows.map((row,index) => <tr key={row[1]}><td><strong>{row[0]}</strong><small>{row[1]}</small></td><td><i className="mini-avatar">{index+1}</i>{row[2]}</td><td><b className="stars">{'★'.repeat(Number(row[3]))}{'☆'.repeat(5-Number(row[3]))}</b><p>"{row[4]}"</p><small>{14+index}/10/2024</small></td><td><span className={row[5] === 'CHỜ DUYỆT' ? 'pending' : ''}>{row[5]}</span></td><td>{index === 1 && <><button>Duyệt</button><XCircle /></>}</td></tr>)}</tbody></table><footer>Hiển thị 1 - 10 trên 1,284 đánh giá <nav><button disabled><ChevronLeft /></button><button className="active">1</button><button>2</button><button>3</button><span>...</span><button>129</button><button><ChevronRight /></button></nav></footer></section>
+    <section className="review-table"><table><thead><tr><th>Khách hàng / Booking</th><th>Chuyên gia</th><th>Đánh giá & Nội dung</th><th>Trạng thái</th><th>Hành động</th></tr></thead><tbody>{items.map((item,index) => <tr key={item._id}><td><strong>{item.parent?.firstName} {item.parent?.lastName}</strong><small>#{String(item.booking?._id || item.booking).slice(-8)}</small></td><td><i className="mini-avatar">{index+1}</i>{item.carer?.user?.firstName} {item.carer?.user?.lastName}</td><td><b className="stars">{'★'.repeat(Number(item.score))}{'☆'.repeat(5-Number(item.score))}</b><p>"{item.content}"</p><small>{item.createdAt ? new Date(item.createdAt).toLocaleDateString('vi-VN') : ''}</small></td><td><span className={item.moderationStatus === 'pending' ? 'pending' : ''}>{item.moderationStatus}</span></td><td>{item.moderationStatus === 'pending' && <><button onClick={() => moderate(item._id, 'published')}>Duyệt</button><XCircle onClick={() => moderate(item._id, 'hidden')} /></>}</td></tr>)}</tbody></table><footer>Hiển thị {items.length} trên {pagination.total} đánh giá <nav><button disabled><ChevronLeft /></button><button className="active">1</button><button disabled><ChevronRight /></button></nav></footer></section>
   </div>;
 };
 
 const StitchAdminReconciliation = () => {
-  const payments = [
-    ['Nguyễn Thị Vân Anh','Hộ sinh cao cấp','30.000.000','-4.500.000','25.500.000','SẴN SÀNG'],
-    ['Trần Hà Thương','Điều dưỡng nhi khoa','21.250.000','-3.187.500','18.062.500','ĐANG XỬ LÝ'],
-    ['Lê Thị Yến','Doula hỗ trợ sinh','52.500.000','-7.875.000','44.625.000','SẴN SÀNG'],
-    ['Phạm Hương','Tư vấn nuôi con bằng sữa mẹ','10.000.000','-1.500.000','8.500.000','ĐÃ TRẢ'],
-  ];
+  const [data, setData] = useState<any>({ items: [], summary: {} });
+  const load = () => api.get('/analytics/reconciliation').then(({ data }) => setData(data));
+  useEffect(() => { void load(); }, []);
+  const pay = async (item: any) => {
+    const reference = prompt('Mã giao dịch đối soát') || '';
+    if (!reference.trim()) return;
+    await api.patch(`/bookings/${item._id}/payout`, { reference });
+    load();
+  };
   return <div className="admin-ops-page reconciliation-page">
     <OperationsHeader title="Đối soát & Thanh toán" subtitle="" action={<nav className="recon-tabs"><b>Tổng quan</b><span>Lịch sử</span><span>Hồ sơ thuế</span></nav>} />
-    <section className="recon-metrics"><OpsMetric icon={TrendingUp} label="Thanh toán chờ" value="311.250.000 VNĐ" note="↗ +12% so với tuần trước" /><OpsMetric icon={BarChart3} label="Phí nền tảng (Ròng)" value="78.062.500 VNĐ" note="Phí trung bình 15.0%" tone="orange" /><OpsMetric icon={CheckCircle2} label="Đã quyết toán tháng này" value="2.122.500.000 VNĐ" note="142 người chăm sóc đã được trả" /><article className="next-batch"><small>Đợt xử lý tiếp theo</small><strong>Trong 14 giờ nữa</strong><button>Xử lý sớm</button></article></section>
-    <section className="ops-panel payment-queue"><header><div><h2>Hàng đợi thanh toán</h2><p>Các khoản chuyển tiền đang chờ cho các dịch vụ chăm sóc đã hoàn thành.</p></div><label><Search /><input placeholder="Tìm người chăm sóc..." /></label><button><Filter />Bộ lọc</button></header><table><thead><tr><th>Tên người chăm sóc</th><th>Tổng thu nhập</th><th>Phí nền tảng</th><th>Thực nhận</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody>{payments.map((row,index) => <tr key={row[0]}><td><i>{index+1}</i><strong>{row[0]}</strong><small>{row[1]}</small></td><td>{row[2]}<br />VNĐ</td><td className="fee-red">{row[3]}<br />VNĐ</td><td><b>{row[4]}<br />VNĐ</b></td><td><span className={`pay-status p${index}`}>{row[5]}</span></td><td>{index < 3 ? <button>{index === 1 ? <MoreVertical /> : 'Đã thanh toán'}</button> : <ReceiptText />}</td></tr>)}</tbody></table><footer>Hiển thị 4 trên 28 thanh toán chờ <span>‹　 Trang 1 trên 7　 ›</span></footer></section>
+    <section className="recon-metrics"><OpsMetric icon={TrendingUp} label="Thanh toán chờ" value={`${Number(data.summary.payable || 0).toLocaleString('vi-VN')} VNĐ`} note="Booking đã hoàn thành" /><OpsMetric icon={BarChart3} label="Phí nền tảng (Ròng)" value={`${Number(data.summary.platformFees || 0).toLocaleString('vi-VN')} VNĐ`} note="Tính từ giá snapshot" tone="orange" /><OpsMetric icon={CheckCircle2} label="Đã quyết toán" value={`${Number(data.summary.paid || 0).toLocaleString('vi-VN')} VNĐ`} note="Dữ liệu đối soát thực" /><article className="next-batch"><small>Đợt xử lý tiếp theo</small><strong>{data.items.filter((item: any) => item.carerPayoutStatus === 'ready').length} khoản chờ</strong><button onClick={() => data.items.filter((item: any) => item.carerPayoutStatus === 'ready').forEach(pay)}>Xử lý sớm</button></article></section>
+    <section className="ops-panel payment-queue"><header><div><h2>Hàng đợi thanh toán</h2><p>Các khoản chuyển tiền đang chờ cho các dịch vụ chăm sóc đã hoàn thành.</p></div><label><Search /><input placeholder="Tìm người chăm sóc..." /></label><button><Filter />Bộ lọc</button></header><table><thead><tr><th>Tên người chăm sóc</th><th>Tổng thu nhập</th><th>Phí nền tảng</th><th>Thực nhận</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody>{data.items.map((item: any,index: number) => <tr key={item._id}><td><i>{index+1}</i><strong>{item.carer?.user?.firstName} {item.carer?.user?.lastName}</strong><small>{item.service?.title}</small></td><td>{Number(item.totalPrice || 0).toLocaleString('vi-VN')}<br />VNĐ</td><td className="fee-red">-{Number(item.platformFeeAmount || 0).toLocaleString('vi-VN')}<br />VNĐ</td><td><b>{Number(item.carerPayoutAmount || 0).toLocaleString('vi-VN')}<br />VNĐ</b></td><td><span className={`pay-status p${index}`}>{item.carerPayoutStatus}</span></td><td>{item.carerPayoutStatus === 'ready' ? <button onClick={() => pay(item)}>Đã thanh toán</button> : <ReceiptText />}</td></tr>)}</tbody></table><footer>Hiển thị {data.items.length} khoản thanh toán <span>‹　 Trang 1　 ›</span></footer></section>
     <section className="recon-bottom"><article className="ops-panel volume-chart"><header><h2>Lịch sử khối lượng thanh toán</h2><button>30 ngày qua⌄</button></header><div>{[45,62,38,78,55,88,70].map((height,index) => <span key={index}><i style={{height:`${height}%`}}><em /></i><small>{index===6?'CN':`T${index+2}`}</small></span>)}</div></article><article className="ops-panel recent-activity"><h2>Hoạt động gần đây</h2><p><CheckCircle2 /><span><b>Lô hàng #A429 đã xử lý</b><small>42 giao dịch đã quyết toán thành công.</small></span></p><p><AlertCircle /><span><b>Thanh toán bị gắn cờ</b><small>Sai lệch tài khoản cho Nguyễn Thị Elena.</small></span></p><p><Download /><span><b>Đã xuất báo cáo thuế</b><small>Tệp CSV tóm tắt thu nhập Q3 đã được tạo.</small></span></p><button>Xem tất cả nhật ký</button></article></section>
   </div>;
 };
 
 const StitchAdminIncidents = () => {
-  const incidents = [
-    ['#INC-4521','Y tế','#BK-9912','Lê Minh Anh','Hải Châu','Nghiêm trọng','Mới','Admin Lan Hương'],
-    ['#INC-4522','Chất lượng','#BK-8843','Nguyễn Văn Bình','Sơn Trà','Trung bình','Đang xử lý','Admin Anh Tuấn'],
-    ['#INC-4523','Thanh toán','#BK-1022','Trần Thu Hà','Ngũ Hành Sơn','Thấp','Đã giải quyết','Hệ thống'],
-  ];
+  const navigate = useNavigate();
+  const [items, setItems] = useState<any[]>([]);
+  const [status, setStatus] = useState('');
+  const [search, setSearch] = useState('');
+  const load = () => api.get('/incidents', { params: { page: 1, limit: 20, status: status || undefined, search: search || undefined } }).then(({ data }) => setItems(data.items || []));
+  useEffect(() => { void load(); }, [status, search]);
+  const openChat = async (item: any) => {
+    const { data } = await api.post(`/messages/incidents/${item._id}/conversation`);
+    navigate(`/admin/messages/${data._id}`);
+  };
+  const updateStatus = async (item: any) => {
+    const resolution = prompt('Kết quả hoặc ghi chú xử lý') || '';
+    if (!resolution.trim()) return;
+    await api.patch(`/incidents/${item._id}`, { status: item.status === 'open' ? 'investigating' : 'resolved', resolution, internalNote: resolution });
+    load();
+  };
+  const openCount = items.filter((item) => item.status === 'open').length;
+  const resolvedCount = items.filter((item) => ['resolved', 'closed'].includes(item.status)).length;
   return <div className="admin-ops-page incidents-page">
-    <OperationsHeader title="Quản lý Sự cố & Khiếu nại" subtitle="" action={<div className="incident-actions"><label><Search /><input placeholder="Tìm ID, Người chăm sóc..." /></label><button>Tất cả trạng thái</button><button><Filter />Lọc nâng cao</button><button className="primary"><Plus />Tạo sự cố mới</button></div>} />
-    <section className="incident-metrics"><article className="new"><small>Sự cố mới</small><strong>12</strong><span>+3 từ hôm qua</span><AlertCircle /></article><article><small>Thời gian xử lý TB</small><strong>4.2h</strong><span>↓ 12% hiệu suất tăng</span><Clock3 /></article><article><small>Tỷ lệ hài lòng</small><strong>94.5%</strong><span>Dựa trên 150 đánh giá</span><Smile /></article></section>
-    <section className="incident-table"><table><thead><tr><th>Mã sự cố</th><th>Loại</th><th>Mã đặt lịch</th><th>Người báo cáo</th><th>Khu vực<br />(Đà Nẵng)</th><th>Mức độ</th><th>Trạng thái</th><th>Phụ trách</th><th>Hành động</th></tr></thead><tbody>{incidents.map((row,index) => <tr key={row[0]}>{row.map((cell,col) => <td key={col}>{col === 0 || col === 2 ? <strong>{cell}</strong> : col === 1 || col === 5 || col === 6 ? <span className={`incident-pill i${index}-${col}`}>{cell}</span> : cell}</td>)}<td><Eye /><MoreVertical /></td></tr>)}</tbody></table></section>
+    <OperationsHeader title="Quản lý Sự cố & Khiếu nại" subtitle="" action={<div className="incident-actions"><label><Search /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Tìm ID, Người chăm sóc..." /></label><select value={status} onChange={(event) => setStatus(event.target.value)}><option value="">Tất cả trạng thái</option><option value="open">Mới</option><option value="investigating">Đang xử lý</option><option value="resolved">Đã giải quyết</option></select><button><Filter />Lọc nâng cao</button><button className="primary"><Plus />Tạo sự cố mới</button></div>} />
+    <section className="incident-metrics"><article className="new"><small>Sự cố mới</small><strong>{openCount}</strong><span>Cần phân loại</span><AlertCircle /></article><article><small>Đang xử lý</small><strong>{items.filter((item) => item.status === 'investigating').length}</strong><span>Đã có người phụ trách</span><Clock3 /></article><article><small>Đã giải quyết</small><strong>{resolvedCount}</strong><span>Từ dữ liệu thực</span><Smile /></article></section>
+    <section className="incident-table"><table><thead><tr><th>Mã sự cố</th><th>Loại</th><th>Mã đặt lịch</th><th>Người báo cáo</th><th>Khu vực<br />(Đà Nẵng)</th><th>Mức độ</th><th>Trạng thái</th><th>Phụ trách</th><th>Hành động</th></tr></thead><tbody>{items.map((item,index) => <tr key={item._id}><td><strong>#INC-{String(item._id).slice(-4).toUpperCase()}</strong></td><td><span className={`incident-pill i${index}-1`}>{item.category}</span></td><td><strong>#BK-{String(item.booking?._id || item.booking).slice(-4).toUpperCase()}</strong></td><td>{item.reportedBy?.firstName} {item.reportedBy?.lastName}</td><td>{item.booking?.district || 'Đà Nẵng'}</td><td><span className={`incident-pill i${index}-5`}>{item.severity}</span></td><td><span className={`incident-pill i${index}-6`}>{item.status}</span></td><td>{item.assignedTo ? `${item.assignedTo.firstName} ${item.assignedTo.lastName}` : 'Chưa phân công'}</td><td><button aria-label="Chat sự cố" onClick={() => openChat(item)}><Eye /></button><button aria-label="Cập nhật sự cố" onClick={() => updateStatus(item)}><MoreVertical /></button></td></tr>)}</tbody></table></section>
   </div>;
 };
 void StitchAdminRevenue;
@@ -186,10 +251,10 @@ void StitchAdminReconciliation;
 void StitchAdminIncidents;
 
 export {
-  LegacyAdminRevenue as AdminRevenue,
-  LegacyAdminReviews as AdminReviews,
-  LegacyAdminReconciliation as AdminReconciliation,
-  LegacyAdminIncidents as AdminIncidents,
+  StitchAdminRevenue as AdminRevenue,
+  StitchAdminReviews as AdminReviews,
+  StitchAdminReconciliation as AdminReconciliation,
+  StitchAdminIncidents as AdminIncidents,
 };
 
 const LegacyAdminBookingDetail = () => {
@@ -205,18 +270,32 @@ void LegacyAdminBookingDetail;
 
 export const AdminBookingDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [booking, setBooking] = useState<any>(null);
-  useEffect(() => { api.get(`/bookings/${id}`).then(({ data }) => setBooking(data)); }, [id]);
+  const loadBooking = () => api.get(`/bookings/${id}`).then(({ data }) => setBooking(data));
+  useEffect(() => { void loadBooking(); }, [id]);
   if (!booking) return <div className="admin-page-content">Đang tải booking...</div>;
   const parentName = `${booking.parent?.firstName || 'Lê Thùy'} ${booking.parent?.lastName || 'Dương'}`;
   const carerName = `${booking.carer?.user?.firstName || 'Nguyễn Thị'} ${booking.carer?.user?.lastName || 'Minh Anh'}`;
   const total = Number(booking.totalPrice || 36000000);
   const fee = Number(booking.platformFeeAmount || total * .15);
   const payout = Number(booking.carerPayoutAmount || total - fee);
+  const updateStatus = async (forcedStatus?: string) => {
+    const status = forcedStatus || prompt('Trạng thái mới') || '';
+    if (!status.trim()) return;
+    const reason = prompt('Lý do cập nhật/override trạng thái') || '';
+    if (!reason.trim()) return;
+    await api.patch(`/bookings/${booking._id}/status`, { status: status.trim(), override: true, reason: reason.trim() });
+    await loadBooking();
+  };
+  const openConversation = async () => {
+    const { data } = await api.post(`/messages/bookings/${booking._id}/conversation`);
+    navigate(`/admin/messages/${data._id}`);
+  };
   return <div className="admin-page-content admin-booking-detail-page">
     <header className="booking-detail-heading">
       <div><div className="booking-title-line"><h1>Đơn đặt chỗ #BK-9021</h1><span>ĐÃ HOÀN THÀNH</span></div><p>Ngày tạo: 12 Th10, 2024 • Quản lý bởi Hệ thống Admin</p></div>
-      <div className="booking-detail-actions"><button><Pencil />Chỉnh sửa</button><button className="danger"><XCircle />Hủy/Hoàn tiền</button><button className="message"><Mail />Nhắn tin phụ huynh</button></div>
+      <div className="booking-detail-actions"><button onClick={() => updateStatus()}><Pencil />Cập nhật trạng thái</button><button className="danger" onClick={() => updateStatus('cancelled')}><XCircle />Hủy/Hoàn tiền</button><button className="message" onClick={openConversation}><Mail />Nhắn tin các bên</button></div>
     </header>
     <section className="booking-progress-card">
       {['Yêu cầu', 'Đã chấp nhận', 'Đã thanh toán', 'Đang thực hiện', 'Đã hoàn thành'].map((label, index) =>
@@ -237,7 +316,7 @@ export const AdminBookingDetail = () => {
           ['Điều dưỡng đã check-out & Hoàn thành dịch vụ', '29 Th10, 2024 • 05:05 PM'],
         ].map(([title, time], index) => <div className="activity-row" key={title}><i>{index === 4 ? <Check /> : null}</i><p><strong>{title}</strong><small>{time}</small></p></div>)}</section>
       </main>
-      <aside className="booking-finance-card"><h2>Tổng kết tài chính</h2><Detail label="Tổng cộng" value={money(total)} /><Detail label="Phí nền tảng (15%)" value={money(fee)} /><div className="net-income"><span>Thu nhập ròng</span><strong>{money(payout)}</strong></div><div className="payos-card"><header><strong>Tích hợp payOS</strong><span>ĐÃ TRẢ</span></header><p>Mã giao dịch: <b>{booking.payosPaymentLinkId || 'payos_txn_782910'}</b></p><p>Phương thức: <b>Visa •••• 4242</b></p><p>Trạng thái: <b>Thành công</b></p></div><button className="invoice-button"><ReceiptText />Tải hóa đơn chi tiết</button><small>Lịch quyết toán tiếp theo: 05 Th11, 2024</small></aside>
+      <aside className="booking-finance-card"><h2>Tổng kết tài chính</h2><Detail label="Tổng cộng" value={money(total)} /><Detail label="Phí nền tảng (15%)" value={money(fee)} /><div className="net-income"><span>Thu nhập ròng</span><strong>{money(payout)}</strong></div><div className="payos-card"><header><strong>Tích hợp payOS</strong><span>{booking.payosStatus || booking.status}</span></header><p>Mã giao dịch: <b>{booking.payosPaymentLinkId || booking.payosOrderCode || 'Chưa có'}</b></p><p>Trạng thái: <b>{booking.payosStatus || 'Chưa thanh toán'}</b></p></div><button className="invoice-button" onClick={() => downloadBookingInvoice(booking._id)}><ReceiptText />Tải hóa đơn chi tiết</button><small>Trạng thái đối soát: {booking.carerPayoutStatus || 'unpaid'}</small></aside>
     </div>
   </div>;
 };

@@ -20,6 +20,7 @@ interface CarerSidebarProps {
   onChange: (name: string, value: string) => void;
   onToggleSchedule: (day: string, slot: string) => void;
   onClear?: () => void;
+  areaOptions?: { value: string; label: string; count?: number }[];
 }
 
 const getOptionLabel = (options: SelectOption[], value: string) =>
@@ -95,14 +96,14 @@ const CarerFilterSelect = ({
   );
 };
 
-const areaOptions = [
-  { value: '', label: 'Tất cả khu vực' },
-  { value: 'Hồ Chí Minh', label: 'Hồ Chí Minh' },
-  { value: 'Hà Nội', label: 'Hà Nội' },
-  { value: 'Đà Nẵng', label: 'Đà Nẵng' },
-];
-
-const CarerSidebar = ({ filters, onChange, onClear }: CarerSidebarProps) => {
+const CarerSidebar = ({ filters, onChange, onClear, areaOptions = [] }: CarerSidebarProps) => {
+  const availableAreas = [
+    { value: '', label: 'Tất cả khu vực' },
+    ...areaOptions.map((area) => ({
+      value: area.value,
+      label: area.count ? `${area.label} (${area.count})` : area.label,
+    })),
+  ];
   return (
     <aside className="carer-sidebar">
       <div className="sidebar-header">
@@ -114,7 +115,7 @@ const CarerSidebar = ({ filters, onChange, onClear }: CarerSidebarProps) => {
         <label>Khu vực (Quận/Huyện)</label>
         <CarerFilterSelect
           value={filters.area}
-          options={areaOptions}
+          options={availableAreas}
           onChange={(value) => onChange('area', value)}
         />
       </div>
@@ -124,24 +125,6 @@ const CarerSidebar = ({ filters, onChange, onClear }: CarerSidebarProps) => {
         <input className="carer-price-range" type="range" min="100000" max="1000000" step="50000"
           value={filters.maxPrice || '500000'} onChange={(event) => onChange('maxPrice', event.target.value)} />
         <div className="price-range-labels"><span>100k</span><span>1.000k</span></div>
-      </div>
-
-      <div className="sidebar-group">
-        <label>Kinh nghiệm</label>
-        <div className="sidebar-check-list">
-          <label><input type="checkbox" /> Dưới 2 năm</label>
-          <label><input type="checkbox" defaultChecked /> 2 - 5 năm</label>
-          <label><input type="checkbox" /> Trên 5 năm</label>
-        </div>
-      </div>
-
-      <div className="sidebar-group">
-        <label>Chuyên môn</label>
-        <div className="sidebar-check-list">
-          <label><input type="checkbox" defaultChecked /> Chăm sóc trẻ sơ sinh</label>
-          <label><input type="checkbox" /> Điều dưỡng sau sinh</label>
-          <label><input type="checkbox" /> Tắm bé tại nhà</label>
-        </div>
       </div>
 
       <div className="sidebar-group">

@@ -41,6 +41,7 @@
 .home-team-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:48px; }
 .home-team-grid article { min-height:220px; display:flex; flex-direction:column; align-items:center; justify-content:center; border:1px solid #c1c9be; border-radius:24px; background:#fff; }
 .home-team-grid article>div { width:92px; height:92px; display:grid; place-items:center; border-radius:50%; color:#396940; background:#7bae7f; }
+.home-team-grid .team-initials { color: #0f411d; background: #9fd3a2; font-size: 1.35rem; font-weight: 850; letter-spacing: .06em; }
 .home-team-grid h3 { margin-top:20px; }
 .home-team-grid span { margin-top:5px; color:#396940; font-size:.72rem; font-weight:800; }
 .landing-team {

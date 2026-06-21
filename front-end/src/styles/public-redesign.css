@@ -772,9 +772,16 @@
 .public-app .auth-panel { min-height: 1023px; grid-template-columns: 1fr 1fr; box-shadow: none; }
 .public-app .auth-image-side {
   min-height: 1023px;
-  background: #7bae7f;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.08)),
+    linear-gradient(90deg, #71a375, #7bae7f);
 }
-.public-app .auth-form-side { min-height: 1023px; padding: 138px 72px 54px; background: #f8f9fa; }
+.public-app .auth-form-side { min-height: 1023px; padding: 120px 72px 54px; background: #f8f9fa; }
+.public-app .auth-form-motion { position: relative; top: -54px; }
+.public-app .auth-brand { top: 60px; }
+.public-app .auth-tabs { top: 158px; }
+.public-app .auth-expert-card { bottom: 124px; }
+.public-app .auth-copyright { bottom: 76px; }
 .public-app .auth-image-side::before { display: none; }
 
 .payment-success-card {
