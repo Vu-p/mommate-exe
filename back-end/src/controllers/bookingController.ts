@@ -254,7 +254,7 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
         service: serviceId,
         status: BookingStatus.PENDING_CARER,
         scheduledAt: scheduledDate,
-        scheduledEndAt: occurrences[occurrences.length - 1].scheduledEndAt,
+        scheduledEndAt: occurrences.length > 0 ? occurrences[occurrences.length - 1]!.scheduledEndAt : new Date(scheduledDate.getTime() + safeHours * 3600000),
         occurrences,
         serviceMode: mode,
         location: mode === 'at_home'
@@ -288,14 +288,17 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
         statusHistory: [{ status: BookingStatus.PENDING_CARER, changedAt: new Date(), changedBy: req.user!._id }],
       }], { session });
 
-      calculatePayoutAmounts(booking[0], carer);
-      await booking[0].save({ session });
+      const newBooking = booking[0];
+      if (!newBooking) throw new Error('Booking creation failed');
+
+      calculatePayoutAmounts(newBooking, carer);
+      await newBooking.save({ session });
       await session.commitTransaction();
       session.endSession();
 
-      await createNotification({ userId: carer.user, type: 'booking_new', title: 'Yêu cầu chăm sóc mới', body: 'Bạn có một yêu cầu đặt lịch mới cần phản hồi.', data: { bookingId: booking[0]._id } });
+      await createNotification({ userId: carer.user, type: 'booking_new', title: 'Yêu cầu chăm sóc mới', body: 'Bạn có một yêu cầu đặt lịch mới cần phản hồi.', data: { bookingId: newBooking._id } });
 
-      return res.status(201).json(booking[0]);
+      return res.status(201).json(newBooking);
     } catch (txError: any) {
       await session.abortTransaction();
       session.endSession();

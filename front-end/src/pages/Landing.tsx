@@ -1,5 +1,7 @@
-import { Baby, HeartHandshake, Info, Search, ShieldCheck, Stethoscope, WalletCards } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Baby, HeartHandshake, Info, Search, ShieldCheck, Stethoscope, WalletCards, Star, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import api from '../utils/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Hero from '../components/landing/Hero';
@@ -8,18 +10,18 @@ import Testimonials from '../components/landing/Testimonials';
 import BackToTop from '../components/common/BackToTop';
 import './Landing.css';
 
-const members = [
-  ['Mai Đăng Bảo Châu', 'Điều hành'],
-  ['Trần Vân Ánh', 'Marketing'],
-  ['Đặng Trí Dũng', 'Marketing'],
-  ['Phan Trần Công Vũ', 'Kỹ thuật'],
-  ['Bùi Tường Vân', 'Thiết kế'],
-  ['Lê Công Tiến Trung', 'Thiết kế'],
-];
-
 const initials = (name: string) => name.split(' ').slice(-2).map((part) => part[0]).join('').toUpperCase();
 
-const Landing = () => (
+const Landing = () => {
+  const [featuredCarers, setFeaturedCarers] = useState<any[]>([]);
+
+  useEffect(() => {
+    api.get('/carers', { params: { limit: 3 } })
+      .then((res) => setFeaturedCarers(res.data.items || res.data || []))
+      .catch(console.error);
+  }, []);
+
+  return (
   <div className="landing-page">
     <Navbar />
     <main>
@@ -49,10 +51,24 @@ const Landing = () => (
 
       <section className="home-team">
         <div className="container">
-          <h2>Đội ngũ xây dựng MomMate</h2>
-          <p>Thông tin thành viên được trình bày bằng visual trung tính cho đến khi có bộ ảnh chính thức được xác minh.</p>
+          <h2>Chuyên gia nổi bật</h2>
+          <p>Lựa chọn những chuyên gia chăm sóc được đánh giá cao và đáng tin cậy nhất trên hệ thống MomMate.</p>
           <div className="home-team-grid">
-            {members.map(([name, role]) => <article key={name}><div className="team-initials" aria-hidden="true">{initials(name)}</div><h3>{name}</h3><span>{role}</span></article>)}
+            {featuredCarers.slice(0, 3).map((carer) => (
+              <article key={carer._id}>
+                {carer.user?.avatar ? (
+                  <img src={carer.user.avatar} alt={carer.displayName} className="team-initials" style={{ width: 92, height: 92, borderRadius: '50%', objectFit: 'cover', background: 'transparent' }} />
+                ) : (
+                  <div className="team-initials" aria-hidden="true">{initials(carer.displayName || 'CG')}</div>
+                )}
+                <h3>{carer.displayName}</h3>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '6px' }}><Star size={14} fill="#eab308" color="#eab308" /> {carer.rating > 0 ? `${carer.rating} (${carer.reviewCount} đánh giá)` : 'Chưa có đánh giá'}</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#717970', fontWeight: 'normal', textTransform: 'none' }}><MapPin size={12} /> {carer.location || 'Chưa cập nhật khu vực'}</span>
+              </article>
+            ))}
+          </div>
+          <div style={{ textAlign: 'center', marginTop: '40px' }}>
+            <Link to="/carers" style={{ display: 'inline-block', padding: '12px 32px', borderRadius: '8px', background: '#396940', color: '#fff', textDecoration: 'none', fontWeight: 600 }}>Xem tất cả chuyên gia</Link>
           </div>
         </div>
       </section>
@@ -67,6 +83,7 @@ const Landing = () => (
     <Footer />
     <BackToTop />
   </div>
-);
+  );
+};
 
 export default Landing;
