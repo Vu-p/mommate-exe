@@ -15,3 +15,8 @@ export const redirectToAdminApp = () => {
   window.location.assign(adminUrl.toString());
   return true;
 };
+
+export const openAdminArea = (navigate: (path: string) => void) => {
+  if (redirectToAdminApp()) return;
+  navigate('/admin/dashboard');
+};

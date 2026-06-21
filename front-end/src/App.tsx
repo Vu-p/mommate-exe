@@ -135,7 +135,21 @@ function App() {
         <Route path="/incidents/new" element={<IncidentReport />} />
         <Route path="/messages/:id" element={<Messages />} />
         {['privacy','terms','help','contact','careers','faq','guide'].map((path) => <Route key={path} path={`/${path}`} element={<InfoPage />} />)}
-        <Route path="/admin/*" element={<Navigate to="/" replace />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="services" element={<AdminServices />} />
+          <Route path="carers" element={<AdminCarers />} />
+          <Route path="bookings" element={<AdminBookings />} />
+          <Route path="bookings/:id" element={<AdminBookingDetail />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="reviews" element={<AdminReviews />} />
+          <Route path="incidents" element={<AdminIncidents />} />
+          <Route path="revenue" element={<AdminRevenue />} />
+          <Route path="reconciliation" element={<AdminReconciliation />} />
+          <Route path="workflows" element={<AdminWorkflows />} />
+          <Route path="messages/:id" element={<Messages />} />
+        </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>

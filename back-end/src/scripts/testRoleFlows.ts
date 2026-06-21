@@ -70,6 +70,36 @@ const run = async () => {
     const forbiddenAdmin = await request('/admin/audit-logs?page=1&limit=1', {}, parent.token);
     assert.equal(forbiddenAdmin.response.status, 403);
 
+    const invalidCareProfile = await request('/care-profiles', {
+      method: 'POST',
+      body: JSON.stringify({ type: 'baby', displayName: 'Bé Test', birthDate: '2999-01-01' }),
+    }, parent.token);
+    assert.equal(invalidCareProfile.response.status, 400, 'Future birth dates must be rejected');
+
+    const createdCareProfile = await request('/care-profiles', {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'baby',
+        displayName: 'Bé Integration Test',
+        weightKg: 4.2,
+        allergies: ['Đạm sữa bò'],
+        isPrimary: true,
+      }),
+    }, parent.token);
+    assert.equal(createdCareProfile.response.status, 201, JSON.stringify(createdCareProfile.body));
+    const careProfileId = createdCareProfile.body._id;
+    const updatedCareProfile = await request(`/care-profiles/${careProfileId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ recoveryStatus: 'Đang theo dõi tăng cân', heightCm: 54 }),
+    }, parent.token);
+    assert.equal(updatedCareProfile.response.status, 200);
+    assert.equal(updatedCareProfile.body.recoveryStatus, 'Đang theo dõi tăng cân');
+    const careProfiles = await request('/care-profiles', {}, parent.token);
+    assert.equal(careProfiles.response.status, 200);
+    assert.ok(careProfiles.body.items.some((item: any) => item._id === careProfileId));
+    const deletedCareProfile = await request(`/care-profiles/${careProfileId}`, { method: 'DELETE' }, parent.token);
+    assert.equal(deletedCareProfile.response.status, 204);
+
     const adminBookings = await request('/bookings?page=1&limit=50', {}, admin.token);
     assert.equal(adminBookings.response.status, 200);
     const foreignBooking = adminBookings.body.items.find((booking: any) => String(booking.parent?._id || booking.parent) !== parent._id);
@@ -110,7 +140,7 @@ const run = async () => {
       assert.equal(parentConversation.response.status, 403);
     }
 
-    console.log(`Role integration OK: parent=${parentBookings.body.pagination.total}, carer=${carerBookings.body.pagination.total}, admin workflows=3, PDF=true`);
+    console.log(`Role integration OK: parent=${parentBookings.body.pagination.total}, carer=${carerBookings.body.pagination.total}, care-profile CRUD=true, admin workflows=3, PDF=true`);
   } finally {
     await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
     await mongoose.disconnect();

@@ -5,7 +5,7 @@ import axios from 'axios';
 // - If running on localhost and no env override, fall back to local API
 // - Otherwise default to same-origin `/api` (works when frontend and backend are deployed together)
 const resolveBaseURL = () => {
-  const envBase = import.meta.env.VITE_API_BASE?.trim();
+  const envBase = (import.meta.env.VITE_API_BASE || import.meta.env.VITE_API_URL)?.trim();
 
   if (envBase) return envBase;
 

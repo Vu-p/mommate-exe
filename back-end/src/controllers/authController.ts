@@ -3,8 +3,26 @@ import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import { generateAccessToken, generateRefreshToken } from '../utils/generateToken.js';
 import type { AuthRequest } from '../middleware/auth.js';
-import { getFirebaseAuth } from '../config/firebaseAdmin.js';
+import { FirebaseConfigurationError, getFirebaseAuth } from '../config/firebaseAdmin.js';
 import jwt from 'jsonwebtoken';
+import { assertSessionConfig, AuthConfigurationError } from '../config/authConfig.js';
+
+const handleAuthFailure = (res: Response, operation: string, error: unknown) => {
+  const details = error instanceof Error
+    ? { name: error.name, message: error.message, code: (error as any).code }
+    : { name: 'UnknownError', message: String(error) };
+
+  console.error(`[auth] ${operation} failed`, details);
+
+  if (error instanceof AuthConfigurationError || error instanceof FirebaseConfigurationError) {
+    return res.status(503).json({
+      code: (error as any).code,
+      message: 'Dịch vụ đăng nhập chưa được cấu hình đầy đủ. Vui lòng thử lại sau.',
+    });
+  }
+
+  return res.status(500).json({ code: 'AUTH_FAILED', message: 'Không thể đăng nhập. Vui lòng thử lại.' });
+};
 
 const authResponse = (user: any) => ({
   _id: user._id,
@@ -25,6 +43,7 @@ const refreshCookieOptions = {
 };
 
 const issueSession = async (res: Response, user: any, status = 200) => {
+  assertSessionConfig();
   const fullUser = await User.findById(user._id).select('+refreshTokenVersion');
   if (!fullUser) return res.status(404).json({ message: 'User not found' });
   fullUser.lastLoginAt = new Date();
@@ -62,7 +81,7 @@ export const registerUser = async (req: Request, res: Response) => {
       res.status(400).json({ message: 'Invalid user data' });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    return handleAuthFailure(res, 'register', error);
   }
 };
 
@@ -84,7 +103,7 @@ export const loginUser = async (req: Request, res: Response) => {
       res.status(401).json({ message: 'Invalid email or password' });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    return handleAuthFailure(res, 'login', error);
   }
 };
 
@@ -147,8 +166,17 @@ export const firebaseGoogleAuth = async (req: Request, res: Response) => {
     });
 
     return issueSession(res, user, 201);
-  } catch (error) {
-    res.status(401).json({ message: 'Google authentication failed' });
+  } catch (error: any) {
+    if (error instanceof AuthConfigurationError || error instanceof FirebaseConfigurationError) {
+      return handleAuthFailure(res, 'firebase-google', error);
+    }
+
+    console.warn('[auth] firebase-google rejected', {
+      name: error?.name,
+      code: error?.code,
+      message: error?.message,
+    });
+    return res.status(401).json({ code: 'GOOGLE_AUTH_FAILED', message: 'Google authentication failed' });
   }
 };
 

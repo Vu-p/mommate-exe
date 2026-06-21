@@ -439,7 +439,7 @@
 .public-app .carer-browser-main { display: contents; }
 .public-app .carer-sidebar-area { grid-column: 1; grid-row: 1 / span 2; }
 .public-app .carer-list-area { grid-column: 2; grid-row: 2; }
-.public-app .carer-list-controls { display: none; }
+.public-app .carer-list-controls { display: flex; }
 .public-app .find-carer-page .marketplace-footer { margin-top: 315px; }
 .public-app .carer-main-info { min-height: 254.6667px; align-items: stretch; padding: 18px; }
 .public-app .carer-avatar { width: 128px; height: 150px; }

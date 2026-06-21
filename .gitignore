@@ -45,6 +45,8 @@ tsconfig.tsbuildinfo
 design-reference/
 
 tests/
+front-end/tests/
 playwright-report/
 test-results/
 
+.vercel

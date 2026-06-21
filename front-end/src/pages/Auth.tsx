@@ -8,7 +8,7 @@ import SocialLogins from '../components/auth/SocialLogins.tsx';
 import logo from '../assets/images/logo.png';
 import './Auth.css';
 import { useAuth } from '../context/AuthContext.tsx';
-import { isAdminApp, redirectToAdminApp } from '../config/appMode.ts';
+import { isAdminApp, openAdminArea } from '../config/appMode.ts';
 
 interface AuthProps {
   defaultMode?: 'login' | 'signup';
@@ -32,7 +32,8 @@ const Auth = ({ defaultMode = 'signup' }: AuthProps) => {
         }
         return;
       }
-      if (user.role === 'admin' && redirectToAdminApp()) {
+      if (user.role === 'admin') {
+        openAdminArea(navigate);
         return;
       }
       if (user.role === 'carer' && user.mustChangePassword) {

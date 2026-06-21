@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, Star } from 'lucide-react';
-import supportImage from '../../assets/stitch/carer-profile.jpg';
 import './CarerSidebar.css';
 
 type SelectOption = {
@@ -99,6 +98,7 @@ const CarerFilterSelect = ({
 const CarerSidebar = ({ filters, onChange, onClear, areaOptions = [] }: CarerSidebarProps) => {
   const availableAreas = [
     { value: '', label: 'Tất cả khu vực' },
+    ...(!areaOptions.some((area) => area.value === 'Đà Nẵng') ? [{ value: 'Đà Nẵng', label: 'Đà Nẵng' }] : []),
     ...areaOptions.map((area) => ({
       value: area.value,
       label: area.count ? `${area.label} (${area.count})` : area.label,
@@ -135,10 +135,6 @@ const CarerSidebar = ({ filters, onChange, onClear, areaOptions = [] }: CarerSid
         </div>
       </div>
 
-      <div className="carer-support-card" style={{ backgroundImage: `linear-gradient(180deg, transparent, rgba(10,35,18,.9)), url(${supportImage})` }}>
-        <strong>Cần hỗ trợ gấp?</strong>
-        <span>Liên hệ đội ngũ điều dưỡng trực 24/7 của chúng tôi.</span>
-      </div>
     </aside>
   );
 };

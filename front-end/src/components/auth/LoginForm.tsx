@@ -6,7 +6,7 @@ import Input from '../common/Input.js';
 import './LoginForm.css';
 import { useAuth } from '../../context/AuthContext.js';
 import api from '../../utils/api.js';
-import { isAdminApp, redirectToAdminApp } from '../../config/appMode.js';
+import { isAdminApp, openAdminArea } from '../../config/appMode.js';
 
 interface LoginFormProps {
   onToggle?: () => void;
@@ -37,9 +37,8 @@ const LoginForm = ({ onToggle }: LoginFormProps) => {
       }
 
       if (!isAdminApp && data.role === 'admin') {
-        if (!redirectToAdminApp()) {
-          setError('Tài khoản admin cần đăng nhập tại trang quản trị.');
-        }
+        login(data);
+        openAdminArea(navigate);
         return;
       }
 
