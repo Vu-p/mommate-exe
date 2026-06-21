@@ -86,7 +86,7 @@ const AccountRequests = () => {
                   <div className="request-row-bottom">
                     <p>Tổng cộng: <strong>{Number(booking.totalPrice || 0).toLocaleString('vi-VN')}đ</strong></p>
                     <div>
-                      {!isCompleted && <button className="request-detail-button" onClick={() => navigate(`/account/request/${booking._id}`)}>Chi tiết</button>}
+                      <button className="request-detail-button" onClick={() => navigate(`/account/request/${booking._id}`)}>Chi tiết</button>
                       {isPayment && <button className="request-primary-button" onClick={() => navigate('/payment', { state: { bookingId: booking._id } })}>Thanh toán ngay</button>}
                       {['accepted_pending_payment','paid_confirmed','confirmed','in_progress'].includes(booking.status) && <button className="request-outline-button" onClick={() => openConversation(booking._id)}>Nhắn tin cho Carer</button>}
                       {isCompleted && <button className="request-review-button" onClick={() => navigate('/review', { state: { bookingId: booking._id } })}>Đánh giá</button>}

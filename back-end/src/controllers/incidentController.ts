@@ -52,20 +52,66 @@ export const getIncidents = async (req: AuthRequest, res: Response) => {
   try {
     const filter: Record<string, any> = {};
     const pagination = getPagination(req.query, 20);
+
+    if (req.user!.role !== 'admin') {
+      if (req.user!.role === 'carer') {
+        const carer = await Carer.findOne({ user: req.user!._id, isDeleted: false });
+        if (!carer) return res.json(paginationPayload([], 0, 1, 20));
+        const bookings = await Booking.find({ carer: carer._id }).select('_id');
+        filter.booking = { $in: bookings.map(b => b._id) };
+      } else {
+        const bookings = await Booking.find({ parent: req.user!._id }).select('_id');
+        filter.$or = [
+          { reportedBy: req.user!._id },
+          { booking: { $in: bookings.map(b => b._id) } }
+        ];
+      }
+    }
+
     if (req.query.status) filter.status = req.query.status;
     if (req.query.severity) filter.severity = req.query.severity;
     if (req.query.search) {
       const search = escapeRegex(req.query.search);
-      filter.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-      ];
+      if (filter.$or) {
+        filter.$and = [
+          { $or: filter.$or },
+          { $or: [{ title: { $regex: search, $options: 'i' } }, { description: { $regex: search, $options: 'i' } }] }
+        ];
+        delete filter.$or;
+      } else {
+        filter.$or = [
+          { title: { $regex: search, $options: 'i' } },
+          { description: { $regex: search, $options: 'i' } },
+        ];
+      }
     }
     const [items, total] = await Promise.all([
       populateIncident(Incident.find(filter).sort({ createdAt: -1 }).skip(pagination.skip).limit(pagination.limit)),
       Incident.countDocuments(filter),
     ]);
     res.json(paginationPayload(items, total, pagination.page, pagination.limit));
+  } catch (error: any) {
+    res.status(500).json({ message: error.message || 'Server error' });
+  }
+};
+
+export const getIncidentDetail = async (req: AuthRequest, res: Response) => {
+  try {
+    const incident = await populateIncident(Incident.findById(req.params.id));
+    if (!incident) return res.status(404).json({ message: 'Incident not found' });
+
+    if (req.user!.role !== 'admin') {
+      const booking = await Booking.findById(incident.booking);
+      if (!booking) return res.status(403).json({ message: 'Forbidden' });
+      let authorized = String(booking.parent) === String(req.user!._id) || String(incident.reportedBy) === String(req.user!._id);
+      if (req.user!.role === 'carer') {
+        const carer = await Carer.findOne({ user: req.user!._id, isDeleted: false });
+        authorized = Boolean(carer && String(booking.carer) === String(carer._id));
+      }
+      if (!authorized) return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    res.json(incident);
   } catch (error: any) {
     res.status(500).json({ message: error.message || 'Server error' });
   }

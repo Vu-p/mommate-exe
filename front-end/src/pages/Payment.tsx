@@ -172,17 +172,11 @@ const Payment = () => {
 
             <section className="stitch-payment-gateway">
               <header><div><strong>payOS</strong><span>Cổng thanh toán bảo mật</span></div><LockKeyhole size={20} /></header>
-              <div className="stitch-gateway-body">
-                <div className="stitch-qr-column">
-                  <h3>Quét mã để trả qua App Ngân hàng</h3>
-                  <div className="stitch-fake-qr" aria-label="Mã QR thanh toán"><span>payOS</span></div>
-                  <p>Hỗ trợ tất cả ứng dụng ngân hàng qua chuẩn VietQR.</p>
-                </div>
-                <div className="stitch-card-column">
-                  <h3>Thẻ Tín dụng hoặc Ghi nợ</h3>
-                  <label>Tên trên thẻ<input placeholder="NGUYEN VAN A" /></label>
-                  <label>Số thẻ<span><input placeholder="**** **** **** ****" /><CreditCard size={18} /></span></label>
-                  <div><label>Ngày hết hạn<input placeholder="MM/YY" /></label><label>Mã CVV<input placeholder="***" type="password" /></label></div>
+              <div className="stitch-gateway-body" style={{ padding: '40px 20px', textAlign: 'center' }}>
+                <div style={{ maxWidth: '400px', margin: '0 auto' }}>
+                  <h3>Thanh toán qua Cổng payOS</h3>
+                  <p style={{ color: '#666', marginBottom: '20px' }}>Hỗ trợ thanh toán bằng ứng dụng ngân hàng (VietQR) hoặc thẻ thanh toán quốc tế.</p>
+                  
                   {isPaid ? (
                     <button className="stitch-pay-button" onClick={() => navigate('/account/request')}>Đã thanh toán</button>
                   ) : (
@@ -192,7 +186,10 @@ const Payment = () => {
                     </button>
                   )}
                   {!canPay && !isPaid && <p className="empty-text">Booking chưa được chuyên gia xác nhận nên chưa thể thanh toán.</p>}
-                  <footer><span><ShieldCheck size={14} /> Tuân thủ PCI-DSS</span><span><LockKeyhole size={14} /> Mã hóa SSL 256-bit</span></footer>
+                  <footer style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '15px' }}>
+                    <span><ShieldCheck size={14} /> Tuân thủ PCI-DSS</span>
+                    <span><LockKeyhole size={14} /> Mã hóa bảo mật</span>
+                  </footer>
                 </div>
               </div>
             </section>

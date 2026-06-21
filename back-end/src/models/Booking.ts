@@ -79,6 +79,7 @@ export interface IBooking extends Document {
   hours: number;
   isDeleted: boolean;
   scheduledEndAt?: Date;
+  occurrences?: { scheduledAt: Date; scheduledEndAt: Date }[];
   serviceMode: 'at_home' | 'online';
   location?: { type: 'Point'; coordinates: [number, number] };
   priceSnapshot?: {
@@ -108,6 +109,10 @@ const BookingSchema: Schema = new Schema({
   status: { type: String, enum: Object.values(BookingStatus), default: BookingStatus.PENDING_CARER },
   scheduledAt: { type: Date, required: true },
   scheduledEndAt: { type: Date },
+  occurrences: [{
+    scheduledAt: { type: Date, required: true },
+    scheduledEndAt: { type: Date, required: true }
+  }],
   serviceMode: { type: String, enum: ['at_home', 'online'], default: 'at_home' },
   location: { type: new Schema({
     type: { type: String, enum: ['Point'] },

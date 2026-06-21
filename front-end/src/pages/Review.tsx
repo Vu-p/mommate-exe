@@ -12,6 +12,7 @@ const Review = () => {
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(false);
   const [booking, setBooking] = useState<any>(null);
+  const [isPublic, setIsPublic] = useState(true);
   const [pageError, setPageError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,10 +20,10 @@ const Review = () => {
   const bookingId = location.state?.bookingId || searchParams.get('bookingId');
 
   useEffect(() => {
-    api.get('/bookings/my').then(({ data }) => {
-      const current = (Array.isArray(data) ? data : []).find((item: any) => item._id === bookingId);
-      if (!current || current.status !== 'completed') setPageError('Chỉ có thể đánh giá lịch đặt đã hoàn thành.');
-      else setBooking(current);
+    if (!bookingId) return setPageError('Không tìm thấy mã đặt lịch.');
+    api.get(`/bookings/${bookingId}`).then(({ data }) => {
+      if (!data || data.status !== 'completed') setPageError('Chỉ có thể đánh giá lịch đặt đã hoàn thành.');
+      else setBooking(data);
     }).catch(() => setPageError('Không thể tải thông tin lịch đặt.'));
   }, [bookingId]);
 
@@ -31,7 +32,13 @@ const Review = () => {
     if (!booking) return;
     setLoading(true);
     try {
-      await api.post('/reviews', { bookingId, carerId: booking.carer?._id || booking.carer, rating, comment });
+      await api.post('/reviews', { 
+        bookingId, 
+        carerId: booking.carer?._id || booking.carer, 
+        rating, 
+        comment,
+        isAnonymous: !isPublic
+      });
       navigate('/account/request');
     } catch {
       alert('Không thể gửi đánh giá. Vui lòng thử lại.');
@@ -50,8 +57,8 @@ const Review = () => {
         {pageError ? <div className="review-error-banner">{pageError}</div> : (
           <section className="stitch-review-card">
             <div className="review-carer-summary">
-              <img src={carerAvatar} alt="" />
-              <div><h2>BS. {carer.firstName || 'Nguyễn Thị'} {carer.lastName || 'Minh Anh'} <span>Đã xác minh</span></h2><em>Bác sĩ Sản phụ khoa & Chuyên gia chăm sóc sau sinh</em><p><CalendarDays />Dịch vụ: {booking?.service?.title || 'Chăm sóc sau sinh (14 ngày)'} <CheckCircle2 />Hoàn tất: 20/8/2026</p></div>
+              <img src={carer.avatar || carerAvatar} alt="" />
+              <div><h2>{booking?.carer?.department === 'doctor' ? 'BS. ' : ''}{carer.firstName} {carer.lastName} <span>Đã xác minh</span></h2><em>{booking?.carer?.position || booking?.carer?.department || 'Chuyên gia chăm sóc'}</em><p><CalendarDays />Dịch vụ: {booking?.service?.title} <CheckCircle2 />Hoàn tất: {booking?.statusHistory?.find((s: any) => s.status === 'completed')?.changedAt ? new Date(booking.statusHistory.find((s: any) => s.status === 'completed').changedAt).toLocaleDateString('vi-VN') : new Date().toLocaleDateString('vi-VN')}</p></div>
             </div>
 
             <div className="review-rating-block">
@@ -68,7 +75,7 @@ const Review = () => {
             <label className="review-comment-label">Nhận xét chi tiết<textarea value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Hãy chia sẻ thêm về quá trình làm việc của Carer (ví dụ: sự tận tâm, khả năng xử lý tình huống, giao tiếp với gia đình...)" /></label>
 
             <footer className="review-card-footer">
-              <label><input type="checkbox" defaultChecked />Hiển thị tên tôi trong phần đánh giá công khai</label>
+              <label><input type="checkbox" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} />Hiển thị tên tôi trong phần đánh giá công khai</label>
               <div><button className="review-cancel" onClick={() => navigate('/account/request')}>Hủy bỏ</button><button className="review-submit" disabled={loading} onClick={handlePost}>{loading ? <Loader2 className="spinner" /> : 'Gửi đánh giá'}</button></div>
             </footer>
           </section>

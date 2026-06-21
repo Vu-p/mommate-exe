@@ -56,7 +56,7 @@ const issueSession = async (res: Response, user: any, status = 200) => {
 // @route   POST /api/auth/register
 // @access  Public
 export const registerUser = async (req: Request, res: Response) => {
-  const { firstName, lastName, email, password, role } = req.body;
+  const { firstName, lastName, email, password } = req.body;
 
   try {
     const userExists = await User.findOne({ email });
@@ -72,7 +72,7 @@ export const registerUser = async (req: Request, res: Response) => {
       lastName,
       email,
       password: hashedPassword,
-      role: role || 'parent',
+      role: 'parent',
     });
 
     if (user) {

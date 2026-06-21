@@ -22,7 +22,7 @@ const Booking = () => {
   const [formData, setFormData] = useState({
     name: user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : '',
     contactPhone: user?.phoneNumber || '',
-    city: 'Hồ Chí Minh',
+    city: 'Đà Nẵng', // BOOK-005
     district: '',
     fullAddress: '',
     date: '',
@@ -37,9 +37,11 @@ const Booking = () => {
     allergies: '',
     medicalNotes: '',
     notes: '',
-    numSessions: 10,
-    hours: 4
+    numSessions: 1, // BOOK-005
+    hours: 2 // BOOK-005
   });
+  const [serviceMode, setServiceMode] = useState<'at_home' | 'online'>('at_home'); // BOOK-006
+  const [locationCoords, setLocationCoords] = useState<{lat: number, lng: number} | null>(null);
   const [service, setService] = useState<any>(null);
   const [quote, setQuote] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -105,8 +107,13 @@ const Booking = () => {
       return;
     }
 
-    if (!formData.contactPhone.trim() || !formData.fullAddress.trim()) {
+    if (serviceMode === 'at_home' && (!formData.contactPhone.trim() || !formData.fullAddress.trim())) {
       alert('Vui lòng nhập số điện thoại liên hệ và địa chỉ chăm sóc chi tiết.');
+      return;
+    }
+
+    if (serviceMode === 'at_home' && !locationCoords) {
+      alert('Vui lòng cung cấp tọa độ vị trí chăm sóc (bấm nút Lấy Vị Trí) để chuyên gia có thể check-in.');
       return;
     }
 
@@ -145,7 +152,10 @@ const Booking = () => {
         medicalNotes: formData.medicalNotes,
         notes: formData.notes,
         numSessions: formData.numSessions,
-        hours: formData.hours
+        hours: formData.hours,
+        serviceMode,
+        latitude: locationCoords?.lat,
+        longitude: locationCoords?.lng,
       };
       
       if (!quote?.available) {
@@ -245,16 +255,44 @@ const Booking = () => {
                   />
                 </div>
               </div>
-              <div className="input-field">
-                <label>Địa chỉ chi tiết</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Số nhà, tên đường, tòa nhà, căn hộ..."
-                  value={formData.fullAddress}
-                  onChange={e => setFormData({...formData, fullAddress: e.target.value})}
-                />
-              </div>
+              {serviceMode === 'at_home' && (
+                <>
+                  <div className="input-field">
+                    <label>Địa chỉ chi tiết</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Số nhà, tên đường, tòa nhà, căn hộ..."
+                      value={formData.fullAddress}
+                      onChange={e => setFormData({...formData, fullAddress: e.target.value})}
+                    />
+                  </div>
+                  <div className="input-field">
+                    <label>Tọa độ vị trí (Bắt buộc cho dịch vụ tại nhà)</label>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                      <button 
+                        type="button" 
+                        className="btn-secondary"
+                        onClick={() => {
+                          if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(
+                              pos => setLocationCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                              err => alert('Lỗi lấy vị trí: ' + err.message)
+                            );
+                          } else {
+                            alert('Trình duyệt không hỗ trợ.');
+                          }
+                        }}
+                      >
+                        <MapPin size={16} style={{marginRight: '5px'}}/> Lấy Vị Trí
+                      </button>
+                      <span style={{ fontSize: '13px', color: '#666' }}>
+                        {locationCoords ? `Đã lưu: ${locationCoords.lat.toFixed(4)}, ${locationCoords.lng.toFixed(4)}` : 'Chưa có tọa độ'}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="booking-form-section">
@@ -323,7 +361,19 @@ const Booking = () => {
             </div>
 
             <div className="booking-form-section">
-              <h2><CalendarDays /> <span>4.</span> Lịch trình chăm sóc</h2>
+              <h2><CalendarDays /> <span>4.</span> Lịch trình & Hình thức chăm sóc</h2>
+              <div className="form-row-2" style={{ marginBottom: '15px' }}>
+                <div className="input-field">
+                  <label>Hình thức dịch vụ</label>
+                  <div className="select-wrapper">
+                    <select value={serviceMode} onChange={e => setServiceMode(e.target.value as 'at_home' | 'online')}>
+                      <option value="at_home">Tại nhà (At Home)</option>
+                      <option value="online">Tư vấn trực tuyến (Online)</option>
+                    </select>
+                    <ChevronDown size={18} />
+                  </div>
+                </div>
+              </div>
               <div className="form-row-2">
                 <div className="input-field"><label>Ngày hẹn</label><input type="date" min={minimumBookingDate} required value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} /></div>
                 <div className="input-field"><label>Giờ hẹn</label><div className="select-wrapper"><select value={formData.time} onChange={e => setFormData({...formData, time: e.target.value})}>
@@ -378,12 +428,6 @@ const Booking = () => {
               >
                 {loading ? 'Đang xử lý...' : 'Xác nhận đặt lịch'} <ArrowRight />
               </button>
-            </div>
-            <div className="booking-trust-card">
-              <header><ShieldCheck /><div><strong>Cam kết tin cậy</strong><span>An tâm cho cả mẹ và bé</span></div></header>
-              <p><CheckCircle2 />100% Nhân viên có bằng cấp y khoa</p>
-              <p><CheckCircle2 />Kiểm tra sức khỏe định kỳ 2 lần/tháng</p>
-              <p><CheckCircle2 />Hỗ trợ 24/7 qua hotline y tế</p>
             </div>
           </aside>
         </div>

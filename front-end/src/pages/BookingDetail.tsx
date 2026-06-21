@@ -21,6 +21,7 @@ const BookingDetail = () => {
   const [journal, setJournal] = useState({ weightKg: '', notes: '', medicationChecked: false, safetyChecked: false });
   const [savingJournal, setSavingJournal] = useState(false);
   const [refund, setRefund] = useState<any>(null);
+  const [incidents, setIncidents] = useState<any[]>([]);
 
   useEffect(() => {
     if (!id) return;
@@ -28,17 +29,19 @@ const BookingDetail = () => {
   }, [id]);
 
   useEffect(() => {
-    if (!id || user?.role !== 'carer') return;
-    api.get(`/bookings/${id}/care-journal`).then(({ data }) => {
-      if (!data) return;
-      setJournal({
-        weightKg: data.weightKg ? String(data.weightKg) : '',
-        notes: data.notes || '',
-        medicationChecked: Boolean(data.checklist?.medicationChecked),
-        safetyChecked: Boolean(data.checklist?.safetyChecked),
-      });
-    }).catch(() => undefined);
-  }, [id, user?.role]);
+    if (!id || !booking) return;
+    if (user?.role === 'carer' || (user?.role === 'parent' && booking.status === 'completed')) {
+      api.get(`/bookings/${id}/care-journal`).then(({ data }) => {
+        if (!data) return;
+        setJournal({
+          weightKg: data.weightKg ? String(data.weightKg) : '',
+          notes: data.notes || '',
+          medicationChecked: Boolean(data.checklist?.medicationChecked),
+          safetyChecked: Boolean(data.checklist?.safetyChecked),
+        });
+      }).catch(() => undefined);
+    }
+  }, [id, user?.role, booking?.status]);
 
   useEffect(() => {
     if (!id || user?.role === 'carer') return;
@@ -46,6 +49,15 @@ const BookingDetail = () => {
       .then(({ data }) => setRefund(data))
       .catch(() => undefined);
   }, [id, user?.role]);
+
+  useEffect(() => {
+    if (!id) return;
+    api.get('/incidents', { params: { limit: 100 } })
+      .then(({ data }) => {
+        const related = (data.items || []).filter((i: any) => String(i.booking?._id || i.booking) === id);
+        setIncidents(related);
+      }).catch(() => undefined);
+  }, [id]);
 
   const saveJournal = async () => {
     if (!id) return;
@@ -119,30 +131,57 @@ const BookingDetail = () => {
             <section className="booking-detail-card carer-information">
               <h2><UserRound />Thông tin Người chăm sóc (Carer)</h2>
               <div className="carer-information-body">
-                <img src={carerAvatar} alt="" />
-                <div><h3>BS. {carer.firstName || 'Nguyễn Thị'} {carer.lastName || 'Minh Anh'}</h3><p>Bác sĩ Sản phụ khoa & Chuyên gia chăm sóc sau sinh<br />10 năm kinh nghiệm</p><span><Phone />{carer.phoneNumber || 'Chưa cập nhật'}</span><button className="message-carer" onClick={openConversation}><MessageSquare />Nhắn tin trực tiếp</button></div>
+                <img src={carer.avatar || carerAvatar} alt="" />
+                <div><h3>{booking.carer?.department === 'doctor' ? 'BS. ' : ''}{carer.firstName} {carer.lastName}</h3><p>{booking.carer?.position || booking.carer?.department || 'Chuyên gia chăm sóc'}<br />{booking.carer?.experienceYears ? `${booking.carer.experienceYears} năm kinh nghiệm` : ''}</p><span><Phone />{carer.phoneNumber || 'Chưa cập nhật'}</span><button className="message-carer" onClick={openConversation}><MessageSquare />Nhắn tin trực tiếp</button></div>
                 <b><ShieldCheck />Đã xác minh</b>
               </div>
             </section>
 
             <section className="booking-detail-card service-schedule">
               <h2>Dịch vụ & Lịch trình chi tiết</h2>
-              <div className="booking-service-package"><Stethoscope /><span><small>GÓI DỊCH VỤ</small><strong>{booking.service?.title || 'Chăm sóc mẹ sau sinh cao cấp - 14 ngày'}</strong></span></div>
-              <div className="booking-date-grid"><div><small>Ngày bắt đầu</small><strong>Thứ Hai, 24/06/2026</strong></div><div><small>Khung giờ</small><strong>08:00 - 17:00 hàng ngày</strong></div></div>
-              <h3>Nội dung chăm sóc dự kiến:</h3>
-              <p><CheckCircle2 />Kiểm tra vết mổ/vết khâu tầng sinh môn cho mẹ.</p>
-              <p><CheckCircle2 />Tắm bé, vệ sinh rốn và massage kích thích vận động cho trẻ sơ sinh.</p>
-              <p><CheckCircle2 />Hỗ trợ tư vấn dinh dưỡng và phương pháp nuôi con bằng sữa mẹ.</p>
+              <div className="booking-service-package"><Stethoscope /><span><small>GÓI DỊCH VỤ</small><strong>{booking.service?.title}</strong></span></div>
+              <div className="booking-date-grid"><div><small>Ngày bắt đầu</small><strong>{new Date(booking.scheduledAt).toLocaleDateString('vi-VN')}</strong></div><div><small>Khung giờ</small><strong>{new Date(booking.scheduledAt).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})} ({booking.hours} tiếng)</strong></div></div>
+              <h3>Ghi chú từ bạn:</h3>
+              <p>{booking.notes || 'Không có ghi chú'}</p>
             </section>
 
             <section className="booking-detail-card family-information">
               <h2>Thông tin Mẹ & Bé</h2>
               <div className="family-columns">
-                <div><h3>THÔNG TIN MẸ</h3><p><span>Họ và tên:</span><strong>{parent.firstName || 'Lê Thùy'} {parent.lastName || 'Dương'}</strong></p><p><span>Ngày sinh:</span><strong>12/08/1995</strong></p><p><span>Tình trạng sức khỏe:</span><strong>Sinh mổ lần 1, ổn định</strong></p></div>
-                <div><h3>THÔNG TIN BÉ</h3><p><span>Biệt danh:</span><strong>Bé Bơ (Baby Avocado)</strong></p><p><span>Ngày sinh:</span><strong>20/05/2024</strong></p><p><span>Cân nặng sinh:</span><strong>3.2 kg</strong></p></div>
+                <div><h3>THÔNG TIN MẸ</h3><p><span>Họ và tên:</span><strong>{booking.contactName || `${parent.firstName} ${parent.lastName}`}</strong></p><p><span>Số điện thoại:</span><strong>{booking.contactPhone}</strong></p><p><span>Tình trạng sức khỏe:</span><strong>{booking.motherCondition || 'Chưa cập nhật'}</strong></p></div>
+                <div><h3>THÔNG TIN BÉ</h3><p><span>Tình trạng bé:</span><strong>{booking.babyCondition || 'Chưa cập nhật'}</strong></p><p><span>Ngày sinh:</span><strong>{booking.babyBirthDate ? new Date(booking.babyBirthDate).toLocaleDateString('vi-VN') : 'Chưa cập nhật'}</strong></p><p><span>Hình thức sinh:</span><strong>{booking.birthMethod === 'vaginal' ? 'Sinh thường' : booking.birthMethod === 'c_section' ? 'Sinh mổ' : 'Chưa cập nhật'}</strong></p></div>
               </div>
-              <aside><strong>Lưu ý đặc biệt cho Carer:</strong><p>Mẹ bị dị ứng với hải sản và cần chú trọng hỗ trợ tư thế bế bé bú không ảnh hưởng vết mổ.</p></aside>
+              <aside><strong>Lưu ý đặc biệt cho Carer:</strong><p>{booking.medicalNotes || booking.allergies || 'Không có lưu ý đặc biệt'}</p></aside>
             </section>
+
+            {booking.status === 'completed' && (
+              <section className="booking-detail-card">
+                <h2>Nhật ký ca chăm sóc</h2>
+                <div style={{ marginTop: '10px' }}>
+                  <p><strong>Cân nặng của bé:</strong> {journal.weightKg ? `${journal.weightKg} kg` : 'Không cập nhật'}</p>
+                  <p><strong>Ghi chú chuyên môn:</strong> {journal.notes || 'Không có ghi chú'}</p>
+                  <p><strong>Uống thuốc:</strong> {journal.medicationChecked ? 'Đã thực hiện' : 'Không thực hiện'}</p>
+                  <p><strong>Kiểm tra an toàn:</strong> {journal.safetyChecked ? 'Đã thực hiện' : 'Không thực hiện'}</p>
+                </div>
+              </section>
+            )}
+
+            {incidents.length > 0 && (
+              <section className="booking-detail-card">
+                <h2>Báo cáo sự cố (Incidents)</h2>
+                <div style={{ marginTop: '10px' }}>
+                  {incidents.map((incident) => (
+                    <div key={incident._id} style={{ marginBottom: '15px', padding: '10px', border: '1px solid #ddd', borderRadius: '8px' }}>
+                      <p><strong>Tiêu đề:</strong> {incident.title}</p>
+                      <p><strong>Trạng thái:</strong> {incident.status === 'open' ? 'Mở' : incident.status === 'investigating' ? 'Đang xử lý' : incident.status === 'resolved' ? 'Đã giải quyết' : 'Đóng'}</p>
+                      <p><strong>Mức độ:</strong> {incident.severity}</p>
+                      <p><strong>Nội dung:</strong> {incident.description}</p>
+                      {incident.resolution && <p><strong>Kết luận:</strong> {incident.resolution}</p>}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
 
           <aside className="booking-detail-right">
@@ -155,7 +194,7 @@ const BookingDetail = () => {
               {refund?.refund && <div className="booking-refund-status"><strong>Hoàn tiền: {refund.refund.status}</strong><small>{refund.refund.providerReference ? `Mã tham chiếu: ${refund.refund.providerReference}` : refund.refund.reason}</small></div>}
               <small><LockKeyhole />Thanh toán được bảo mật bởi payOS</small>
             </section>
-            <section className="booking-side-card location-card"><h3>ĐỊA ĐIỂM CHĂM SÓC</h3><p><MapPin />123 Bạch Đằng, Hải Châu,<br />Đà Nẵng</p><div><Map /></div></section>
+            <section className="booking-side-card location-card"><h3>ĐỊA ĐIỂM CHĂM SÓC</h3><p><MapPin />{booking.fullAddress}</p><div><Map /></div></section>
             <section className="booking-policy-card"><strong>Cần thay đổi lịch hẹn?</strong><p>Bạn có thể dời lịch hẹn miễn phí trước 24h kể từ thời điểm bắt đầu.</p><Link to="/terms">Đọc Chính sách hoàn tiền & hủy lịch <ArrowRight /></Link></section>
           </aside>
         </div>

@@ -12,7 +12,8 @@ import { writeAudit } from '../utils/audit.js';
 import PaymentTransaction from '../models/PaymentTransaction.js';
 import BookingChangeRequest from '../models/BookingChangeRequest.js';
 import Refund from '../models/Refund.js';
-import { calculateBookingPrice, distanceMeters, isOutsideFreeCancellationWindow, isWithinCheckInWindow } from '../utils/bookingRules.js';
+import mongoose from 'mongoose';
+import { calculateBookingPrice, distanceMeters, isOutsideFreeCancellationWindow, isWithinCheckInWindow, isWithinAvailability } from '../utils/bookingRules.js';
 
 const PAYOS_PAID_STATUSES = new Set(['PAID', '00']);
 
@@ -107,7 +108,7 @@ export const quoteBooking = async (req: AuthRequest, res: Response) => {
     return res.status(400).json({ message: 'Carer, service and a future scheduled time are required' });
   }
   const [carer, service] = await Promise.all([
-    Carer.findOne({ _id: carerId, isDeleted: false, isVerified: true, verificationStatus: 'verified', acceptingBookings: true }),
+    Carer.findOne({ _id: carerId, isDeleted: false, isVerified: true, verificationStatus: 'verified', acceptingBookings: true }).select('_id services platformFeePercent availability timezone'),
     Service.findOne({ _id: serviceId, isActive: true }),
   ]);
   if (!carer || !service) return res.status(404).json({ message: 'Service or available carer not found' });
@@ -117,7 +118,7 @@ export const quoteBooking = async (req: AuthRequest, res: Response) => {
   const safeHours = Math.max(1, Number(hours) || 1);
   const safeSessions = Math.max(1, Number(numSessions) || 1);
   const end = new Date(start.getTime() + safeHours * 3_600_000);
-  const available = !(await hasScheduleConflict(carer._id, start, end));
+  const available = !(await hasScheduleConflict(carer._id, start, end)) && isWithinAvailability(start, end, carer.availability, carer.timezone);
   const unitPrice = Number(service.price || service.basePrice);
   const platformFeePercent = Number(carer.platformFeePercent || 10);
   const pricing = calculateBookingPrice({ unitPrice, hours: safeHours, sessions: safeSessions, platformFeePercent });
@@ -181,7 +182,7 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
     }
 
     const [carer, service] = await Promise.all([
-      Carer.findById(carerId).select('platformFeePercent isVerified verificationStatus isDeleted services'),
+      Carer.findById(carerId).select('platformFeePercent isVerified verificationStatus isDeleted services availability timezone'),
       Service.findOne({ _id: serviceId, isActive: true }).select('_id price basePrice'),
     ]);
 
@@ -201,59 +202,107 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ message: 'Chuyên gia không cung cấp dịch vụ đã chọn' });
     }
 
+    const mode = serviceMode === 'online' ? 'online' : 'at_home';
+    if (mode === 'at_home' && (!Number.isFinite(Number(latitude)) || !Number.isFinite(Number(longitude)))) {
+      return res.status(400).json({ message: 'Bắt buộc phải có tọa độ GPS hợp lệ cho dịch vụ tại nhà' });
+    }
+
     const safeSessions = Math.max(1, Number(numSessions) || 1);
     const safeHours = Math.max(1, Number(hours) || 1);
     const unitPrice = Number(service.price || service.basePrice || 0);
     const calculatedTotal = unitPrice * safeHours * safeSessions;
-    const scheduledEndAt = new Date(scheduledDate.getTime() + safeHours * 3_600_000);
-    if (await hasScheduleConflict(carer._id, scheduledDate, scheduledEndAt)) {
-      return res.status(409).json({ message: 'The selected carer is no longer available for this time slot' });
+    
+    // Generate occurrences
+    const occurrences = [];
+    let occStart = new Date(scheduledDate);
+    
+    if (!isWithinAvailability(occStart, new Date(occStart.getTime() + safeHours * 3600000), carer.availability, carer.timezone)) {
+       return res.status(400).json({ message: 'Thời gian đặt lịch bắt đầu không nằm trong giờ làm việc của chuyên gia' });
     }
 
-    const booking = await Booking.create({
-      parent: req.user!._id,
-      carer: carerId,
-      service: serviceId,
-      status: BookingStatus.PENDING_CARER,
-      scheduledAt: scheduledDate,
-      scheduledEndAt,
-      serviceMode: serviceMode === 'online' ? 'online' : 'at_home',
-      location: Number.isFinite(Number(latitude)) && Number.isFinite(Number(longitude))
-        ? { type: 'Point', coordinates: [Number(longitude), Number(latitude)] }
-        : undefined,
-      address: resolvedAddress,
-      contactName,
-      contactPhone: resolvedPhone,
-      city,
-      district,
-      fullAddress: resolvedAddress,
-      careFor,
-      pregnancyWeek,
-      expectedBirthDate,
-      babyBirthDate,
-      birthMethod,
-      motherCondition,
-      babyCondition,
-      allergies,
-      medicalNotes,
-      notes,
-      totalPrice: calculatedTotal,
-      numSessions: safeSessions,
-      hours: safeHours,
-      priceSnapshot: {
-        unitPrice,
+    let safetyCounter = 0;
+    while(occurrences.length < safeSessions && safetyCounter < 100) {
+      safetyCounter++;
+      const occEnd = new Date(occStart.getTime() + safeHours * 3_600_000);
+      
+      if (isWithinAvailability(occStart, occEnd, carer.availability, carer.timezone)) {
+        occurrences.push({ scheduledAt: occStart, scheduledEndAt: occEnd });
+      }
+      occStart = new Date(occStart);
+      occStart.setDate(occStart.getDate() + 1);
+    }
+    
+    if (occurrences.length < safeSessions) {
+      return res.status(409).json({ message: 'Chuyên gia không đủ lịch trống (theo tuần) để xếp đủ số buổi' });
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      // Re-check conflict inside transaction
+      for (const occ of occurrences) {
+        if (await hasScheduleConflict(carer._id, occ.scheduledAt, occ.scheduledEndAt)) {
+          await session.abortTransaction();
+          session.endSession();
+          return res.status(409).json({ message: `Chuyên gia đã kẹt lịch vào lúc ${occ.scheduledAt.toLocaleString()}` });
+        }
+      }
+
+      const booking = await Booking.create([{
+        parent: req.user!._id,
+        carer: carerId,
+        service: serviceId,
+        status: BookingStatus.PENDING_CARER,
+        scheduledAt: scheduledDate,
+        scheduledEndAt: occurrences[occurrences.length - 1].scheduledEndAt,
+        occurrences,
+        serviceMode: mode,
+        location: mode === 'at_home'
+          ? { type: 'Point', coordinates: [Number(longitude), Number(latitude)] }
+          : undefined,
+        address: resolvedAddress,
+        contactName,
+        contactPhone: resolvedPhone,
+        city,
+        district,
+        fullAddress: resolvedAddress,
+        careFor,
+        pregnancyWeek,
+        expectedBirthDate,
+        babyBirthDate,
+        birthMethod,
+        motherCondition,
+        babyCondition,
+        allergies,
+        medicalNotes,
+        notes,
+        totalPrice: calculatedTotal,
+        numSessions: safeSessions,
         hours: safeHours,
-        sessions: safeSessions,
-        platformFeePercent: Number(carer.platformFeePercent ?? 10),
-      },
-      statusHistory: [{ status: BookingStatus.PENDING_CARER, changedAt: new Date(), changedBy: req.user!._id }],
-    });
+        priceSnapshot: {
+          unitPrice,
+          hours: safeHours,
+          sessions: safeSessions,
+          platformFeePercent: Number(carer.platformFeePercent ?? 10),
+        },
+        statusHistory: [{ status: BookingStatus.PENDING_CARER, changedAt: new Date(), changedBy: req.user!._id }],
+      }], { session });
 
-    calculatePayoutAmounts(booking, carer);
-    await booking.save();
-    await createNotification({ userId: carer.user, type: 'booking_new', title: 'Yêu cầu chăm sóc mới', body: 'Bạn có một yêu cầu đặt lịch mới cần phản hồi.', data: { bookingId: booking._id } });
+      calculatePayoutAmounts(booking[0], carer);
+      await booking[0].save({ session });
+      await session.commitTransaction();
+      session.endSession();
 
-    res.status(201).json(booking);
+      await createNotification({ userId: carer.user, type: 'booking_new', title: 'Yêu cầu chăm sóc mới', body: 'Bạn có một yêu cầu đặt lịch mới cần phản hồi.', data: { bookingId: booking[0]._id } });
+
+      return res.status(201).json(booking[0]);
+    } catch (txError: any) {
+      await session.abortTransaction();
+      session.endSession();
+      throw txError;
+    }
+
+
   } catch (error: any) {
     console.error('Booking creation error:', error);
     res.status(400).json({ message: error.message || 'Dữ liệu đặt lịch không hợp lệ' });
@@ -938,6 +987,11 @@ export const requestBookingChange = async (req: AuthRequest, res: Response) => {
   const authorized = String(booking.parent) === String(req.user!._id)
     || Boolean(carer && String(booking.carer) === String(carer._id));
   if (!authorized) return res.status(403).json({ message: 'Forbidden' });
+
+  if (![BookingStatus.PENDING_CARER, BookingStatus.ACCEPTED_PENDING_PAYMENT, BookingStatus.PAID_CONFIRMED, BookingStatus.CONFIRMED].includes(booking.status as any)) {
+    return res.status(400).json({ message: 'Cannot modify booking in its current state' });
+  }
+
   const type = req.body.type === 'cancel' ? 'cancel' : 'reschedule';
   const reason = String(req.body.reason || '').trim();
   if (!reason) return res.status(400).json({ message: 'Reason is required' });
@@ -960,7 +1014,12 @@ export const requestBookingChange = async (req: AuthRequest, res: Response) => {
   if (outside24Hours) {
     if (type === 'reschedule' && requestedScheduledAt) {
       const end = new Date(requestedScheduledAt.getTime() + Math.max(1, booking.hours) * 3_600_000);
-      if (await hasScheduleConflict(booking.carer, requestedScheduledAt, end, booking._id)) {
+      const carerObj = await Carer.findById(booking.carer).select('availability timezone');
+      
+      if (
+        (carerObj && !isWithinAvailability(requestedScheduledAt, end, carerObj.availability, carerObj.timezone)) ||
+        await hasScheduleConflict(booking.carer, requestedScheduledAt, end, booking._id)
+      ) {
         changeRequest.status = 'pending';
         await changeRequest.save();
       } else {

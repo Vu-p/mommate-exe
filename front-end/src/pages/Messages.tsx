@@ -26,7 +26,14 @@ const Messages = () => {
     socket.emit('conversation:join', id);
     const onMessage = (message: any) => setMessages((items) => items.some((item) => item._id === message._id) ? items : [...items, message]);
     socket.on('message:new', onMessage);
-    return () => { socket.off('message:new', onMessage); };
+    
+    // Polling fallback for Vercel Serverless
+    const intervalId = window.setInterval(() => void load(), 5000);
+    
+    return () => { 
+      socket.off('message:new', onMessage); 
+      window.clearInterval(intervalId);
+    };
   }, [id, load]);
 
   const send = async () => {
