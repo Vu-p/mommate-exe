@@ -63,7 +63,7 @@ const Navbar = ({ currentMode }: NavbarProps) => {
             <div className="nav-group center">
               <Link to="/" className="brand-logo">
                 <img src={logo} alt="MomMate" className="logo-img" />
-                <span>MaternalCare</span>
+                <span>Mommate</span>
               </Link>
             </div>
 
