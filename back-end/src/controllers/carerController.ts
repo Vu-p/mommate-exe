@@ -132,7 +132,16 @@ export const getCarers = async (req: Request, res: Response) => {
     }
 
     if (req.query.area) {
-      filter.location = { $regex: String(req.query.area), $options: 'i' };
+      filter.$and = [
+        ...(filter.$and || []),
+        { location: { $regex: String(req.query.area), $options: 'i' } }
+      ];
+    }
+    if (req.query.district) {
+      filter.$and = [
+        ...(filter.$and || []),
+        { location: { $regex: String(req.query.district), $options: 'i' } }
+      ];
     }
     if (req.query.maxPrice) {
       filter.hourlyRate = { $lte: Number(req.query.maxPrice) };

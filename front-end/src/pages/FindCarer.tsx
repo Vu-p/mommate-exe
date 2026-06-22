@@ -97,6 +97,7 @@ const FindCarer = () => {
   const [areaOptions, setAreaOptions] = useState<{ value: string; label: string; count?: number }[]>([]);
   const [filters, setFilters] = useState({
     area: 'Đà Nẵng',
+    district: '',
     maxPrice: '',
     minRating: '',
     scheduleSlots: [] as string[],
@@ -116,6 +117,7 @@ const FindCarer = () => {
           params: {
             serviceId: serviceId || undefined,
             area: filters.area || undefined,
+            district: filters.district || undefined,
             maxPrice: filters.maxPrice || undefined,
             minRating: filters.minRating || undefined,
             scheduleSlots: filters.scheduleSlots.length > 0 ? filters.scheduleSlots.join(',') : undefined,
@@ -138,11 +140,11 @@ const FindCarer = () => {
     };
 
     fetchCarers();
-  }, [currentPage, filters.area, filters.maxPrice, filters.minRating, filters.scheduleSlots, searchTerm, serviceId, sortBy]);
+  }, [currentPage, filters.area, filters.district, filters.maxPrice, filters.minRating, filters.scheduleSlots, searchTerm, serviceId, sortBy]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, sortBy, filters.area, filters.maxPrice, filters.minRating, filters.scheduleSlots]);
+  }, [searchTerm, sortBy, filters.area, filters.district, filters.maxPrice, filters.minRating, filters.scheduleSlots]);
 
   const safeCurrentPage = Math.min(currentPage, totalPages);
 
@@ -155,6 +157,7 @@ const FindCarer = () => {
     setSortBy('default');
     setFilters({
       area: 'Đà Nẵng',
+      district: '',
       maxPrice: '',
       minRating: '',
       scheduleSlots: [],

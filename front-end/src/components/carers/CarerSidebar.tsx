@@ -11,6 +11,7 @@ type SelectOption = {
 interface CarerSidebarProps {
   filters: {
     area: string;
+    district?: string;
     maxPrice: string;
     minRating: string;
     scheduleSlots: string[];
@@ -99,11 +100,67 @@ const CarerSidebar = ({ filters, onChange, onClear, areaOptions = [] }: CarerSid
   const availableAreas = [
     { value: '', label: 'Tất cả khu vực' },
     ...(!areaOptions.some((area) => area.value === 'Đà Nẵng') ? [{ value: 'Đà Nẵng', label: 'Đà Nẵng' }] : []),
+    ...(!areaOptions.some((area) => area.value === 'Hà Nội') ? [{ value: 'Hà Nội', label: 'Hà Nội' }] : []),
+    ...(!areaOptions.some((area) => area.value === 'TP. Hồ Chí Minh') ? [{ value: 'TP. Hồ Chí Minh', label: 'TP. Hồ Chí Minh' }] : []),
     ...areaOptions.map((area) => ({
       value: area.value,
       label: area.count ? `${area.label} (${area.count})` : area.label,
-    })),
+    })).filter((item) => !['Đà Nẵng', 'Hà Nội', 'TP. Hồ Chí Minh'].includes(item.value)),
   ];
+
+  const daNangDistricts = [
+    { value: '', label: 'Tất cả quận/huyện' },
+    { value: 'Hải Châu', label: 'Hải Châu' },
+    { value: 'Thanh Khê', label: 'Thanh Khê' },
+    { value: 'Sơn Trà', label: 'Sơn Trà' },
+    { value: 'Ngũ Hành Sơn', label: 'Ngũ Hành Sơn' },
+    { value: 'Liên Chiểu', label: 'Liên Chiểu' },
+    { value: 'Cẩm Lệ', label: 'Cẩm Lệ' },
+    { value: 'Hòa Vang', label: 'Hòa Vang' },
+  ];
+
+  const hnDistricts = [
+    { value: '', label: 'Tất cả quận/huyện' },
+    { value: 'Ba Đình', label: 'Ba Đình' },
+    { value: 'Hoàn Kiếm', label: 'Hoàn Kiếm' },
+    { value: 'Đống Đa', label: 'Đống Đa' },
+    { value: 'Thanh Xuân', label: 'Thanh Xuân' },
+    { value: 'Cầu Giấy', label: 'Cầu Giấy' },
+    { value: 'Hoàng Mai', label: 'Hoàng Mai' },
+    { value: 'Hai Bà Trưng', label: 'Hai Bà Trưng' },
+    { value: 'Hà Đông', label: 'Hà Đông' },
+    { value: 'Long Biên', label: 'Long Biên' },
+    { value: 'Nam Từ Liêm', label: 'Nam Từ Liêm' },
+    { value: 'Bắc Từ Liêm', label: 'Bắc Từ Liêm' },
+    { value: 'Tây Hồ', label: 'Tây Hồ' }
+  ];
+
+  const hcmDistricts = [
+    { value: '', label: 'Tất cả quận/huyện' },
+    { value: 'Quận 1', label: 'Quận 1' },
+    { value: 'Quận 3', label: 'Quận 3' },
+    { value: 'Quận 4', label: 'Quận 4' },
+    { value: 'Quận 5', label: 'Quận 5' },
+    { value: 'Quận 6', label: 'Quận 6' },
+    { value: 'Quận 7', label: 'Quận 7' },
+    { value: 'Quận 8', label: 'Quận 8' },
+    { value: 'Quận 10', label: 'Quận 10' },
+    { value: 'Quận 11', label: 'Quận 11' },
+    { value: 'Quận 12', label: 'Quận 12' },
+    { value: 'Tân Bình', label: 'Tân Bình' },
+    { value: 'Bình Tân', label: 'Bình Tân' },
+    { value: 'Bình Thạnh', label: 'Bình Thạnh' },
+    { value: 'Tân Phú', label: 'Tân Phú' },
+    { value: 'Gò Vấp', label: 'Gò Vấp' },
+    { value: 'Phú Nhuận', label: 'Phú Nhuận' },
+    { value: 'Thủ Đức', label: 'TP. Thủ Đức' }
+  ];
+
+  let currentDistricts: { value: string; label: string }[] = [];
+  if (filters.area === 'Đà Nẵng') currentDistricts = daNangDistricts;
+  else if (filters.area === 'Hà Nội') currentDistricts = hnDistricts;
+  else if (filters.area === 'TP. Hồ Chí Minh' || filters.area === 'Hồ Chí Minh') currentDistricts = hcmDistricts;
+
   return (
     <aside className="carer-sidebar">
       <div className="sidebar-header">
@@ -112,13 +169,27 @@ const CarerSidebar = ({ filters, onChange, onClear, areaOptions = [] }: CarerSid
       </div>
 
       <div className="sidebar-group">
-        <label>Khu vực (Quận/Huyện)</label>
+        <label>Tỉnh/Thành phố</label>
         <CarerFilterSelect
           value={filters.area}
           options={availableAreas}
-          onChange={(value) => onChange('area', value)}
+          onChange={(value) => {
+            onChange('area', value);
+            if (filters.district) onChange('district', '');
+          }}
         />
       </div>
+
+      {currentDistricts.length > 0 && (
+        <div className="sidebar-group">
+          <label>Quận/Huyện</label>
+          <CarerFilterSelect
+            value={filters.district || ''}
+            options={currentDistricts}
+            onChange={(value) => onChange('district', value)}
+          />
+        </div>
+      )}
 
       <div className="sidebar-group">
         <label>Mức giá (VNĐ/Giờ)</label>

@@ -1,0 +1,419 @@
+[
+  {
+    "_id": "6a211dba2105b4672ad9e859",
+    "title": "Bé và Mẹ chuyên sâu (Combo)",
+    "description": "Gói dịch vụ cao cấp toàn diện cho cả mẹ và bé: giúp mẹ lấy lại vóc dáng, phục hồi làn da và giúp bé phát triển thể chất lẫn trí não thông qua các bài tập chuyên sâu.",
+    "icon": "sparkles",
+    "image": "https://res.cloudinary.com/dbmqfmvyh/image/upload/v1780555468/mommate/upload-1780555465746.jpg",
+    "basePrice": 1820000,
+    "price": 1820000,
+    "category": "Newborn Care",
+    "duration": "180 phút",
+    "tags": [
+      "Combo cao cấp",
+      "Giáo dục sớm",
+      "Dưỡng sinh"
+    ],
+    "steps": [
+      {
+        "title": "Chăm sóc bé chuyên sâu",
+        "text": "Massage chuyên sâu kích thích hệ tiêu hóa và vận động, tắm bé, vệ sinh các vùng nhạy cảm và tập vận động sớm Tummy time.",
+        "_id": "6a211dba2105b4672ad9e85a"
+      },
+      {
+        "title": "Giáo dục sớm",
+        "text": "Áp dụng phương pháp giáo dục sớm, kích thích thị giác và thính giác bằng giáo cụ chuyên dụng.",
+        "_id": "6a211dba2105b4672ad9e85b"
+      },
+      {
+        "title": "Giảm mỡ và trị liệu",
+        "text": "Thực hiện liệu trình giảm mỡ bụng chuyên sâu, quấn định hình form eo kết hợp massage trị liệu toàn thân.",
+        "_id": "6a211dba2105b4672ad9e85c"
+      },
+      {
+        "title": "Thư giãn toàn diện",
+        "text": "Chăm sóc da mặt chuyên sâu, gội đầu dưỡng sinh giúp mẹ thư giãn tinh thần tuyệt đối.",
+        "_id": "6a211dba2105b4672ad9e85d"
+      }
+    ],
+    "sessionOptions": [
+      1,
+      5,
+      10
+    ],
+    "isActive": true,
+    "__v": 0,
+    "createdAt": "2026-06-04T06:39:54.801Z",
+    "updatedAt": "2026-06-21T04:06:47.228Z",
+    "careItems": [],
+    "faq": []
+  },
+  {
+    "_id": "6a211dba2105b4672ad9e854",
+    "title": "Bé và Mẹ phục hồi (Combo)",
+    "description": "Sự kết hợp hoàn hảo giữa liệu trình phục hồi sức khỏe cho mẹ và dịch vụ tắm, massage, chăm sóc chuẩn y khoa cho bé yêu trong những tháng đầu đời.",
+    "icon": "baby",
+    "image": "https://res.cloudinary.com/dbmqfmvyh/image/upload/v1780555446/mommate/upload-1780555439870.jpg",
+    "basePrice": 1500000,
+    "price": 1500000,
+    "category": "Newborn Care",
+    "duration": "150 phút",
+    "tags": [
+      "Combo",
+      "Mẹ và bé",
+      "Phục hồi"
+    ],
+    "steps": [
+      {
+        "title": "Chăm sóc bé",
+        "text": "Massage thư giãn cho bé, tắm bé trong chậu nước ấm thảo dược, vệ sinh mắt, mũi, rốn và rơ lưỡi chuẩn y khoa.",
+        "_id": "6a211dba2105b4672ad9e855"
+      },
+      {
+        "title": "Tương tác giác quan",
+        "text": "Tương tác giác quan bằng đọc sách hoặc cho bé xem tranh kích thích thị giác trắng đen.",
+        "_id": "6a211dba2105b4672ad9e856"
+      },
+      {
+        "title": "Chăm sóc mẹ",
+        "text": "Kiểm tra sức khỏe, vết thương sau sinh và tiến hành massage toàn thân giảm đau nhức, giải tỏa căng thẳng.",
+        "_id": "6a211dba2105b4672ad9e857"
+      },
+      {
+        "title": "Phục hồi vùng bụng",
+        "text": "Chăm sóc vùng bụng bằng túi chườm thảo dược và hướng dẫn mẹ cách chăm sóc bé tại nhà.",
+        "_id": "6a211dba2105b4672ad9e858"
+      }
+    ],
+    "sessionOptions": [
+      1,
+      5,
+      10
+    ],
+    "isActive": true,
+    "__v": 0,
+    "createdAt": "2026-06-04T06:39:54.800Z",
+    "updatedAt": "2026-06-21T04:06:47.228Z",
+    "careItems": [],
+    "faq": []
+  },
+  {
+    "_id": "6a211dba2105b4672ad9e85e",
+    "title": "Bé và Mẹ y khoa (Combo)",
+    "description": "Liệu trình chăm sóc sức khỏe đặc biệt dưới góc độ y khoa, tập trung vào việc kiểm tra, theo dõi và xử lý các vấn đề y tế cơ bản cho cả mẹ và bé sau khi xuất viện.",
+    "icon": "shield",
+    "image": "https://res.cloudinary.com/dbmqfmvyh/image/upload/v1780555494/mommate/upload-1780555489747.jpg",
+    "basePrice": 1820000,
+    "price": 1820000,
+    "category": "Newborn Care",
+    "duration": "180 phút",
+    "tags": [
+      "Y khoa",
+      "Mẹ và bé",
+      "Điều dưỡng"
+    ],
+    "steps": [
+      {
+        "title": "Kiểm tra chỉ số",
+        "text": "Điều dưỡng kiểm tra các chỉ số sinh tồn cho mẹ như huyết áp, vết thương và đánh giá tình trạng sức khỏe tổng quát của bé như vàng da, cân nặng, nhịp thở.",
+        "_id": "6a211dba2105b4672ad9e85f"
+      },
+      {
+        "title": "Vệ sinh vô trùng",
+        "text": "Tiến hành vệ sinh, sát khuẩn và thay băng vết mổ hoặc vết khâu tầng sinh môn cho mẹ; chăm sóc và sát trùng cuống rốn cho bé bằng kỹ thuật vô trùng.",
+        "_id": "6a211dba2105b4672ad9e860"
+      },
+      {
+        "title": "Tắm bé và tuần hoàn",
+        "text": "Massage và tắm bé chuẩn y khoa, kết hợp ngâm chân thảo dược cho mẹ để kích thích tuần hoàn máu, giảm tê phù.",
+        "_id": "6a211dba2105b4672ad9e861"
+      },
+      {
+        "title": "Hướng dẫn theo dõi",
+        "text": "Hướng dẫn gia đình kỹ năng theo dõi các dấu hiệu bất thường ở trẻ sơ sinh, cách vệ sinh đúng cách và tư vấn lịch tiêm chủng phòng bệnh.",
+        "_id": "6a211dba2105b4672ad9e862"
+      }
+    ],
+    "sessionOptions": [
+      1,
+      5,
+      10
+    ],
+    "isActive": true,
+    "__v": 0,
+    "createdAt": "2026-06-04T06:39:54.801Z",
+    "updatedAt": "2026-06-21T04:06:47.228Z",
+    "careItems": [],
+    "faq": []
+  },
+  {
+    "_id": "6a211dba2105b4672ad9e84f",
+    "title": "Mẹ chuyên sâu",
+    "description": "Gói chăm sóc cao cấp kết hợp phục hồi sức khỏe, lấy lại vóc dáng, giảm mỡ bụng và chăm sóc làn da trắng sáng rạng rỡ cho mẹ.",
+    "icon": "sparkles",
+    "image": "https://res.cloudinary.com/dbmqfmvyh/image/upload/v1780555420/mommate/upload-1780555418645.jpg",
+    "basePrice": 750000,
+    "price": 750000,
+    "category": "Postpartum Support",
+    "duration": "120 phút",
+    "tags": [
+      "Chuyên sâu",
+      "Giảm mỡ bụng",
+      "Dưỡng sinh"
+    ],
+    "steps": [
+      {
+        "title": "Đánh giá cơ thể",
+        "text": "Kiểm tra chỉ số cơ thể, mức độ xổ bụng sau sinh và làm sạch vùng da cần chăm sóc.",
+        "_id": "6a211dba2105b4672ad9e850"
+      },
+      {
+        "title": "Chăm sóc vùng bụng",
+        "text": "Massage bấm huyệt chuyên sâu vùng bụng bằng tinh dầu giảm béo, kết hợp quấn muối thảo dược hoặc nằm túi muối ấm để săn chắc vòng eo.",
+        "_id": "6a211dba2105b4672ad9e851"
+      },
+      {
+        "title": "Phục hồi và chăm da",
+        "text": "Massage phục hồi toàn thân kết hợp liệu trình chăm sóc da mặt, tẩy da chết và đắp mặt nạ thiên nhiên.",
+        "_id": "6a211dba2105b4672ad9e852"
+      },
+      {
+        "title": "Dưỡng sinh thư giãn",
+        "text": "Gội đầu dưỡng sinh thảo dược, sấy tóc và thoa serum dưỡng thể phục hồi.",
+        "_id": "6a211dba2105b4672ad9e853"
+      }
+    ],
+    "sessionOptions": [
+      1,
+      5,
+      10
+    ],
+    "isActive": true,
+    "__v": 0,
+    "createdAt": "2026-06-04T06:39:54.800Z",
+    "updatedAt": "2026-06-21T04:06:47.228Z",
+    "careItems": [],
+    "faq": []
+  },
+  {
+    "_id": "6a211dba2105b4672ad9e840",
+    "title": "Thông tắc tia sữa",
+    "description": "Giải pháp nhanh chóng, an toàn giúp loại bỏ các cục hạch sữa tắc nghẽn, giảm đau nhức tức thì và phòng ngừa viêm tuyến vú cho mẹ sau sinh.",
+    "icon": "milk",
+    "image": "https://res.cloudinary.com/dbmqfmvyh/image/upload/v1780555306/mommate/upload-1780555305213.jpg",
+    "basePrice": 200000,
+    "price": 200000,
+    "category": "Postpartum Support",
+    "duration": "60 phút",
+    "tags": [
+      "Tắc tia sữa",
+      "Sữa mẹ",
+      "Sau sinh"
+    ],
+    "steps": [
+      {
+        "title": "Thăm khám",
+        "text": "Thăm khám, kiểm tra bầu ngực và xác định vị trí các tia sữa bị tắc.",
+        "_id": "6a211dba2105b4672ad9e841"
+      },
+      {
+        "title": "Chườm ấm và massage",
+        "text": "Chườm ấm kết hợp massage nhẹ nhàng bằng tinh dầu tự nhiên để làm mềm bầu ngực.",
+        "_id": "6a211dba2105b4672ad9e842"
+      },
+      {
+        "title": "Thông dòng sữa",
+        "text": "Sử dụng kỹ thuật tay để thông dòng chảy của sữa.",
+        "_id": "6a211dba2105b4672ad9e843"
+      },
+      {
+        "title": "Vệ sinh và hướng dẫn",
+        "text": "Vắt hoặc hút sạch lượng sữa tồn đọng, vệ sinh lại bầu ngực và hướng dẫn mẹ cách cho bé bú hoặc hút sữa đúng cách để tránh tái phát.",
+        "_id": "6a211dba2105b4672ad9e844"
+      }
+    ],
+    "sessionOptions": [
+      1,
+      3,
+      5
+    ],
+    "isActive": true,
+    "__v": 0,
+    "createdAt": "2026-06-04T06:39:54.794Z",
+    "updatedAt": "2026-06-21T04:06:47.228Z",
+    "careItems": [],
+    "faq": []
+  },
+  {
+    "_id": "6a211dba2105b4672ad9e845",
+    "title": "Kích & gọi sữa về",
+    "description": "Phương pháp kích thích tuyến sữa hoạt động tối đa dành cho các mẹ gặp tình trạng ít sữa, mất sữa hoặc sữa chưa về sau khi sinh.",
+    "icon": "milk",
+    "image": "https://res.cloudinary.com/dbmqfmvyh/image/upload/v1780555377/mommate/upload-1780555374198.jpg",
+    "basePrice": 350000,
+    "price": 350000,
+    "category": "Postpartum Support",
+    "duration": "75 phút",
+    "tags": [
+      "Kích sữa",
+      "Gọi sữa",
+      "Tư vấn sữa mẹ"
+    ],
+    "steps": [
+      {
+        "title": "Kiểm tra và tư vấn",
+        "text": "Kiểm tra nang sữa, tư vấn chế độ dinh dưỡng và sinh hoạt tối ưu cho mẹ.",
+        "_id": "6a211dba2105b4672ad9e846"
+      },
+      {
+        "title": "Massage bấm huyệt",
+        "text": "Massage bấm huyệt chuyên sâu vùng lưng, vai gáy và ngực để kích thích hoóc-môn tiết sữa Prolactin và Oxytocin.",
+        "_id": "6a211dba2105b4672ad9e847"
+      },
+      {
+        "title": "Liệu pháp nhiệt",
+        "text": "Sử dụng liệu pháp nhiệt và dụng cụ hỗ trợ kích sữa chuẩn y khoa.",
+        "_id": "6a211dba2105b4672ad9e848"
+      },
+      {
+        "title": "Kế hoạch tại nhà",
+        "text": "Hướng dẫn mẹ kỹ thuật massage tại nhà và lịch trình hút sữa hoặc bú mẹ khoa học.",
+        "_id": "6a211dba2105b4672ad9e849"
+      }
+    ],
+    "sessionOptions": [
+      1,
+      3,
+      5
+    ],
+    "isActive": true,
+    "__v": 0,
+    "createdAt": "2026-06-04T06:39:54.798Z",
+    "updatedAt": "2026-06-21T04:06:47.228Z",
+    "careItems": [],
+    "faq": []
+  },
+  {
+    "_id": "6a211dba2105b4672ad9e84a",
+    "title": "Mẹ phục hồi",
+    "description": "Liệu trình chăm sóc toàn diện giúp cơ thể mẹ nhanh chóng phục hồi bản năng, giảm đau mỏi cơ xương khớp và chữa lành các tổn thương sau sinh.",
+    "icon": "heart",
+    "image": "https://res.cloudinary.com/dbmqfmvyh/image/upload/v1780555402/mommate/upload-1780555401107.jpg",
+    "basePrice": 550000,
+    "price": 550000,
+    "category": "Postpartum Support",
+    "duration": "90 phút",
+    "tags": [
+      "Phục hồi",
+      "Mẹ sau sinh",
+      "Thảo dược"
+    ],
+    "steps": [
+      {
+        "title": "Kiểm tra sức khỏe",
+        "text": "Đo huyết áp, kiểm tra vết mổ hoặc vết khâu tầng sinh môn và tình trạng phục hồi của mẹ.",
+        "_id": "6a211dba2105b4672ad9e84b"
+      },
+      {
+        "title": "Xông thảo dược",
+        "text": "Xông hơi toàn thân bằng thảo dược thiên nhiên để đào thải độc tố và sản dịch.",
+        "_id": "6a211dba2105b4672ad9e84c"
+      },
+      {
+        "title": "Massage toàn thân",
+        "text": "Massage toàn thân chuyên sâu vùng lưng, hông, tay, chân giúp lưu thông khí huyết, giảm nhức mỏi.",
+        "_id": "6a211dba2105b4672ad9e84d"
+      },
+      {
+        "title": "Dưỡng da thảo dược",
+        "text": "Thoa thảo dược dưỡng da toàn thân, giúp da sáng hồng và làm ấm cơ thể.",
+        "_id": "6a211dba2105b4672ad9e84e"
+      }
+    ],
+    "sessionOptions": [
+      1,
+      5,
+      10
+    ],
+    "isActive": true,
+    "__v": 0,
+    "createdAt": "2026-06-04T06:39:54.799Z",
+    "updatedAt": "2026-06-21T04:06:47.228Z",
+    "careItems": [],
+    "faq": []
+  },
+  {
+    "_id": "6a369f1b58be76d7894d081a",
+    "title": "Chăm sóc mẹ và bé sau sinh",
+    "__v": 0,
+    "basePrice": 250000,
+    "category": "postpartum",
+    "createdAt": "2026-06-20T14:09:31.855Z",
+    "description": "Chăm sóc mẹ và bé sau sinh bởi chuyên gia MomMate đã xác minh.",
+    "duration": "Theo giờ",
+    "icon": "postpartum",
+    "image": "",
+    "isActive": true,
+    "price": 250000,
+    "sessionOptions": [
+      1,
+      2,
+      4
+    ],
+    "steps": [],
+    "tags": [
+      "MomMate",
+      "postpartum"
+    ],
+    "updatedAt": "2026-06-21T09:25:39.019Z",
+    "careItems": [
+      "Đánh giá nhu cầu chăm sóc trước khi bắt đầu",
+      "Thực hiện quy trình phù hợp với hồ sơ mẹ và bé",
+      "Hướng dẫn gia đình theo dõi sau buổi chăm sóc"
+    ],
+    "faq": [
+      {
+        "question": "Khi nào gia đình nên sử dụng dịch vụ?",
+        "answer": "Gia đình có thể đặt lịch khi mẹ và bé đã ổn định và không có chỉ định cấp cứu.",
+        "_id": "6a37ae137129d4775d2181f8"
+      }
+    ]
+  },
+  {
+    "_id": "6a369f1c58be76d7894d081b",
+    "title": "Tư vấn nuôi con bằng sữa mẹ",
+    "__v": 0,
+    "basePrice": 180000,
+    "category": "consultation",
+    "createdAt": "2026-06-20T14:09:31.856Z",
+    "description": "Tư vấn nuôi con bằng sữa mẹ bởi chuyên gia MomMate đã xác minh.",
+    "duration": "90 phút",
+    "icon": "consultation",
+    "image": "",
+    "isActive": true,
+    "price": 180000,
+    "sessionOptions": [
+      1,
+      2,
+      4
+    ],
+    "steps": [],
+    "tags": [
+      "MomMate",
+      "consultation"
+    ],
+    "updatedAt": "2026-06-21T09:25:39.019Z",
+    "careItems": [
+      "Đánh giá nhu cầu chăm sóc trước khi bắt đầu",
+      "Thực hiện quy trình phù hợp với hồ sơ mẹ và bé",
+      "Hướng dẫn gia đình theo dõi sau buổi chăm sóc"
+    ],
+    "faq": [
+      {
+        "question": "Khi nào gia đình nên sử dụng dịch vụ?",
+        "answer": "Gia đình có thể đặt lịch khi mẹ và bé đã ổn định và không có chỉ định cấp cứu.",
+        "_id": "6a37ae137129d4775d2181f9"
+      }
+    ]
+  }
+]
