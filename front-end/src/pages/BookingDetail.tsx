@@ -132,8 +132,25 @@ const BookingDetail = () => {
           <article><img src={parent.avatar || motherAvatar}/><h3>{parent.firstName} {parent.lastName}</h3><small>Mẹ</small><hr/><p>Tình trạng sức khỏe: <strong>{booking.motherCondition || 'Chưa cập nhật'}</strong></p><p>Ghi chú y tế: <strong>{booking.medicalNotes || 'Không có'}</strong></p>{booking.allergies && <span>DỊ ỨNG: {booking.allergies}</span>}</article>
           {booking.careFor !== 'postpartum_mom' && <article className="baby-record"><div className="baby-icon">☺</div><h3>{booking.babyName || 'Thông tin bé'}</h3><small>{booking.babyBirthDate ? `${Math.ceil((Date.now() - new Date(booking.babyBirthDate).getTime()) / 86400000)} ngày tuổi` : 'Chưa cập nhật'}</small><hr/><p>Hình thức bú: <strong>{booking.feedingMethod || 'Chưa cập nhật'}</strong></p><p>Cân nặng khi sinh: <strong>{booking.birthWeight ? `${booking.birthWeight}kg` : 'Chưa cập nhật'}</strong></p></article>}
         </div></section>
-        <section className="carer-case-card care-journal"><h2>Nhật ký ca chăm sóc</h2><p>Ghi lại các quan sát chuyên môn, thời gian bú và các hoạt động trong buổi làm việc. Thông tin này sẽ hiển thị cho phụ huynh sau khi kết thúc.</p><div><input placeholder="Cân nặng (kg)" value={journal.weightKg} onChange={(event) => setJournal((value) => ({ ...value, weightKg: event.target.value }))}/><textarea placeholder="Ghi chú chuyên môn, hướng dẫn của bác sĩ nhi khoa..." value={journal.notes} onChange={(event) => setJournal((value) => ({ ...value, notes: event.target.value }))}/></div><label><input type="checkbox" checked={journal.medicationChecked} onChange={(event) => setJournal((value) => ({ ...value, medicationChecked: event.target.checked }))}/>Đã cho uống thuốc</label><label><input type="checkbox" checked={journal.safetyChecked} onChange={(event) => setJournal((value) => ({ ...value, safetyChecked: event.target.checked }))}/>Đã kiểm tra an toàn tiêu chuẩn</label><button className="primary" onClick={saveJournal} disabled={savingJournal}>{savingJournal ? 'Đang lưu...' : 'Lưu nhật ký'}</button></section>
-      </div><aside className="carer-case-sidebar"><div className="map-cover"><Map/></div><section><h3>{booking.address || 'Chưa có địa chỉ'}</h3><p>{booking.fullAddress || ''}</p></section><section><small>Ngày</small><strong>{scheduledDate ? scheduledDate.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Chưa xác định'}</strong><small>Thời gian</small><strong>{scheduledDate ? `${scheduledDate.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})} - ${scheduledEnd ? scheduledEnd.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}) : ''} (${booking.hours || '?'} tiếng)` : 'Chưa xác định'}</strong><small>Phí dịch vụ</small><strong>{total.toLocaleString('vi-VN')}đ • {booking.paidAt ? 'Đã thanh toán' : 'Chưa thanh toán'}</strong></section></aside></div>
+        {['in_progress', 'completed'].includes(booking.status) && (
+          <section className="carer-case-card care-journal"><h2>Nhật ký ca chăm sóc</h2><p>Ghi lại các quan sát chuyên môn, thời gian bú và các hoạt động trong buổi làm việc. Thông tin này sẽ hiển thị cho phụ huynh sau khi kết thúc.</p><div><input placeholder="Cân nặng (kg)" value={journal.weightKg} onChange={(event) => setJournal((value) => ({ ...value, weightKg: event.target.value }))}/><textarea placeholder="Ghi chú chuyên môn, hướng dẫn của bác sĩ nhi khoa..." value={journal.notes} onChange={(event) => setJournal((value) => ({ ...value, notes: event.target.value }))}/></div><label><input type="checkbox" checked={journal.medicationChecked} onChange={(event) => setJournal((value) => ({ ...value, medicationChecked: event.target.checked }))}/>Đã cho uống thuốc</label><label><input type="checkbox" checked={journal.safetyChecked} onChange={(event) => setJournal((value) => ({ ...value, safetyChecked: event.target.checked }))}/>Đã kiểm tra an toàn tiêu chuẩn</label><button className="primary" onClick={saveJournal} disabled={savingJournal}>{savingJournal ? 'Đang lưu...' : 'Lưu nhật ký'}</button></section>
+        )}
+      </div><aside className="carer-case-sidebar">
+        <section style={{padding: '20px', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '20px'}}>
+          <h3 style={{fontSize: '16px', marginBottom: '8px'}}>{booking.address || 'Chưa có địa chỉ'}</h3>
+          <p style={{marginBottom: '12px', color: '#64748b', fontSize: '14px'}}>{booking.fullAddress || ''}</p>
+          {booking.latitude && booking.longitude && (
+            <a 
+              href={`https://www.google.com/maps/search/?api=1&query=${booking.latitude},${booking.longitude}`} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{display: 'flex', alignItems: 'center', gap: '8px', color: '#16a34a', textDecoration: 'none', padding: '12px', backgroundColor: '#f0fdf4', borderRadius: '8px', fontWeight: '600', justifyContent: 'center'}}
+            >
+              <Map size={18} /> Mở bằng Google Maps
+            </a>
+          )}
+        </section>
+        <section><small>Ngày</small><strong>{scheduledDate ? scheduledDate.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Chưa xác định'}</strong><small>Thời gian</small><strong>{scheduledDate ? `${scheduledDate.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})} - ${scheduledEnd ? scheduledEnd.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}) : ''} (${booking.hours || '?'} tiếng)` : 'Chưa xác định'}</strong><small>Phí dịch vụ</small><strong>{total.toLocaleString('vi-VN')}đ • {booking.paidAt ? 'Đã thanh toán' : 'Chưa thanh toán'}</strong></section></aside></div>
       <footer className="carer-case-action"><p><strong>Trạng thái hiện tại: {carerStatusLabel}</strong><small>{new Date(booking.scheduledAt).toLocaleString('vi-VN')}</small></p><button onClick={() => navigate('/carer/bookings')}>Quay lại</button>{['paid_confirmed','confirmed'].includes(booking.status) && <button className="primary" onClick={checkIn}><PlayCircle/>Bắt đầu điểm danh</button>}</footer>
     </main><Footer/></div>;
   }
@@ -220,7 +237,7 @@ const BookingDetail = () => {
               <div><span><CheckCircle2 /></span><strong>{booking.paidAt ? 'Đã thanh toán' : 'Chưa thanh toán'}</strong><small>{booking.paidAt ? 'Qua payOS' : (statusLabels[booking.status] || booking.status)}</small></div>
               {booking.priceSnapshot && <p><span>Đơn giá ({booking.hours || 1} tiếng × {booking.numSessions || 1} buổi)</span><span>{total.toLocaleString('vi-VN')}đ</span></p>}
               <p className="payment-total"><strong>Tổng cộng</strong><b>{total.toLocaleString('vi-VN')}đ</b></p>
-              {booking.status === 'pending_payment' && (
+              {['pending_payment', 'accepted_pending_payment'].includes(booking.status) && user?.role !== 'carer' && (
                 <button className="btn-primary" onClick={() => navigate(`/payment?bookingId=${booking._id}`)} style={{width: '100%', marginBottom: '10px', backgroundColor: '#16a34a', color: 'white', padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'}}>
                   Thanh toán ngay
                 </button>
