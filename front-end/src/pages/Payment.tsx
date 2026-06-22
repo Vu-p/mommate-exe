@@ -182,15 +182,19 @@ const Payment = () => {
                   </div>
                 ) : (
                   <div className="payment-qr-view">
-                    <div className="qr-container">
-                      <QRCodeSVG value={paymentLink.qrCode} size={220} level="M" />
-                      <div className="qr-overlay-logo">
-                         <img src="/logo192.png" alt="Logo" width="30" style={{backgroundColor: 'white', padding: '2px', borderRadius: '4px'}}/>
-                      </div>
+                    <div className="qr-container" style={{ padding: 0, overflow: 'hidden', border: 'none', background: 'transparent', boxShadow: 'none' }}>
+                      <img 
+                        src={`https://img.vietqr.io/image/${paymentLink.bin || '970436'}-${paymentLink.accountNumber}-compact2.jpg?amount=${paymentLink.amount}&addInfo=${encodeURIComponent(paymentLink.description)}&accountName=${encodeURIComponent(paymentLink.accountName)}`}
+                        alt="VietQR Code" 
+                        style={{ width: '100%', maxWidth: '320px', borderRadius: '12px' }}
+                      />
                     </div>
                     
                     <div className="payment-instructions">
-                      <p className="instruction-text">Mở ứng dụng ngân hàng và <strong>quét mã QR</strong> hoặc chuyển khoản thủ công theo thông tin bên dưới:</p>
+                      <div className="instruction-alert" style={{ backgroundColor: '#fef2f2', color: '#991b1b', padding: '12px', borderRadius: '8px', marginBottom: '20px', fontSize: '14px', fontWeight: '500' }}>
+                        ⚠️ Lưu ý: Bạn BẮT BUỘC phải mở <strong>Ứng dụng Ngân hàng</strong> (Vietcombank, MBBank...) để quét mã này, không dùng Camera thường hay Zalo.
+                      </div>
+                      <p className="instruction-text">Hoặc chuyển khoản thủ công theo thông tin bên dưới:</p>
                       
                       <div className="transfer-details">
                         <div className="detail-row">
