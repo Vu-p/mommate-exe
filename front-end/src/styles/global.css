@@ -28,48 +28,44 @@ body {
 }
 
 /* ═══════════════════════════════════════════════
-   Ambient Background — Floating aurora blobs
+   Ambient Background — Full Screen Mesh Gradient
    ═══════════════════════════════════════════════ */
 body::before,
 body::after {
   content: '';
   position: fixed;
-  border-radius: 50%;
-  filter: blur(100px);
-  opacity: 0.35;
-  z-index: -1;
+  inset: -20%;
+  filter: blur(120px);
+  opacity: 0.6;
+  z-index: -2;
   pointer-events: none;
   will-change: transform;
 }
 
 body::before {
-  width: 600px;
-  height: 600px;
-  top: -100px;
-  right: -150px;
-  background: radial-gradient(circle, #DCCEF9 0%, #E9E1FF 40%, transparent 70%);
-  animation: floatBlob1 20s ease-in-out infinite;
+  background: 
+    radial-gradient(circle at 10% 20%, #DCCEF9 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, #FFE0ED 0%, transparent 40%);
+  animation: floatMesh1 25s ease-in-out infinite alternate;
 }
 
 body::after {
-  width: 500px;
-  height: 500px;
-  bottom: -80px;
-  left: -120px;
-  background: radial-gradient(circle, #FFE0ED 0%, #F0E8FF 40%, transparent 70%);
-  animation: floatBlob2 25s ease-in-out infinite;
+  background: 
+    radial-gradient(circle at 80% 20%, #E9E1FF 0%, transparent 40%),
+    radial-gradient(circle at 20% 80%, #F0E8FF 0%, transparent 40%);
+  animation: floatMesh2 30s ease-in-out infinite alternate-reverse;
 }
 
-@keyframes floatBlob1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(-40px, 60px) scale(1.1); }
-  66% { transform: translate(30px, -40px) scale(0.95); }
+@keyframes floatMesh1 {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  50% { transform: translate(-3%, 5%) scale(1.1) rotate(5deg); }
+  100% { transform: translate(3%, -5%) scale(0.95) rotate(-5deg); }
 }
 
-@keyframes floatBlob2 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(50px, -40px) scale(1.05); }
-  66% { transform: translate(-30px, 50px) scale(0.9); }
+@keyframes floatMesh2 {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  50% { transform: translate(5%, -3%) scale(1.05) rotate(-5deg); }
+  100% { transform: translate(-5%, 5%) scale(0.9) rotate(5deg); }
 }
 
 /* Subtle noise texture overlay */

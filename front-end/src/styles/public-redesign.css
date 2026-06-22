@@ -174,7 +174,7 @@
   position: relative;
   overflow: hidden;
   background: 
-    linear-gradient(135deg, rgba(233, 225, 255, 0.8) 0%, rgba(247, 243, 255, 0.7) 30%, rgba(255, 224, 237, 0.6) 60%, rgba(220, 206, 249, 0.8) 100%),
+    linear-gradient(135deg, rgba(183, 156, 237, 0.1) 0%, rgba(45, 38, 64, 0.35) 100%),
     url('../assets/images/hero-bg-sharp.png') center/cover;
 }
 
@@ -261,11 +261,11 @@
 
 .public-app .services,
 .public-app .how-it-works,
-.public-app .about-commitments { background: rgba(237, 230, 247, 0.25); }
+.public-app .about-commitments { background: transparent; }
 .public-app .carers,
-.public-app .about-redesign-story { background: rgba(255, 255, 255, 0.3); }
+.public-app .about-redesign-story { background: transparent; }
 .public-app .values,
-.public-app .testimonials { background: rgba(243, 238, 255, 0.3); }
+.public-app .testimonials { background: transparent; }
 
 .public-app .services-header,
 .public-app .carers-heading { margin-bottom: 36px; }
@@ -1022,7 +1022,7 @@
   .public-app .hero-content { min-height: 600px; }
   .public-app .hero-main-container {
     background: 
-      linear-gradient(180deg, rgba(247, 243, 255, 0.5) 0%, rgba(233, 225, 255, 0.9) 100%),
+      linear-gradient(180deg, rgba(183, 156, 237, 0.1) 0%, rgba(45, 38, 64, 0.45) 100%),
       url('../assets/images/hero-bg-sharp.png') 62% center/cover;
   }
   .public-app .hero-content { display: flex; align-items: center; }
