@@ -171,6 +171,8 @@
 
 .user-profile-nav {
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .user-dropdown-toggle {
