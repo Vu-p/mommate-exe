@@ -64,18 +64,18 @@ const run = async () => {
   await Booking.deleteMany({});
   await CareProfile.deleteMany({});
   await Review.deleteMany({});
-  
+
   await Carer.deleteMany({});
   await Contract.deleteMany({});
   await User.deleteMany({ role: { $ne: UserRole.ADMIN } });
 
   const services = await Service.find({});
 
-  const admin = await upsertUser('admin.demo@mommate.local', { 
-    role: UserRole.ADMIN, 
-    firstName: 'Admin', 
-    lastName: 'MomMate', 
-    phoneNumber: '0900000003' 
+  const admin = await upsertUser('admin.demo@mommate.local', {
+    role: UserRole.ADMIN,
+    firstName: 'Admin',
+    lastName: 'MomMate',
+    phoneNumber: '0900000003'
   });
 
   const carersData = [
@@ -84,7 +84,7 @@ const run = async () => {
       firstName: 'Nguyễn Thị',
       lastName: 'Trà My',
       phone: '0901000001',
-      avatar: '/carers/carer1.png',
+      avatar: '/carers/carer1.jpg',
       district: 'Hải Châu',
       bio: 'Điều dưỡng nhi khoa với 8 năm kinh nghiệm. Chuyên hỗ trợ các mẹ bỉm sữa phục hồi sau sinh và chăm sóc trẻ sơ sinh.',
       age: 32,
@@ -96,7 +96,7 @@ const run = async () => {
       firstName: 'Lê Hoàng',
       lastName: 'Lan',
       phone: '0901000002',
-      avatar: '/carers/carer2.png',
+      avatar: '/carers/carer2.jpg',
       district: 'Thanh Khê',
       bio: 'Chuyên viên tư vấn sữa mẹ, có chứng chỉ quốc tế IBCLC. Kinh nghiệm làm việc tại khoa Phụ Sản.',
       age: 29,
@@ -108,7 +108,7 @@ const run = async () => {
       firstName: 'Trần Thanh',
       lastName: 'Hương',
       phone: '0901000003',
-      avatar: '/carers/carer3.png',
+      avatar: '/carers/carer3.jpg',
       district: 'Liên Chiểu',
       bio: 'Nữ hộ sinh giàu tình cảm, chu đáo. Luôn đặt sức khỏe của mẹ và sự phát triển của bé lên hàng đầu.',
       age: 35,
@@ -120,7 +120,7 @@ const run = async () => {
       firstName: 'Võ Minh',
       lastName: 'Tâm',
       phone: '0901000004',
-      avatar: '/carers/carer4.png',
+      avatar: '/carers/carer4.jpg',
       district: 'Sơn Trà',
       bio: 'Tốt nghiệp chuyên ngành Điều dưỡng đa khoa. Đặc biệt có kinh nghiệm xử lý các tình huống vàng da ở trẻ sơ sinh.',
       age: 26,
@@ -132,7 +132,7 @@ const run = async () => {
       firstName: 'Phạm Thị',
       lastName: 'Hoa',
       phone: '0901000005',
-      avatar: '/carers/carer5.png',
+      avatar: '/carers/carer5.jpg',
       district: 'Ngũ Hành Sơn',
       bio: 'Cô bảo mẫu hiền lành, yêu trẻ. Kinh nghiệm đồng hành cùng hơn 100 gia đình nhỏ tại khu vực Đà Nẵng.',
       age: 40,
@@ -142,10 +142,10 @@ const run = async () => {
   ];
 
   for (const cData of carersData) {
-    const carerUser = await upsertUser(cData.email, { 
-      role: UserRole.CARER, 
-      firstName: cData.firstName, 
-      lastName: cData.lastName, 
+    const carerUser = await upsertUser(cData.email, {
+      role: UserRole.CARER,
+      firstName: cData.firstName,
+      lastName: cData.lastName,
       phoneNumber: cData.phone,
       address: `${cData.district}, Đà Nẵng`,
       avatar: cData.avatar
