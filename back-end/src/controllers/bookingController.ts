@@ -508,14 +508,9 @@ export const createPaymentLink = async (req: AuthRequest, res: Response) => {
 
     if (booking.payosPaymentLinkId && booking.payosStatus === 'PENDING') {
       try {
-        const paymentLinkInfo = await payos.paymentRequests.get(booking.payosOrderCode);
-        return res.json({
-          booking,
-          ...paymentLinkInfo,
-        });
+        await payos.paymentRequests.cancel(booking.payosOrderCode, 'Tạo lại link thanh toán');
       } catch (err) {
-        console.error('Failed to fetch existing payment link info', err);
-        // Fallback to regenerating or just continuing
+        console.error('Failed to cancel existing payment link', err);
       }
     }
 
