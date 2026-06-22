@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import api from '../utils/api';
+import { isAdminApp } from '../config/appMode';
 
 interface User {
   _id: string;
@@ -37,10 +38,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const userInfo = localStorage.getItem('userInfo');
     if (userInfo) {
-      setUser(JSON.parse(userInfo));
+      try {
+        const parsed = JSON.parse(userInfo);
+        if (isAdminApp && parsed.role !== 'admin') {
+          // Ignore non-admin in admin app
+        } else if (!isAdminApp && parsed.role === 'admin') {
+          // Ignore admin in user app
+        } else {
+          setUser(parsed);
+        }
+      } catch (e) {
+        // Ignored
+      }
     }
     if (!userInfo) {
       api.post('/auth/refresh').then(({ data }) => {
+        if (isAdminApp && data.role !== 'admin') {
+          setLoading(false);
+          return;
+        }
+        if (!isAdminApp && data.role === 'admin') {
+          setLoading(false);
+          return;
+        }
         setUser(data);
         localStorage.setItem('userInfo', JSON.stringify(data));
       }).catch(() => undefined).finally(() => setLoading(false));

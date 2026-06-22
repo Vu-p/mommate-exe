@@ -70,42 +70,44 @@ const Auth = ({ defaultMode = 'signup' }: AuthProps) => {
                   <ArrowLeft size={16} /> Quay lại trang chủ
                 </Link>
               )}
-              <div className="auth-brand"><img src={logo} alt="" /><strong>Mommate</strong></div>
-              <div className="auth-tabs">
-                <button className={isLogin ? 'active' : ''} onClick={toggleToLogin}>Đăng nhập</button>
-                <button className={!isLogin ? 'active' : ''} onClick={toggleToSignup}>Đăng ký</button>
+              <div className="auth-form-wrapper">
+                <div className="auth-brand"><img src={logo} alt="" /><strong>Mommate</strong></div>
+                <div className="auth-tabs">
+                  <button className={isLogin ? 'active' : ''} onClick={toggleToLogin}>Đăng nhập</button>
+                  <button className={!isLogin ? 'active' : ''} onClick={toggleToSignup}>Đăng ký</button>
+                </div>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    className="auth-form-motion"
+                    key={isLogin ? 'login' : 'signup'}
+                    initial={{ opacity: 0, x: isLogin ? 20 : -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: isLogin ? -20 : 20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="auth-form-intro">
+                      <h2>{isLogin ? 'Chào mừng quay trở lại' : 'Tạo tài khoản MomMate'}</h2>
+                      <p>{isLogin ? 'Nhập thông tin của bạn để truy cập bảng điều khiển chăm sóc.' : 'Tìm kiếm sự hỗ trợ chuyên nghiệp mà gia đình bạn xứng đáng có được.'}</p>
+                    </div>
+                    {!isAdminApp && <SocialLogins isLogin={isLogin} />}
+                    {isLogin ? (
+                      <LoginForm onToggle={toggleToSignup} />
+                    ) : (
+                      <SignUpForm onToggle={toggleToLogin} />
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+                {!isAdminApp && (
+                  <>
+                    <aside className="auth-expert-card">
+                      <BriefcaseMedical aria-hidden="true" />
+                      <span><strong>Bạn là Chuyên gia?</strong><small>Truy cập cổng thông tin chuyên gia</small></span>
+                    <a href="/login">Đăng nhập cho<br />Chuyên gia →</a>
+                    </aside>
+                    <p className="auth-copyright">© 2026 Dịch vụ Chuyên nghiệp MomMate. Bảo lưu mọi quyền.</p>
+                  </>
+                )}
               </div>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  className="auth-form-motion"
-                  key={isLogin ? 'login' : 'signup'}
-                  initial={{ opacity: 0, x: isLogin ? 20 : -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: isLogin ? -20 : 20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="auth-form-intro">
-                    <h2>{isLogin ? 'Chào mừng quay trở lại' : 'Tạo tài khoản MomMate'}</h2>
-                    <p>{isLogin ? 'Nhập thông tin của bạn để truy cập bảng điều khiển chăm sóc.' : 'Tìm kiếm sự hỗ trợ chuyên nghiệp mà gia đình bạn xứng đáng có được.'}</p>
-                  </div>
-                  {!isAdminApp && <SocialLogins isLogin={isLogin} />}
-                  {isLogin ? (
-                    <LoginForm onToggle={toggleToSignup} />
-                  ) : (
-                    <SignUpForm onToggle={toggleToLogin} />
-                  )}
-                </motion.div>
-              </AnimatePresence>
-              {!isAdminApp && (
-                <>
-                  <aside className="auth-expert-card">
-                    <BriefcaseMedical aria-hidden="true" />
-                    <span><strong>Bạn là Chuyên gia?</strong><small>Truy cập cổng thông tin chuyên gia</small></span>
-                  <a href="/login">Đăng nhập cho<br />Chuyên gia →</a>
-                  </aside>
-                  <p className="auth-copyright">© 2026 Dịch vụ Chuyên nghiệp MomMate. Bảo lưu mọi quyền.</p>
-                </>
-              )}
             </div>
           </motion.div>
       </main>
