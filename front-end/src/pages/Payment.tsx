@@ -182,11 +182,11 @@ const Payment = () => {
                   </div>
                 ) : (
                   <div className="payment-qr-view">
-                    <div className="qr-container" style={{ padding: 0, overflow: 'hidden', border: 'none', background: 'transparent', boxShadow: 'none' }}>
+                    <div className="qr-container" style={{ padding: 0, overflow: 'hidden', border: 'none', background: 'transparent', boxShadow: 'none', width: '320px' }}>
                       <img 
                         src={`https://img.vietqr.io/image/${paymentLink.bin || '970436'}-${paymentLink.accountNumber}-compact2.jpg?amount=${paymentLink.amount}&addInfo=${encodeURIComponent(paymentLink.description)}&accountName=${encodeURIComponent(paymentLink.accountName)}`}
                         alt="VietQR Code" 
-                        style={{ width: '100%', maxWidth: '320px', borderRadius: '12px' }}
+                        style={{ width: '320px', height: 'auto', borderRadius: '12px', display: 'block' }}
                       />
                     </div>
                     
