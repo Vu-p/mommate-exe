@@ -220,11 +220,29 @@ const BookingDetail = () => {
               <div><span><CheckCircle2 /></span><strong>{booking.paidAt ? 'Đã thanh toán' : 'Chưa thanh toán'}</strong><small>{booking.paidAt ? 'Qua payOS' : (statusLabels[booking.status] || booking.status)}</small></div>
               {booking.priceSnapshot && <p><span>Đơn giá ({booking.hours || 1} tiếng × {booking.numSessions || 1} buổi)</span><span>{total.toLocaleString('vi-VN')}đ</span></p>}
               <p className="payment-total"><strong>Tổng cộng</strong><b>{total.toLocaleString('vi-VN')}đ</b></p>
+              {booking.status === 'pending_payment' && (
+                <button className="btn-primary" onClick={() => navigate(`/payment?bookingId=${booking._id}`)} style={{width: '100%', marginBottom: '10px', backgroundColor: '#16a34a', color: 'white', padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'}}>
+                  Thanh toán ngay
+                </button>
+              )}
               {booking.paidAt && <button onClick={() => booking?._id && downloadBookingInvoice(booking._id)}><Download />Tải hóa đơn điện tử</button>}
               {refund?.refund && <div className="booking-refund-status"><strong>Hoàn tiền: {refund.refund.status}</strong><small>{refund.refund.providerReference ? `Mã tham chiếu: ${refund.refund.providerReference}` : refund.refund.reason}</small></div>}
               <small><LockKeyhole />Thanh toán được bảo mật bởi payOS</small>
             </section>
-            <section className="booking-side-card location-card"><h3>ĐỊA ĐIỂM CHĂM SÓC</h3><p><MapPin />{booking.fullAddress}</p><div><Map /></div></section>
+            <section className="booking-side-card location-card">
+              <h3>ĐỊA ĐIỂM CHĂM SÓC</h3>
+              <p><MapPin />{booking.fullAddress}</p>
+              {booking.latitude && booking.longitude && (
+                <a 
+                  href={`https://www.google.com/maps/search/?api=1&query=${booking.latitude},${booking.longitude}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{display: 'flex', alignItems: 'center', gap: '8px', color: '#3b82f6', textDecoration: 'none', marginTop: '10px', padding: '10px', backgroundColor: '#eff6ff', borderRadius: '8px', fontWeight: '500'}}
+                >
+                  <Map size={18} /> Mở bằng Google Maps
+                </a>
+              )}
+            </section>
             <section className="booking-policy-card"><strong>Cần thay đổi lịch hẹn?</strong><p>Bạn có thể dời lịch hẹn miễn phí trước 24h kể từ thời điểm bắt đầu.</p><Link to="/terms">Đọc Chính sách hoàn tiền & hủy lịch <ArrowRight /></Link></section>
           </aside>
         </div>

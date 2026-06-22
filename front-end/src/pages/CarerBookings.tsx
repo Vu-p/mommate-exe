@@ -10,7 +10,7 @@ import './CarerBookings.css';
 
 const tabStatuses: Record<string, string> = {
   pending: 'pending,pending_carer',
-  upcoming: 'accepted_pending_payment,paid_confirmed,confirmed',
+  upcoming: 'pending_payment,accepted_pending_payment,paid_confirmed,confirmed',
   active: 'in_progress',
   history: 'completed,cancelled,rejected',
 };
@@ -68,9 +68,69 @@ const CarerBookings = () => {
     }
   };
 
-  const pending = useMemo(() => bookings.find((item) => ['pending', 'pending_carer'].includes(item.status)), [bookings]);
-  const checkin = useMemo(() => bookings.find((item) => ['paid_confirmed', 'confirmed'].includes(item.status)), [bookings]);
-  const active = useMemo(() => bookings.find((item) => item.status === 'in_progress'), [bookings]);
+  const renderCard = (booking: any) => {
+    if (['pending', 'pending_carer'].includes(booking.status)) {
+      return (
+        <article key={booking._id} className="carer-booking-card">
+          <header><UserRound/><div><h2>{booking.parent?.firstName} {booking.parent?.lastName}</h2><strong>{booking.service?.title}</strong></div><b>{Number(booking.totalPrice).toLocaleString('vi-VN')}đ</b></header>
+          <div className="booking-card-facts">
+            <p><CalendarDays/>{new Date(booking.scheduledAt).toLocaleString('vi-VN')}</p>
+            <p><MapPin/>{booking.fullAddress || booking.address}</p>
+            <p>{booking.medicalNotes || booking.notes || 'Không có ghi chú bổ sung.'}</p>
+          </div>
+          <footer>
+            <button disabled={!signed} onClick={() => action(booking._id, 'accept')}>Chấp nhận</button>
+            <button onClick={() => action(booking._id, 'reject')}>Từ chối</button>
+          </footer>
+        </article>
+      );
+    }
+    
+    if (['pending_payment', 'accepted_pending_payment', 'paid_confirmed', 'confirmed'].includes(booking.status)) {
+      return (
+        <article key={booking._id} className="carer-booking-card">
+          <header><UserRound/><div><h2>{booking.parent?.firstName} {booking.parent?.lastName}</h2><strong>{booking.service?.title}</strong></div><b>{Number(booking.totalPrice).toLocaleString('vi-VN')}đ</b></header>
+          <div className="booking-card-facts">
+            <p><Clock3/>{new Date(booking.scheduledAt).toLocaleString('vi-VN')}</p>
+            <p><MapPin/>{booking.serviceMode === 'online' ? 'Hẹn trực tuyến' : booking.fullAddress || booking.address}</p>
+            <p style={{color: booking.status === 'pending_payment' ? '#f59e0b' : '#10b981'}}>
+              {booking.status === 'pending_payment' ? 'Chờ KH thanh toán' : 'Đã xác nhận'}
+            </p>
+          </div>
+          {['paid_confirmed', 'confirmed'].includes(booking.status) && (
+            <button className="checkin-button" onClick={() => action(booking._id, 'check-in')}><LogIn/>Điểm danh</button>
+          )}
+          <button onClick={() => navigate(`/carer/bookings/${booking._id}`)}>Xem chi tiết</button>
+        </article>
+      );
+    }
+    
+    if (booking.status === 'in_progress') {
+      return (
+        <article key={booking._id} className="carer-booking-card active-case">
+          <header><img src={booking.parent?.avatar || activeAvatar} alt=""/><div><h2>{booking.parent?.firstName} {booking.parent?.lastName}</h2><strong>{booking.service?.title}</strong></div><b>{Number(booking.totalPrice).toLocaleString('vi-VN')}đ</b></header>
+          <div className="elapsed">Bắt đầu: {new Date(booking.checkInAt || booking.scheduledAt).toLocaleTimeString('vi-VN')} <strong>• Đang thực hiện</strong></div>
+          <p><MapPin/>{booking.fullAddress || booking.address}</p>
+          <footer>
+            <button onClick={() => navigate(`/carer/bookings/${booking._id}`)}>Nhật ký chăm sóc</button>
+            <button className="danger" onClick={() => action(booking._id, 'check-out')}><LogOut/>Kết thúc ca</button>
+          </footer>
+        </article>
+      );
+    }
+    
+    // History
+    return (
+      <article key={booking._id} className="carer-booking-card">
+        <header><UserRound/><div><h2>{booking.parent?.firstName} {booking.parent?.lastName}</h2><strong>{booking.service?.title}</strong></div><b>{Number(booking.totalPrice).toLocaleString('vi-VN')}đ</b></header>
+        <div className="booking-card-facts">
+          <p><CalendarDays/>{new Date(booking.scheduledAt).toLocaleString('vi-VN')}</p>
+          <p>Trạng thái: <strong>{booking.status === 'completed' ? 'Hoàn thành' : booking.status === 'cancelled' ? 'Đã hủy' : 'Đã từ chối'}</strong></p>
+        </div>
+        <button onClick={() => navigate(`/carer/bookings/${booking._id}`)}>Xem chi tiết</button>
+      </article>
+    );
+  };
 
   return <div className="carer-workspace-page carer-bookings-workspace"><Navbar/><main className="container carer-bookings-main">
     <h1>Quản lý lịch hẹn</h1>
@@ -83,11 +143,8 @@ const CarerBookings = () => {
     </nav>
     {error && <p className="stitch-error">{error}</p>}
     {loading && <p>Đang tải lịch hẹn...</p>}
-    <div className="carer-booking-grid"><div>
-      {pending && <article className="carer-booking-card"><header><UserRound/><div><h2>{pending.parent?.firstName} {pending.parent?.lastName}</h2><strong>{pending.service?.title}</strong></div><b>{Number(pending.totalPrice).toLocaleString('vi-VN')}đ</b></header><div className="booking-card-facts"><p><CalendarDays/>{new Date(pending.scheduledAt).toLocaleString('vi-VN')}</p><p><MapPin/>{pending.fullAddress || pending.address}</p><p>{pending.medicalNotes || pending.notes || 'Không có ghi chú bổ sung.'}</p></div><footer><button disabled={!signed} onClick={() => action(pending._id, 'accept')}>Chấp nhận</button><button onClick={() => action(pending._id, 'reject')}>Từ chối</button></footer></article>}
-      {checkin && <article className="carer-booking-card"><header><UserRound/><div><h2>{checkin.parent?.firstName} {checkin.parent?.lastName}</h2><strong>{checkin.service?.title}</strong></div><b>{Number(checkin.totalPrice).toLocaleString('vi-VN')}đ</b></header><div className="booking-card-facts"><p><Clock3/>{new Date(checkin.scheduledAt).toLocaleString('vi-VN')}</p><p><MapPin/>{checkin.serviceMode === 'online' ? 'Hẹn trực tuyến' : checkin.fullAddress || checkin.address}</p></div><button className="checkin-button" onClick={() => action(checkin._id, 'check-in')}><LogIn/>Điểm danh</button><button onClick={() => navigate(`/carer/bookings/${checkin._id}`)}>Xem chi tiết</button></article>}
-    </div>
-    {active && <article className="carer-booking-card active-case"><header><img src={active.parent?.avatar || activeAvatar} alt=""/><div><h2>{active.parent?.firstName} {active.parent?.lastName}</h2><strong>{active.service?.title}</strong></div><b>{Number(active.totalPrice).toLocaleString('vi-VN')}đ</b></header><div className="elapsed">Bắt đầu: {new Date(active.checkInAt || active.scheduledAt).toLocaleTimeString('vi-VN')} <strong>• Đang thực hiện</strong></div><p><MapPin/>{active.fullAddress || active.address}</p><footer><button onClick={() => navigate(`/carer/bookings/${active._id}`)}>Nhật ký chăm sóc</button><button className="danger" onClick={() => action(active._id, 'check-out')}><LogOut/>Kết thúc ca</button></footer></article>}
+    <div className="carer-booking-grid">
+      {bookings.map(renderCard)}
     </div>
     {!loading && bookings.length === 0 && <section className="empty-booking-workspace"><CalendarDays/><p>Không có lịch hẹn trong nhóm này.</p></section>}
   </main><Footer/></div>;
