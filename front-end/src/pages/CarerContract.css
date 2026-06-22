@@ -1,6 +1,6 @@
 .contract-page {
   min-height: 100vh;
-  background: #f8f9fa;
+  background: var(--bg);
 }
 
 .contract-shell {
@@ -16,9 +16,9 @@
 
 .contract-document-card,
 .contract-sign-panel {
-  border: 1px solid #c1c9be;
-  border-radius: 12px;
-  background: #fff;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg-strong);
 }
 
 .contract-document-card {
@@ -65,9 +65,9 @@
 .contract-document-card article {
   margin-top: 28px;
   padding: 44px 48px;
-  border: 1px solid #c1c9be;
-  border-radius: 8px;
-  background: #f8f9fa;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--bg);
   line-height: 1.55;
 }
 
@@ -101,9 +101,9 @@
   gap: 14px;
   margin: 28px 0;
   padding: 22px;
-  border: 1px solid #c1c9be;
-  border-radius: 8px;
-  background: #f3f4f5;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-container, #F3EEFF);
   line-height: 1.55;
   cursor: pointer;
 }
@@ -123,9 +123,9 @@
 .signature-box {
   position: relative;
   height: 165px;
-  border: 1px solid #c1c9be;
-  border-radius: 8px;
-  background: #fff;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg-strong);
   overflow: hidden;
 }
 
@@ -145,7 +145,7 @@
   height: 36px;
   display: grid;
   place-items: center;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   background: #e1e3e4;
   border: none;
   cursor: pointer;
@@ -175,9 +175,9 @@
   width: 100%;
   min-height: 56px;
   margin-top: 24px;
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   color: #fff;
-  background: #396940;
+  background: var(--primary);
   font-weight: 800;
   border: none;
   cursor: pointer;
@@ -193,22 +193,22 @@
   gap: 12px;
   margin-top: 32px;
   padding-top: 28px;
-  border-top: 1px solid #c1c9be;
-  color: #414940;
+  border-top: 1px solid var(--glass-border);
+  color: var(--text-muted);
   font-size: 0.75rem;
 }
 
 .contract-sign-panel footer svg {
   flex: none;
-  color: #396940;
+  color: var(--primary);
 }
 
 /* New Styles for Refactored States */
 .contract-error-state {
   text-align: center;
   padding: 60px 20px;
-  background: #fff;
-  border-radius: 12px;
+  background: var(--glass-bg-strong);
+  border-radius: var(--radius-lg);
   border: 1px solid #e1e3e0;
 }
 
@@ -235,7 +235,7 @@
   background: #ffdad6;
   color: #410002;
   padding: 16px 20px;
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   margin-bottom: 24px;
 }
 
@@ -259,8 +259,8 @@
 .voided-panel {
   margin-top: 24px;
   padding: 20px;
-  background: #f3f4f5;
-  border-radius: 8px;
+  background: var(--surface-container, #F3EEFF);
+  border-radius: var(--radius-lg);
   color: #5c5f5a;
   font-size: 0.95rem;
   text-align: center;
@@ -270,7 +270,7 @@
   background: #ffdad6;
   color: #ba1a1a;
   padding: 12px 16px;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   margin-bottom: 24px;
   font-weight: 500;
   font-size: 0.95rem;
@@ -292,7 +292,7 @@
 
 .signed-stamp p {
   font-weight: 700;
-  color: #193d22;
+  color: var(--ink, #2D2640);
   font-size: 1.05rem;
   margin-bottom: 4px;
 }
@@ -303,10 +303,10 @@
 
 .signature-preview {
   margin-top: 10px;
-  border: 1px dashed #c1c9be;
-  border-radius: 8px;
+  border: 1px dashed var(--glass-border);
+  border-radius: var(--radius-lg);
   padding: 10px;
-  background: #f8f9fa;
+  background: var(--bg);
 }
 
 .signature-preview img {

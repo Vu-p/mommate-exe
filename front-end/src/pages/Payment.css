@@ -33,7 +33,7 @@
 
 .stitch-payment-status {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   padding: 20px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   border-left: 4px solid #eab308;
@@ -69,7 +69,7 @@
 
 .stitch-payment-recap {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   padding: 24px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
@@ -145,7 +145,7 @@
   gap: 15px;
   padding: 20px;
   background: #f0fdf4;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   color: #16a34a;
 }
 
@@ -238,7 +238,7 @@
   transform: translate(-50%, -50%);
   background: white;
   padding: 6px;
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   display: flex;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
@@ -257,7 +257,7 @@
 
 .transfer-details {
   background: #f8fafc;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -307,7 +307,7 @@
   padding: 4px;
   color: #94a3b8;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -328,7 +328,7 @@
   color: #2563eb;
   background: #eff6ff;
   padding: 16px;
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   font-weight: 500;
   font-size: 14px;
   border: 1px solid #bfdbfe;
@@ -373,7 +373,7 @@
   background: #16a34a;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   padding: 16px 32px;
   font-size: 16px;
   font-weight: 600;

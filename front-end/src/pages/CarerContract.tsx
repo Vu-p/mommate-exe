@@ -1,6 +1,7 @@
 import { Loader2, RotateCcw, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
@@ -164,7 +165,12 @@ const CarerContract = () => {
           </div>
         )}
 
-        <div className="contract-layout">
+        <motion.div 
+          className="contract-layout"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
+        >
           <section className="contract-document-card">
             <header>
               <div>
@@ -246,7 +252,7 @@ const CarerContract = () => {
               <p>Chữ ký điện tử được lưu cùng thời gian, địa chỉ IP và thiết bị ký.</p>
             </footer>
           </aside>
-        </div>
+        </motion.div>
       </main>
       <Footer />
     </div>

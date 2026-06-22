@@ -13,7 +13,7 @@
   letter-spacing: .12em;
   margin: 34px 0 30px;
 }
-.social-text span { flex: 1; height: 1px; background: #c1c9be; }
+.social-text span { flex: 1; height: 1px; background: var(--glass-border); }
 
 .social-buttons {
   display: grid;
@@ -33,7 +33,7 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  border: 1px solid #c1c9be;
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   color: #191c1d;
   background: #fff;

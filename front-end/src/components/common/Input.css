@@ -21,7 +21,7 @@
 .input-control {
   min-height: 52px;
   padding: 0 16px;
-  border: 1px solid #c1c9be;
+  border: 1px solid var(--glass-border);
   background-color: #fff;
   border-radius: 8px;
   font-size: 1rem;

@@ -1,6 +1,6 @@
 .service-card-premium {
   min-height: 442px;
-  border: 1px solid #c1c9be;
+  border: 1px solid var(--glass-border);
   border-radius: 12px;
   background: var(--white);
   overflow: hidden;
@@ -63,17 +63,17 @@
 .service-category-tag.postpartum { color: #39081b; background: #ffd9e1; }
 .service-rating { display: flex; align-items: center; gap: 5px; color: #8b4b5d; font-size: .75rem; }
 .service-rating svg { width: 17px; }
-.service-rating span { color: #414940; font-size: .68rem; }
+.service-rating span { color: var(--text-muted); font-size: .68rem; }
 .service-card-bottom { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: auto; padding-top: 18px; }
-.card-content .price { margin: 0; color: #895032; line-height: 1.25; }
-.card-content .price small { display: block; color: #414940; font-size: .65rem; }
+.card-content .price { margin: 0; color: var(--primary-dark); line-height: 1.25; }
+.card-content .price small { display: block; color: var(--text-muted); font-size: .65rem; }
 .card-content .price strong { font-size: 1.05rem; }
-.card-content .price span { color: #414940; font-size: .62rem; }
+.card-content .price span { color: var(--text-muted); font-size: .62rem; }
 
 .learn-more {
   padding: 11px 15px;
   border-radius: 8px;
-  color: #396940;
+  color: var(--primary);
   background: rgba(57,105,64,.1);
   font-size: .75rem;
   font-weight: 650;

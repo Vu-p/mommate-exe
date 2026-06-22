@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowRight, ChevronDown, ClipboardList, MapPin, UsersRound, CalendarDays, FileHeart } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
@@ -206,7 +207,12 @@ const Booking = () => {
           <p>Vui lòng cung cấp chi tiết thông tin để chúng tôi có thể điều phối nhân viên y tế (Điều dưỡng/Nữ hộ sinh) phù hợp nhất với nhu cầu của gia đình.</p>
         </header>
 
-        <div className="booking-layout">
+        <motion.div 
+          className="booking-layout"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
+        >
           {/* Left Form Column */}
           <form id="booking-request-form" className="booking-form-col" onSubmit={handleSubmit}>
             <div className="booking-form-section">
@@ -435,7 +441,7 @@ const Booking = () => {
               </button>
             </div>
           </aside>
-        </div>
+        </motion.div>
       </main>
 
       <Footer />

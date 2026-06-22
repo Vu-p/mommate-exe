@@ -29,21 +29,21 @@
 }
 
 .page-header h1 {
-  color: #191c1d;
+  color: var(--text);
   font-size: 2rem;
   font-weight: 650;
   line-height: 1.18;
 }
 
 .page-header p {
-  color: #414940;
+  color: var(--text-muted);
   font-size: .82rem;
   line-height: 1.6;
   max-width: 620px;
   margin: 6px 0 0;
 }
-.page-header > span { color: #414940; font-size: .75rem; }
-.page-header > span strong { color: #396940; }
+.page-header > span { color: var(--text-muted); font-size: .75rem; }
+.page-header > span strong { color: var(--primary); }
 
 .listing-search-row {
   display: flex;
@@ -139,7 +139,7 @@
 }
 
 .page-btn:hover:not(:disabled):not(.active):not(.arrow) {
-  background-color: #f8f9fa;
+  background-color: var(--bg);
 }
 
 .page-btn.arrow {
@@ -222,7 +222,7 @@
   top: 80px;
   z-index: 40;
   padding: 14px 0;
-  border-bottom: 1px solid #c1c9be;
+  border-bottom: 1px solid var(--glass-border);
   background: rgba(255,255,255,.95);
   backdrop-filter: blur(14px);
 }
@@ -234,14 +234,14 @@
 .stitch-service-filter-inner .filter-select,
 .stitch-service-filter-inner .sort-filter .filter-select { min-width: 0; }
 .stitch-service-filter-inner .sort-filter .filter-group { display: block; }
-.stitch-service-filter-inner .filter-select-trigger { height: 44px; padding: 0 13px; border-radius: 8px; background: #f3f4f5; font-size: .82rem; }
-.stitch-service-filter-inner .filter-select-menu { border-radius: 8px; }
+.stitch-service-filter-inner .filter-select-trigger { height: 44px; padding: 0 13px; border-radius: var(--radius-lg); background: var(--surface-container, #F3EEFF); font-size: .82rem; }
+.stitch-service-filter-inner .filter-select-menu { border-radius: var(--radius-lg); }
 .stitch-category-chips { display: flex; gap: 8px; }
-.stitch-category-chips button { padding: 10px 14px; border-radius: 999px; color: #414940; background: #e7e8e9; font-size: .72rem; white-space: nowrap; }
-.stitch-category-chips button.active { color: #fff; background: #396940; }
-.stitch-area-select { min-height: 44px; width: 180px; padding: 0 13px; border: 1px solid #c1c9be; border-radius: 8px; background: #f3f4f5; color: #414940; }
-.stitch-sort-select { display: flex; align-items: center; gap: 8px; margin-left: auto; color: #414940; font-size: .68rem; white-space: nowrap; }
-.stitch-sort-select select { min-height: 44px; padding: 0 14px; border: 1px solid #c1c9be; color: #396940; background: #fff; font-weight: 700; }
+.stitch-category-chips button { padding: 10px 14px; border-radius: 999px; color: var(--text-muted); background: #e7e8e9; font-size: .72rem; white-space: nowrap; }
+.stitch-category-chips button.active { color: #fff; background: var(--primary); }
+.stitch-area-select { min-height: 44px; width: 180px; padding: 0 13px; border: 1px solid var(--glass-border); border-radius: var(--radius-lg); background: var(--surface-container, #F3EEFF); color: var(--text-muted); }
+.stitch-sort-select { display: flex; align-items: center; gap: 8px; margin-left: auto; color: var(--text-muted); font-size: .68rem; white-space: nowrap; }
+.stitch-sort-select select { min-height: 44px; padding: 0 14px; border: 1px solid var(--glass-border); color: var(--primary); background: var(--glass-bg-strong); font-weight: 700; }
 .public-app .find-service-page .site-footer { margin-top: 226px; }
 
 @media (max-width: 900px) {

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CalendarDays, ChevronRight, Clock3, Loader2, LockKeyhole, ShieldCheck, Stethoscope, UserRound, Copy, CheckCircle2 } from 'lucide-react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -132,7 +133,12 @@ const Payment = () => {
             <Link to="/bookings" className="btn-primary">Quay lại lịch đặt</Link>
           </div>
         ) : (
-          <div className="payment-layout">
+          <motion.div 
+            className="payment-layout"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
+          >
             <aside className="stitch-payment-summary">
               {isPaid ? (
                 <section className="stitch-payment-status success">
@@ -243,7 +249,7 @@ const Payment = () => {
                 )}
               </div>
             </section>
-          </div>
+          </motion.div>
         )}
       </main>
 

@@ -1,54 +1,92 @@
 :root {
-  /* Core Colors */
-  --primary: #396940;
-  --primary-light: #baf0bc;
-  --primary-dark: #20502a;
-  --primary-container: #7bae7f;
-  --on-primary-container: #0f411d;
-  --secondary: #895032;
-  --secondary-container: #feb28d;
-  --on-secondary-container: #794225;
-  --tertiary: #8b4b5d;
-  --tertiary-container: #d88ca0;
-  
-  /* Background & Surfaces */
-  --bg: #f8f9fa;
-  --background: #f8f9fa;
-  --surface: #f8f9fa;
-  --surface-dim: #d9dadb;
-  --surface-bright: #f8f9fa;
+  /* ═══════════════════════════════════════════════
+     Core Palette — Soft Lavender & Pastel
+     ═══════════════════════════════════════════════ */
+  --primary: #B79CED;
+  --primary-light: #DCCEF9;
+  --primary-dark: #9B7FD4;
+  --primary-container: #E9E1FF;
+  --on-primary-container: #3B2D66;
+  --secondary: #C4B1E0;
+  --secondary-container: #F0E8FF;
+  --on-secondary-container: #5A4A7A;
+  --tertiary: #E8B4CB;
+  --tertiary-container: #FFE0ED;
+
+  /* ═══════════════════════════════════════════════
+     Background & Surfaces
+     ═══════════════════════════════════════════════ */
+  --bg: #F7F3FF;
+  --background: #F7F3FF;
+  --surface: #ffffff;
+  --surface-dim: #EDE6F7;
+  --surface-bright: #ffffff;
   --surface-container-lowest: #ffffff;
-  --surface-container-low: #f3f4f5;
-  --surface-container: #edeeef;
-  --surface-container-high: #e7e8e9;
-  --surface-container-highest: #e1e3e4;
-  --surface-variant: #e1e3e4;
-  --inverse-surface: #2e3132;
-  --inverse-on-surface: #f0f1f2;
-  
-  /* Text & Outline */
+  --surface-container-low: #FAF7FF;
+  --surface-container: #F3EEFF;
+  --surface-container-high: #EDE6F9;
+  --surface-container-highest: #E9E1FF;
+  --surface-variant: #E9E1FF;
+  --inverse-surface: #2D2640;
+  --inverse-on-surface: #F3EEFF;
+
+  /* ═══════════════════════════════════════════════
+     Glassmorphism System — Multi-layer
+     ═══════════════════════════════════════════════ */
+  --glass-bg: rgba(255, 255, 255, 0.45);
+  --glass-bg-hover: rgba(255, 255, 255, 0.62);
+  --glass-bg-strong: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.25);
+  --glass-border-strong: rgba(255, 255, 255, 0.45);
+  --glass-shadow: 0 8px 32px 0 rgba(183, 156, 237, 0.15);
+  --glass-blur: blur(20px);
+  --glass-blur-strong: blur(30px);
+  --glass-blur-light: blur(12px);
+  --glass-inner-glow: inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+
+  /* ═══════════════════════════════════════════════
+     Gradients & Aurora
+     ═══════════════════════════════════════════════ */
+  --gradient-bg: linear-gradient(135deg, #F7F3FF 0%, #EDE6F9 25%, #F3EEFF 50%, #FAF7FF 75%, #F7F3FF 100%);
+  --gradient-aurora: linear-gradient(135deg, #DCCEF9 0%, #E9E1FF 25%, #F0E8FF 50%, #FFE0ED 75%, #DCCEF9 100%);
+  --gradient-primary: linear-gradient(135deg, #B79CED, #DCCEF9);
+  --gradient-hero: linear-gradient(160deg, #E9E1FF 0%, #F7F3FF 30%, #FFE0ED 60%, #DCCEF9 100%);
+  --gradient-cta: linear-gradient(135deg, #9B7FD4 0%, #B79CED 50%, #C4B1E0 100%);
+  --gradient-card-shine: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 60%);
+
+  /* ═══════════════════════════════════════════════
+     Text & Outline
+     ═══════════════════════════════════════════════ */
   --white: #ffffff;
-  --text: #191c1d;
-  --on-surface: #191c1d;
-  --on-background: #191c1d;
-  --text-muted: #414940;
-  --on-surface-variant: #414940;
-  --text-light: #717970;
-  --outline: #717970;
-  --border: #c1c9be;
-  --outline-variant: #c1c9be;
+  --text: #2D2640;
+  --on-surface: #2D2640;
+  --on-background: #2D2640;
+  --text-muted: #6B5E87;
+  --on-surface-variant: #6B5E87;
+  --text-light: #9B8FBE;
+  --outline: #DCCEF9;
+  --border: rgba(183, 156, 237, 0.2);
+  --outline-variant: #F0E8FF;
 
-  /* Feedback Colors */
-  --error: #ba1a1a;
-  --error-container: #ffdad6;
-  --on-error-container: #93000a;
-  --warning: #ffc107;
+  /* ═══════════════════════════════════════════════
+     Feedback Colors
+     ═══════════════════════════════════════════════ */
+  --error: #D64545;
+  --error-container: #FFE5E5;
+  --on-error-container: #8B1A1A;
+  --warning: #E8A940;
+  --success: #5CB87A;
+  --success-container: #E5F6EC;
 
-  /* Typography */
-  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  /* ═══════════════════════════════════════════════
+     Typography
+     ═══════════════════════════════════════════════ */
+  --font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-size-base: 16px;
 
-  /* Spacing */
+  /* ═══════════════════════════════════════════════
+     Spacing
+     ═══════════════════════════════════════════════ */
   --spacing-xs: 4px;
   --spacing-base: 8px;
   --spacing-sm: 12px;
@@ -60,17 +98,30 @@
   --spacing-margin-desktop: 64px;
   --container: 1280px;
 
-  /* Borders & Shadows */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  /* ═══════════════════════════════════════════════
+     Borders & Shadows — Layered depth system
+     ═══════════════════════════════════════════════ */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-2xl: 36px;
   --radius-pill: 9999px;
-  --shadow-sm: 0 2px 8px rgba(25, 28, 29, 0.04);
-  --shadow-md: 0 8px 24px rgba(25, 28, 29, 0.08);
-  --shadow-lg: 0 14px 36px rgba(25, 28, 29, 0.11);
-  --shadow-glass: 0 8px 32px rgba(93, 90, 136, 0.14);
 
-  /* Transitions */
-  --transition-fast: 0.2s ease;
-  --transition-normal: 0.3s ease;
+  --shadow-sm: 0 2px 8px rgba(183, 156, 237, 0.06), 0 1px 2px rgba(183, 156, 237, 0.04);
+  --shadow-md: 0 4px 16px rgba(183, 156, 237, 0.08), 0 2px 6px rgba(183, 156, 237, 0.05);
+  --shadow-lg: 0 8px 32px rgba(183, 156, 237, 0.12), 0 4px 12px rgba(183, 156, 237, 0.06);
+  --shadow-xl: 0 16px 48px rgba(183, 156, 237, 0.16), 0 8px 24px rgba(183, 156, 237, 0.08);
+  --shadow-glow: 0 0 40px rgba(183, 156, 237, 0.2);
+  --shadow-glass: 0 8px 32px rgba(183, 156, 237, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+
+  /* ═══════════════════════════════════════════════
+     Transitions — Spring-inspired easing
+     ═══════════════════════════════════════════════ */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }

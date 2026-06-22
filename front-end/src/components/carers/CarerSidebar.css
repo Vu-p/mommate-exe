@@ -15,7 +15,7 @@
   position: static;
   gap: 28px;
   padding: 28px 24px 0;
-  border-color: #c1c9be;
+  border-color: var(--glass-border);
   border-radius: 12px;
   box-shadow: none;
 }
@@ -29,12 +29,12 @@
 
 .public-app .carer-sidebar .sidebar-header h3 {
   margin: 0;
-  color: #396940;
+  color: var(--primary);
   font-size: 1.35rem;
 }
 
 .public-app .carer-sidebar .sidebar-header button {
-  color: #396940;
+  color: var(--primary);
   font-size: .75rem;
 }
 
@@ -42,19 +42,19 @@
 .public-app .carer-sidebar .sidebar-group > label { color: #191c1d; }
 .public-app .carer-sidebar .carer-select-trigger {
   min-height: 52px;
-  border-color: #c1c9be;
+  border-color: var(--glass-border);
   border-radius: 8px;
   background: #fff;
-  color: #414940;
+  color: var(--text-muted);
 }
 
-.carer-price-range { width: 100%; accent-color: #396940; }
-.price-range-labels { display: flex; justify-content: space-between; color: #414940; font-size: .72rem; }
+.carer-price-range { width: 100%; accent-color: var(--primary); }
+.price-range-labels { display: flex; justify-content: space-between; color: var(--text-muted); font-size: .72rem; }
 .sidebar-check-list { display: flex; flex-direction: column; gap: 12px; }
-.sidebar-check-list label { display: flex; align-items: center; gap: 9px; color: #414940; font-size: .85rem; }
-.sidebar-check-list input { width: 16px; height: 16px; accent-color: #396940; }
+.sidebar-check-list label { display: flex; align-items: center; gap: 9px; color: var(--text-muted); font-size: .85rem; }
+.sidebar-check-list input { width: 16px; height: 16px; accent-color: var(--primary); }
 .sidebar-rating-list { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
-.sidebar-rating-list button { display: inline-flex; align-items: center; gap: 5px; color: #414940; }
+.sidebar-rating-list button { display: inline-flex; align-items: center; gap: 5px; color: var(--text-muted); }
 .sidebar-rating-list svg { color: #8b4b5d; }
 .carer-support-card {
   min-height: 250px;

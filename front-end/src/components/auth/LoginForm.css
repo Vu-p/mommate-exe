@@ -64,7 +64,7 @@
 }
 
 .forgot-password {
-  color: #396940;
+  color: var(--primary);
   font-weight: 500;
 }
 
