@@ -506,12 +506,17 @@ export const createPaymentLink = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ message: 'Booking must be accepted by the carer before payment' });
     }
 
-    if (booking.payosCheckoutUrl && booking.payosStatus === 'PENDING') {
-      return res.json({
-        booking,
-        checkoutUrl: booking.payosCheckoutUrl,
-        qrCode: booking.payosQrCode,
-      });
+    if (booking.payosPaymentLinkId && booking.payosStatus === 'PENDING') {
+      try {
+        const paymentLinkInfo = await payos.paymentRequests.get(booking.payosOrderCode);
+        return res.json({
+          booking,
+          ...paymentLinkInfo,
+        });
+      } catch (err) {
+        console.error('Failed to fetch existing payment link info', err);
+        // Fallback to regenerating or just continuing
+      }
     }
 
     const appPublicUrl = process.env.APP_PUBLIC_URL || req.get('origin') || 'http://localhost:5173';
@@ -548,10 +553,7 @@ export const createPaymentLink = async (req: AuthRequest, res: Response) => {
 
     res.json({
       booking: updatedBooking,
-      checkoutUrl: paymentLink.checkoutUrl,
-      qrCode: paymentLink.qrCode,
-      paymentLinkId: paymentLink.paymentLinkId,
-      orderCode: paymentLink.orderCode,
+      ...paymentLink,
     });
   } catch (error: any) {
     console.error('payOS payment link error:', error);

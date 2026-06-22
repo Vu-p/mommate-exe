@@ -1,5 +1,5 @@
 import { AlertTriangle, CalendarDays, Clock3, LogIn, LogOut, MapPin, UserRound } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';

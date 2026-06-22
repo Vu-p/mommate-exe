@@ -139,9 +139,9 @@ const BookingDetail = () => {
         <section style={{padding: '20px', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '20px'}}>
           <h3 style={{fontSize: '16px', marginBottom: '8px'}}>{booking.address || 'Chưa có địa chỉ'}</h3>
           <p style={{marginBottom: '12px', color: '#64748b', fontSize: '14px'}}>{booking.fullAddress || ''}</p>
-          {booking.latitude && booking.longitude && (
+          {(booking.location?.coordinates || booking.fullAddress) && (
             <a 
-              href={`https://www.google.com/maps/search/?api=1&query=${booking.latitude},${booking.longitude}`} 
+              href={`https://www.google.com/maps/search/?api=1&query=${booking.location?.coordinates ? `${booking.location.coordinates[1]},${booking.location.coordinates[0]}` : encodeURIComponent(booking.fullAddress || '')}`} 
               target="_blank" 
               rel="noopener noreferrer"
               style={{display: 'flex', alignItems: 'center', gap: '8px', color: '#16a34a', textDecoration: 'none', padding: '12px', backgroundColor: '#f0fdf4', borderRadius: '8px', fontWeight: '600', justifyContent: 'center'}}
@@ -249,9 +249,9 @@ const BookingDetail = () => {
             <section className="booking-side-card location-card">
               <h3>ĐỊA ĐIỂM CHĂM SÓC</h3>
               <p><MapPin />{booking.fullAddress}</p>
-              {booking.latitude && booking.longitude && (
+              {(booking.location?.coordinates || booking.fullAddress) && (
                 <a 
-                  href={`https://www.google.com/maps/search/?api=1&query=${booking.latitude},${booking.longitude}`} 
+                  href={`https://www.google.com/maps/search/?api=1&query=${booking.location?.coordinates ? `${booking.location.coordinates[1]},${booking.location.coordinates[0]}` : encodeURIComponent(booking.fullAddress || '')}`} 
                   target="_blank" 
                   rel="noopener noreferrer"
                   style={{display: 'flex', alignItems: 'center', gap: '8px', color: '#3b82f6', textDecoration: 'none', marginTop: '10px', padding: '10px', backgroundColor: '#eff6ff', borderRadius: '8px', fontWeight: '500'}}
