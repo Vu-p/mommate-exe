@@ -53,7 +53,7 @@ const Review = () => {
     <div className="review-page">
       <Navbar />
       <main className="container stitch-review-main">
-        <header className="stitch-review-heading"><h1>Đánh giá dịch vụ</h1><p>Cảm ơn bạn đã tin tưởng MaternalCare. Hãy chia sẻ trải nghiệm của bạn để chúng tôi phục vụ tốt hơn.</p></header>
+        <header className="stitch-review-heading"><h1>Đánh giá dịch vụ</h1><p>Cảm ơn bạn đã tin tưởng MomMate. Hãy chia sẻ trải nghiệm của bạn để chúng tôi phục vụ tốt hơn.</p></header>
         {pageError ? <div className="review-error-banner">{pageError}</div> : (
           <section className="stitch-review-card">
             <div className="review-carer-summary">

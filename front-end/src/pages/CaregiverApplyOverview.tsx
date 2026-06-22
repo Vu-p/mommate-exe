@@ -62,6 +62,10 @@ const CaregiverApplyOverview = () => {
       try {
         setLoading(true);
         const { data } = await api.get('/carers/me');
+        if (data?.carer?.isVerified || data?.carer?.applicationStatus === 'verified') {
+          navigate('/carer/profile');
+          return;
+        }
         const profileUser = data?.user || {};
         setFormData({
           firstName: profileUser.firstName || user.firstName || '',

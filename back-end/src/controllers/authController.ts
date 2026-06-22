@@ -58,6 +58,10 @@ const issueSession = async (res: Response, user: any, status = 200) => {
 export const registerUser = async (req: Request, res: Response) => {
   const { firstName, lastName, email, password } = req.body;
 
+  if (!firstName || !lastName || !email || !password) {
+    return res.status(400).json({ message: 'Vui lòng điền đầy đủ họ tên, email và mật khẩu.' });
+  }
+
   try {
     const userExists = await User.findOne({ email });
 

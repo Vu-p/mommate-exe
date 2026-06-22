@@ -43,9 +43,9 @@ const ChangePassword = () => {
 
   return (
     <div className="change-password-page">
-      <header className="security-header"><div><Stethoscope /><strong>MaternalCare</strong></div><span><ShieldCheck />Môi trường bảo mật</span></header>
+      <header className="security-header"><div><Stethoscope /><strong>MomMate</strong></div><span><ShieldCheck />Môi trường bảo mật</span></header>
       <main className="change-password-shell">
-        <section className="password-intro"><h1>Đặt lại mật khẩu tài khoản</h1><p>Để đảm bảo an toàn cho bệnh nhân và thông tin chuyên môn của bạn, vui lòng cập nhật mật khẩu tạm thời do quản trị viên cung cấp.</p></section>
+        <section className="password-intro"><h1>Đặt lại mật khẩu tài khoản</h1><p>Để đảm bảo an toàn cho mẹ và bé cũng như thông tin chuyên môn của bạn, vui lòng cập nhật mật khẩu tạm thời do quản trị viên cung cấp.</p></section>
         <div className="password-layout">
           <div>
             <form className="change-password-card" onSubmit={handleSubmit}>
@@ -61,7 +61,7 @@ const ChangePassword = () => {
           </div>
           <aside className="security-aside">
             <div className="security-image"><img src={securityImage} alt="" /><strong>Bảo vệ mạng lưới Chuyên gia với các tiêu chuẩn bảo mật cấp doanh nghiệp.</strong></div>
-            <section><h2><ShieldAlert />Hướng dẫn bảo mật tốt nhất</h2><article><History /><div><strong>Tránh sử dụng lại mật khẩu cũ</strong><p>Không sử dụng mật khẩu bạn dùng cho các tài khoản cá nhân như mạng xã hội hoặc ngân hàng.</p></div></article><article><b>***</b><div><strong>Sử dụng cụm mật khẩu</strong><p>Thay vì một từ, hãy sử dụng kết hợp 3-4 từ không liên quan.</p></div></article><article><Laptop /><div><strong>Đăng xuất trên thiết bị dùng chung</strong><p>Luôn đăng xuất khi sử dụng máy trạm chung tại bệnh viện hoặc đại lý.</p></div></article><footer><strong>Lưu ý cho Chuyên gia</strong><p>Quản trị viên MaternalCare sẽ không bao giờ hỏi mật khẩu của bạn qua email hoặc điện thoại.</p></footer></section>
+            <section><h2><ShieldAlert />Hướng dẫn bảo mật tốt nhất</h2><article><History /><div><strong>Tránh sử dụng lại mật khẩu cũ</strong><p>Không sử dụng mật khẩu bạn dùng cho các tài khoản cá nhân như mạng xã hội hoặc ngân hàng.</p></div></article><article><b>***</b><div><strong>Sử dụng cụm mật khẩu</strong><p>Thay vì một từ, hãy sử dụng kết hợp 3-4 từ không liên quan.</p></div></article><article><Laptop /><div><strong>Đăng xuất trên thiết bị dùng chung</strong><p>Luôn đăng xuất khi sử dụng máy tính dùng chung.</p></div></article><footer><strong>Lưu ý</strong><p>Quản trị viên MomMate sẽ không bao giờ hỏi mật khẩu của bạn qua email hoặc điện thoại.</p></footer></section>
           </aside>
         </div>
       </main>

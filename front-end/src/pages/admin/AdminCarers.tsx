@@ -222,7 +222,7 @@ const AdminCarers = () => {
                       </div>
                     </td>
                     <td>{carer.experienceYears} Years</td>
-                    <td><span className="price-tag">{carer.hourlyRate.toLocaleString()} VND/hr</span></td>
+                    <td><span className="price-tag">{carer.hourlyRate ? carer.hourlyRate.toLocaleString('vi-VN') : 0} VNĐ/giờ</span></td>
                     <td>
                       <span className={`badge ${carer.isVerified ? 'verified' : 'unverified'}`}>
                         {carer.verificationStatus || (carer.isVerified ? 'verified' : 'pending')}

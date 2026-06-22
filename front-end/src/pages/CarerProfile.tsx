@@ -40,8 +40,8 @@ const CarerProfile = () => {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user || user.role !== 'carer') return navigate('/login');
-    if (user.mustChangePassword) return navigate('/change-password');
+    if (!user || user.role !== 'carer') { navigate('/login'); return; }
+    if (user.mustChangePassword) { navigate('/change-password'); return; }
     void load();
   }, [authLoading, load, navigate, user]);
 
@@ -55,11 +55,11 @@ const CarerProfile = () => {
     : [...form.services, id]);
 
   const toggleSlot = (day: string, slot: string) => {
-    const next = new Map((form.availability || []).map((entry: any) => [entry.day, new Set(entry.slots)]));
-    const values = (next.get(day) || new Set()) as Set<string>;
+    const next = new Map<string, Set<string>>((form.availability || []).map((entry: any) => [entry.day, new Set(entry.slots)]));
+    const values = (next.get(day) || new Set<string>()) as Set<string>;
     values.has(slot) ? values.delete(slot) : values.add(slot);
     next.set(day, values);
-    update('availability', [...next.entries()].map(([entryDay, entrySlots]) => ({ day: entryDay, slots: [...entrySlots] })));
+    update('availability', Array.from(next.entries()).map(([entryDay, entrySlots]) => ({ day: entryDay, slots: Array.from(entrySlots) })));
   };
 
   const save = async () => {

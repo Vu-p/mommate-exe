@@ -25,6 +25,7 @@ import CaregiverApplyJob from './pages/CaregiverApplyJob';
 import BookingChange from './pages/BookingChange';
 import InfoPage from './pages/InfoPage';
 import PublicMotion from './components/common/PublicMotion';
+import ProtectedRoute from './components/common/ProtectedRoute';
 import './styles/global.css';
 import './styles/public-redesign.css';
 
@@ -114,26 +115,26 @@ function App() {
         <Route path="/services/:id" element={<ServiceDetail />} />
         <Route path="/carers" element={<FindCarer />} />
         <Route path="/carers/:id" element={<CarerDetail />} />
-        <Route path="/booking" element={<Booking />} />
-        <Route path="/account/request" element={<AccountRequests />} />
-        <Route path="/account/request/:id" element={<BookingDetail />} />
-        <Route path="/bookings/:id/change" element={<BookingChange />} />
-        <Route path="/payment" element={<Payment />} />
-        <Route path="/payment/success" element={<PaymentSuccess />} />
-        <Route path="/review" element={<Review />} />
-        <Route path="/account/profile" element={<AccountProfile />} />
+        <Route path="/booking" element={<ProtectedRoute><Booking /></ProtectedRoute>} />
+        <Route path="/account/request" element={<ProtectedRoute><AccountRequests /></ProtectedRoute>} />
+        <Route path="/account/request/:id" element={<ProtectedRoute><BookingDetail /></ProtectedRoute>} />
+        <Route path="/bookings/:id/change" element={<ProtectedRoute><BookingChange /></ProtectedRoute>} />
+        <Route path="/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
+        <Route path="/payment/success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
+        <Route path="/review" element={<ProtectedRoute><Review /></ProtectedRoute>} />
+        <Route path="/account/profile" element={<ProtectedRoute><AccountProfile /></ProtectedRoute>} />
         <Route path="/auth" element={<Auth />} />
-        <Route path="/change-password" element={<ChangePassword />} />
+        <Route path="/change-password" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
         <Route path="/signup" element={<Auth defaultMode="signup" />} />
         <Route path="/login" element={<Auth defaultMode="login" />} />
-        <Route path="/carer/profile" element={<CarerProfile />} />
-        <Route path="/carer/apply" element={<CaregiverApplyOverview />} />
-        <Route path="/carer/apply/job" element={<CaregiverApplyJob />} />
-        <Route path="/carer/bookings" element={<CarerBookings />} />
-        <Route path="/carer/bookings/:id" element={<BookingDetail />} />
-        <Route path="/carer/contract" element={<CarerContract />} />
-        <Route path="/incidents/new" element={<IncidentReport />} />
-        <Route path="/messages/:id" element={<Messages />} />
+        <Route path="/carer/profile" element={<ProtectedRoute allowedRoles={['carer']}><CarerProfile /></ProtectedRoute>} />
+        <Route path="/carer/apply" element={<ProtectedRoute allowedRoles={['carer']}><CaregiverApplyOverview /></ProtectedRoute>} />
+        <Route path="/carer/apply/job" element={<ProtectedRoute allowedRoles={['carer']}><CaregiverApplyJob /></ProtectedRoute>} />
+        <Route path="/carer/bookings" element={<ProtectedRoute allowedRoles={['carer']}><CarerBookings /></ProtectedRoute>} />
+        <Route path="/carer/bookings/:id" element={<ProtectedRoute allowedRoles={['carer']}><BookingDetail /></ProtectedRoute>} />
+        <Route path="/carer/contract" element={<ProtectedRoute allowedRoles={['carer']}><CarerContract /></ProtectedRoute>} />
+        <Route path="/incidents/new" element={<ProtectedRoute><IncidentReport /></ProtectedRoute>} />
+        <Route path="/messages/:id" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
         {['privacy','terms','help','contact','careers','faq','guide'].map((path) => <Route key={path} path={`/${path}`} element={<InfoPage />} />)}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Navigate to="dashboard" replace />} />

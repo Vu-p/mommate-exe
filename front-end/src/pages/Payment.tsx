@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { CalendarDays, ChevronRight, Clock3, CreditCard, Loader2, LockKeyhole, ShieldCheck, Stethoscope, UserRound } from 'lucide-react';
+import { CalendarDays, ChevronRight, Clock3, Loader2, LockKeyhole, ShieldCheck, Stethoscope, UserRound } from 'lucide-react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';

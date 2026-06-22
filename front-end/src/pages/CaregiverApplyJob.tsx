@@ -159,10 +159,7 @@ const CaregiverApplyJob = () => {
     fetchData();
   }, [overviewData]);
 
-  const selectedServices = useMemo(
-    () => services.filter((service) => formData.serviceIds.includes(service._id)),
-    [formData.serviceIds, services]
-  );
+
 
   const estimatedValue = useMemo(() => {
     const rate = formData.pricingType === 'fixed' ? Number(formData.fixedRate || 0) : Number(formData.hourlyRate || 0);
@@ -228,13 +225,7 @@ const CaregiverApplyJob = () => {
     });
   };
 
-  const updateWorkplaceProofImage = (index: number, url: string) => {
-    setFormData((prev) => {
-      const workplaceProofImages = [...prev.workplaceProofImages];
-      workplaceProofImages[index] = url;
-      return { ...prev, workplaceProofImages };
-    });
-  };
+
 
   const handleSubmit = async (submit: boolean) => {
     setSaving(true);

@@ -1,6 +1,6 @@
 import { AlertCircle, BarChart3, Building2, CalendarDays, Check, CheckCircle2, ChevronLeft, ChevronRight, CircleDollarSign, Clock3, Download, Eye, Filter, Mail, MapPin, MoreVertical, Pencil, Phone, Plus, ReceiptText, Search, ShieldAlert, Smile, Star, TrendingUp, UserRoundX, WalletCards, XCircle } from 'lucide-react';
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ReactNode, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 import '../OperationalPages.css';
@@ -40,7 +40,7 @@ export const AdminUsers = () => {
   return <AdminListShell eyebrow="QUẢN TRỊ TÀI KHOẢN" title="Quản lý Người dùng Admin" subtitle="Quản lý tài khoản phụ huynh và quản trị viên hệ thống trong hệ sinh thái MomMate." action={<button className="admin-primary-action"><Plus />Thêm người dùng mới</button>}>
     <div className="admin-filter-row"><SearchBox value={search} onChange={setSearch} placeholder="Tìm kiếm người dùng theo tên, email hoặc ID..." /><select value={role} onChange={(e) => { setRole(e.target.value); setPage(1); }}><option value="">Tất cả vai trò</option><option value="parent">Phụ huynh</option><option value="carer">Chuyên gia</option><option value="admin">Admin</option></select><select defaultValue=""><option value="">Tất cả trạng thái</option><option>Hoạt động</option><option>Tạm khóa</option></select><button className="admin-advanced-filter"><Filter size={18} />Bộ lọc nâng cao</button></div>
     <AdminTable headers={['Thông tin người dùng', 'Liên hệ & địa chỉ', 'Vai trò', 'Ngày tham gia', 'Trạng thái', 'Thao tác']}>
-      {items.map((user) => <tr key={user._id}><td><strong>{user.firstName} {user.lastName}</strong><small>ID: {String(user._id).toUpperCase()}</small></td><td><strong>{user.email}</strong><small>{user.phoneNumber || 'Chưa cập nhật'} · Đà Nẵng</small></td><td>{user.role === 'admin' ? 'ADMIN' : 'PHỤ HUYNH'}</td><td>12/10/2023</td><td><Status value={user.accountStatus || 'active'} /></td><td><button className="admin-inline-action" onClick={() => toggle(user)}>{user.accountStatus === 'suspended' ? 'Mở khóa' : 'Tạm khóa'}</button></td></tr>)}
+      {items.map((user) => <tr key={user._id}><td><strong>{user.firstName} {user.lastName}</strong><small>ID: {String(user._id).toUpperCase()}</small></td><td><strong>{user.email}</strong><small>{user.phoneNumber ? `${user.phoneNumber} · ` : 'Chưa cập nhật · '}Đà Nẵng</small></td><td>{user.role === 'admin' ? 'ADMIN' : user.role === 'carer' ? 'CHUYÊN GIA' : 'PHỤ HUYNH'}</td><td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</td><td><Status value={user.accountStatus || 'active'} /></td><td><button className="admin-inline-action" onClick={() => toggle(user)}>{user.accountStatus === 'suspended' ? 'Mở khóa' : 'Tạm khóa'}</button></td></tr>)}
     </AdminTable><PageNav pagination={pagination} onChange={setPage} />
     <div className="admin-user-metrics"><Metric label="Tổng phụ huynh đang hoạt động" value="1,248" /><Metric label="Quản trị viên hệ thống" value="12" /><article><UserRoundX /><small>Tài khoản tạm khóa/vô hiệu hóa</small><strong>45</strong></article></div>
   </AdminListShell>;
@@ -174,8 +174,8 @@ const StitchAdminRevenue = () => {
   const topCarers = data.topCarers.length ? data.topCarers : [{ name: 'Chưa có dữ liệu', revenue: 0, bookings: 0, rating: 0 }];
   return <div className="admin-ops-page revenue-page">
     <OperationsHeader title="Báo cáo & Phân tích" subtitle="Theo dõi doanh thu thời gian thực và thông tin hiệu suất." action={<div className="ops-actions"><button><CalendarDays />30 ngày qua</button><button className="primary" onClick={() => downloadReport('pdf')}><Download />Xuất PDF</button><button onClick={() => downloadReport('csv')}>CSV</button></div>} />
-    <section className="ops-metrics four"><OpsMetric icon={CircleDollarSign} label="Tổng doanh thu gộp" value={Number(data.totals.revenue || 0).toLocaleString('vi-VN')} note="VNĐ" /><OpsMetric icon={Building2} label="Hoa hồng nền tảng" value={Number(data.totals.platformFees || 0).toLocaleString('vi-VN')} note="VNĐ" tone="orange" /><OpsMetric icon={BarChart3} label="Giá trị đơn hàng TB (AOV)" value={Number(data.totals.bookings ? data.totals.revenue / data.totals.bookings : 0).toLocaleString('vi-VN')} note="VNĐ" tone="pink" /><OpsMetric icon={TrendingUp} label="Tổng booking" value={data.totals.bookings || 0} note="Đã ghi nhận" /></section>
-    <section className="ops-panel revenue-trend"><header><div><h2>Xu hướng tăng trưởng doanh thu</h2><p>Doanh thu gộp vs. Phí nền tảng (Hàng tuần)</p></div><span>● Doanh thu gộp　 <i>●</i> Phí nền tảng</span></header><div className="trend-grid">{revenueBars.map((height, index) => <div key={index}><span className="gross" style={{ height: `${height}%` }} /><span className="fee" style={{ height: `${height * .28}%` }} /><small>T{index + 1}</small></div>)}</div></section>
+    <section className="ops-metrics four"><OpsMetric icon={CircleDollarSign} label="Tổng doanh thu gộp" value={Number(data.totals.revenue || 0).toLocaleString('vi-VN')} note="VNĐ" /><OpsMetric icon={Building2} label="Hoa hồng nền tảng" value={Number(data.totals.platformFees || 0).toLocaleString('vi-VN')} note="VNĐ" tone="orange" /><OpsMetric icon={BarChart3} label="Giá trị đơn hàng TB (AOV)" value={Math.round(Number(data.totals.bookings ? data.totals.revenue / data.totals.bookings : 0)).toLocaleString('vi-VN')} note="VNĐ" tone="pink" /><OpsMetric icon={TrendingUp} label="Tổng booking" value={data.totals.bookings || 0} note="Đã ghi nhận" /></section>
+    <section className="ops-panel revenue-trend"><header><div><h2>Xu hướng tăng trưởng doanh thu</h2><p>Doanh thu gộp vs. Phí nền tảng (Hàng tuần)</p></div><span>● Doanh thu gộp　 <i>●</i> Phí nền tảng</span></header><div className="trend-grid">{revenueBars.map((height: number, index: number) => <div key={index}><span className="gross" style={{ height: `${height}%` }} /><span className="fee" style={{ height: `${height * .28}%` }} /><small>T{index + 1}</small></div>)}</div></section>
     <section className="revenue-bottom-grid">
       <article className="ops-panel category-card"><h2>Theo danh mục dịch vụ</h2><div className="donut"><span>CAO NHẤT<strong>{services[0].label}</strong></span></div>{services.slice(0, 3).map((item: any) => <p key={item.label}><i />{item.label} <b>{item.percent}%</b></p>)}</article>
       <article className="ops-panel district-card"><h2>Doanh thu theo quận</h2>{districts.slice(0, 4).map((item: any) => <div key={item.label}><span>{item.label}<b>{Number(item.revenue || 0).toLocaleString('vi-VN')} VNĐ</b></span><i><em style={{ width: `${Number(item.revenue || 0) / maxDistrict * 90}%` }} /></i></div>)}<div className="map-placeholder">Xem bản đồ nhiệt</div></article>
@@ -275,11 +275,11 @@ export const AdminBookingDetail = () => {
   const loadBooking = () => api.get(`/bookings/${id}`).then(({ data }) => setBooking(data));
   useEffect(() => { void loadBooking(); }, [id]);
   if (!booking) return <div className="admin-page-content">Đang tải booking...</div>;
-  const parentName = `${booking.parent?.firstName || 'Lê Thùy'} ${booking.parent?.lastName || 'Dương'}`;
-  const carerName = `${booking.carer?.user?.firstName || 'Nguyễn Thị'} ${booking.carer?.user?.lastName || 'Minh Anh'}`;
-  const total = Number(booking.totalPrice || 36000000);
-  const fee = Number(booking.platformFeeAmount || total * .15);
-  const payout = Number(booking.carerPayoutAmount || total - fee);
+  const parentName = `${booking.parent?.firstName || ''} ${booking.parent?.lastName || ''}`;
+  const carerName = `${booking.carer?.user?.firstName || ''} ${booking.carer?.user?.lastName || ''}`;
+  const total = Number(booking.totalPrice || 0);
+  const fee = Number(booking.platformFeeAmount || 0);
+  const payout = Number(booking.carerPayoutAmount || 0);
   const updateStatus = async (forcedStatus?: string) => {
     const status = forcedStatus || prompt('Trạng thái mới') || '';
     if (!status.trim()) return;
@@ -294,7 +294,7 @@ export const AdminBookingDetail = () => {
   };
   return <div className="admin-page-content admin-booking-detail-page">
     <header className="booking-detail-heading">
-      <div><div className="booking-title-line"><h1>Đơn đặt chỗ #BK-9021</h1><span>ĐÃ HOÀN THÀNH</span></div><p>Ngày tạo: 12 Th10, 2024 • Quản lý bởi Hệ thống Admin</p></div>
+      <div><div className="booking-title-line"><h1>Đơn đặt chỗ #BK-{String(booking._id).slice(-4).toUpperCase()}</h1><span>{booking.status?.toUpperCase()}</span></div><p>Ngày tạo: {new Date(booking.createdAt || booking.scheduledAt).toLocaleDateString('vi-VN')} • Quản lý bởi Hệ thống Admin</p></div>
       <div className="booking-detail-actions"><button onClick={() => updateStatus()}><Pencil />Cập nhật trạng thái</button><button className="danger" onClick={() => updateStatus('cancelled')}><XCircle />Hủy/Hoàn tiền</button><button className="message" onClick={openConversation}><Mail />Nhắn tin các bên</button></div>
     </header>
     <section className="booking-progress-card">
@@ -307,16 +307,16 @@ export const AdminBookingDetail = () => {
           <section className="booking-detail-card person-card"><header><h2>Thông tin phụ huynh</h2><a>Hồ sơ ↗</a></header><div className="person-content"><div className="person-avatar">LD</div><div><h3>{parentName}</h3><p><MapPin />{booking.fullAddress || booking.address || '123 Bạch Đằng, Hải Châu, Đà Nẵng'}</p><p><Phone />{booking.parent?.phoneNumber || '+84 90 1234 567'}</p></div></div></section>
           <section className="booking-detail-card person-card"><header><h2>Thông tin chăm sóc</h2><a>Hồ sơ đầy đủ ↗</a></header><div className="person-content"><div className="person-avatar carer-avatar">MA</div><div><h3>{carerName}</h3><p><Building2 />BV Phụ sản - Nhi Đà Nẵng</p><a className="person-message">Nhắn tin cho chuyên gia</a></div></div></section>
         </div>
-        <section className="booking-detail-card service-schedule-card"><h2>Dịch vụ & Lịch trình</h2><div className="service-facts"><div><small>TÊN GÓI DỊCH VỤ</small><strong>{booking.service?.title || 'Hỗ trợ sau sinh'}</strong></div><div><small>THỜI GIAN</small><strong>14 Ngày (15 Th10 - 29 Th10)</strong></div><div><small>LỊCH TRÌNH HÀNG NGÀY</small><strong>08:00 - 17:00 (9 tiếng)</strong></div></div><div className="care-note"><small>YÊU CẦU CHĂM SÓC / GHI CHÚ</small><p>{booking.medicalNotes || 'Phụ huynh cần hỗ trợ kỹ thuật tắm trẻ sơ sinh và tư vấn kích sữa. Ưu tiên hướng dẫn thói quen ngủ đêm cho trẻ. Lưu ý: Gia đình có nuôi một chú chó nhỏ, rất thân thiện.'}</p></div></section>
+        <section className="booking-detail-card service-schedule-card"><h2>Dịch vụ & Lịch trình</h2><div className="service-facts"><div><small>TÊN GÓI DỊCH VỤ</small><strong>{booking.service?.title || 'Chưa có dịch vụ'}</strong></div><div><small>THỜI GIAN</small><strong>{booking.scheduledAt ? `${new Date(booking.scheduledAt).toLocaleDateString('vi-VN')} - ${booking.scheduledEndAt ? new Date(booking.scheduledEndAt).toLocaleDateString('vi-VN') : ''}` : 'Chưa xác định'}</strong></div><div><small>LỊCH TRÌNH</small><strong>{booking.scheduledAt ? `${new Date(booking.scheduledAt).toLocaleTimeString('vi-VN', {hour:'2-digit',minute:'2-digit'})} - ${booking.scheduledEndAt ? new Date(booking.scheduledEndAt).toLocaleTimeString('vi-VN', {hour:'2-digit',minute:'2-digit'}) : ''} (${booking.hours || '?'} tiếng)` : 'Chưa xác định'}</strong></div></div><div className="care-note"><small>YÊU CẦU CHĂM SÓC / GHI CHÚ</small><p>{booking.medicalNotes || booking.notes || 'Không có ghi chú'}</p></div></section>
         <section className="booking-detail-card activity-card"><h2>Lịch sử hoạt động</h2>{[
-          ['Đơn đặt chỗ được tạo bởi Phụ huynh', '12 Th10, 2024 • 10:24 AM'],
-          [`Điều dưỡng ${carerName} đã chấp nhận yêu cầu`, '12 Th10, 2024 • 11:45 AM'],
-          ['Thanh toán được xác nhận qua payOS (Mã: #POS-99210)', '12 Th10, 2024 • 01:15 PM'],
-          ['Bắt đầu dịch vụ: Check-in Ngày 1', '15 Th10, 2024 • 07:58 AM'],
-          ['Điều dưỡng đã check-out & Hoàn thành dịch vụ', '29 Th10, 2024 • 05:05 PM'],
-        ].map(([title, time], index) => <div className="activity-row" key={title}><i>{index === 4 ? <Check /> : null}</i><p><strong>{title}</strong><small>{time}</small></p></div>)}</section>
+          ['Đơn đặt chỗ được tạo bởi Phụ huynh', booking.createdAt ? new Date(booking.createdAt).toLocaleString('vi-VN') : ''],
+          [`${carerName} đã chấp nhận yêu cầu`, booking.acceptedAt ? new Date(booking.acceptedAt).toLocaleString('vi-VN') : ''],
+          ['Thanh toán được xác nhận', booking.paidAt ? new Date(booking.paidAt).toLocaleString('vi-VN') : 'Chưa thanh toán'],
+          ['Bắt đầu dịch vụ', booking.startedAt ? new Date(booking.startedAt).toLocaleString('vi-VN') : ''],
+          ['Hoàn thành dịch vụ', booking.completedAt ? new Date(booking.completedAt).toLocaleString('vi-VN') : ''],
+        ].filter(([, time]) => time).map(([title, time], index) => <div className="activity-row" key={title}><i>{index === 4 ? <Check /> : null}</i><p><strong>{title}</strong><small>{time}</small></p></div>)}</section>
       </main>
-      <aside className="booking-finance-card"><h2>Tổng kết tài chính</h2><Detail label="Tổng cộng" value={money(total)} /><Detail label="Phí nền tảng (15%)" value={money(fee)} /><div className="net-income"><span>Thu nhập ròng</span><strong>{money(payout)}</strong></div><div className="payos-card"><header><strong>Tích hợp payOS</strong><span>{booking.payosStatus || booking.status}</span></header><p>Mã giao dịch: <b>{booking.payosPaymentLinkId || booking.payosOrderCode || 'Chưa có'}</b></p><p>Trạng thái: <b>{booking.payosStatus || 'Chưa thanh toán'}</b></p></div><button className="invoice-button" onClick={() => downloadBookingInvoice(booking._id)}><ReceiptText />Tải hóa đơn chi tiết</button><small>Trạng thái đối soát: {booking.carerPayoutStatus || 'unpaid'}</small></aside>
+      <aside className="booking-finance-card"><h2>Tổng kết tài chính</h2><Detail label="Tổng cộng" value={money(total)} /><Detail label={`Phí nền tảng (${total ? Math.round(fee / total * 100) : 0}%)`} value={money(fee)} /><div className="net-income"><span>Thu nhập ròng</span><strong>{money(payout)}</strong></div><div className="payos-card"><header><strong>Tích hợp payOS</strong><span>{booking.payosStatus || booking.status}</span></header><p>Mã giao dịch: <b>{booking.payosPaymentLinkId || booking.payosOrderCode || 'Chưa có'}</b></p><p>Trạng thái: <b>{booking.payosStatus || 'Chưa thanh toán'}</b></p></div><button className="invoice-button" onClick={() => downloadBookingInvoice(booking._id)}><ReceiptText />Tải hóa đơn chi tiết</button><small>Trạng thái đối soát: {booking.carerPayoutStatus || 'unpaid'}</small></aside>
     </div>
   </div>;
 };

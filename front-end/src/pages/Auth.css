@@ -1,9 +1,7 @@
 .auth-page {
-  height: 1023px;
-  min-height: 1023px;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   background: var(--white);
 }
 
@@ -20,16 +18,14 @@
 .auth-panel {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  min-height: 1023px;
-  overflow: hidden;
+  min-height: 100vh;
   border-radius: 0;
   background: var(--surface-lavender);
 }
 
 .auth-image-side {
   position: relative;
-  min-height: 1023px;
-  overflow: hidden;
+  min-height: 100vh;
   background:
     linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.08)),
     linear-gradient(90deg, #71a375, #7bae7f);
@@ -55,11 +51,12 @@
 
 .auth-form-side {
   position: relative;
-  min-height: 1023px;
+  min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding: 120px 72px 54px;
+  justify-content: center;
+  padding: 120px 40px 140px;
   background: #fff;
 }
 
@@ -98,13 +95,25 @@
   line-height: 1.6;
 }
 
-.auth-brand {
+.auth-back-home {
   position: absolute;
-  top: 68px;
-  left: 50%;
-  width: min(100% - 80px, 420px);
-  transform: translateX(-50%);
+  top: 40px;
+  left: 40px;
   display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #396940;
+  font-weight: 500;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.auth-brand {
+  width: 100%;
+  max-width: 420px;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
   align-items: center;
   gap: 8px;
   color: #20502a;
@@ -113,11 +122,9 @@
 
 .auth-brand img { width: 42px; height: 42px; object-fit: contain; }
 .auth-tabs {
-  position: absolute;
-  top: 171px;
-  left: 50%;
-  width: min(100% - 80px, 420px);
-  transform: translateX(-50%);
+  width: 100%;
+  max-width: 420px;
+  margin-bottom: 40px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   border-bottom: 1px solid #c1c9be;
@@ -126,12 +133,10 @@
 .auth-tabs button.active { color: #396940; border-bottom: 2px solid #396940; }
 
 .auth-expert-card {
-  position: absolute;
-  left: 50%;
-  bottom: 110px;
-  width: min(100% - 80px, 460px);
+  width: 100%;
+  max-width: 460px;
+  margin-top: 50px;
   min-height: 92px;
-  transform: translateX(-50%);
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
@@ -146,11 +151,7 @@
 .auth-expert-card small { margin-top: 2px; font-size: .72rem; }
 .auth-expert-card a { color: #895032; font-size: .78rem; font-weight: 800; line-height: 1.45; }
 .auth-copyright {
-  position: absolute;
-  bottom: 67px;
-  left: 50%;
-  width: min(100% - 80px, 460px);
-  transform: translateX(-50%);
+  margin-top: 30px;
   color: #3f4840;
   font-size: .72rem;
   text-align: center;
@@ -171,8 +172,7 @@
 
   .auth-form-side {
     min-height: auto;
-    min-height: 660px;
-    padding: 145px 28px 64px;
+    padding: 60px 28px 64px;
   }
 }
 
@@ -190,7 +190,7 @@
   }
 
   .auth-form-side {
-    padding: 145px 20px 50px;
+    padding: 60px 20px 50px;
   }
 
   .auth-visual-copy { top: 32px; left: 24px; right: 24px; }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowRight, CheckCircle2, ChevronDown, ClipboardList, MapPin, ShieldCheck, UsersRound, CalendarDays, FileHeart } from 'lucide-react';
+import { ArrowRight, ChevronDown, ClipboardList, MapPin, UsersRound, CalendarDays, FileHeart } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -78,8 +78,7 @@ const Booking = () => {
 
   const pricePerHour = quote?.unitPrice ?? service?.price ?? 0;
   const subTotal = quote?.totalPrice ?? pricePerHour * formData.hours * formData.numSessions;
-  const serviceFee = quote?.platformFeeAmount ?? 0;
-  const totalPrice = quote?.totalPrice ?? subTotal;
+
 
   useEffect(() => {
     if (!carerId || !serviceId || !formData.date || !formData.time) {

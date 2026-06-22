@@ -1,12 +1,14 @@
 .about-page {
-  min-height: 2655px;
+  min-height: 100vh;
   overflow-x: hidden;
   background: #f8f9fa;
+  display: flex;
+  flex-direction: column;
 }
 
 .about-page main {
+  flex: 1;
   width: 100%;
-  min-height: 2255px;
 }
 
 .about-page .about-redesign-hero {

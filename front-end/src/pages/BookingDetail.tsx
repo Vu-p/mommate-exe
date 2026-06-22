@@ -12,6 +12,28 @@ import './OperationalPages.css';
 
 const steps = ['Chờ Carer', 'Chờ thanh toán', 'Đã thanh toán', 'Đang chăm sóc', 'Hoàn tất'];
 
+const statusToStep: Record<string, number> = {
+  pending: 0,
+  pending_carer: 0,
+  accepted_pending_payment: 1,
+  paid_confirmed: 2,
+  confirmed: 2,
+  in_progress: 3,
+  completed: 4,
+};
+
+const statusLabels: Record<string, string> = {
+  pending: 'Chờ xác nhận',
+  pending_carer: 'Chờ Carer duyệt',
+  accepted_pending_payment: 'Chờ thanh toán',
+  paid_confirmed: 'Đã thanh toán',
+  confirmed: 'Đã xác nhận',
+  in_progress: 'Đang chăm sóc',
+  completed: 'Hoàn tất',
+  cancelled: 'Đã hủy',
+  refunded: 'Đã hoàn tiền',
+};
+
 const BookingDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -97,19 +119,22 @@ const BookingDetail = () => {
 
   const carer = booking.carer?.user || {};
   const parent = booking.parent || {};
-  const total = Number(booking.totalPrice || 10000000);
+  const total = Number(booking.totalPrice || 0);
 
   if (user?.role === 'carer') {
+    const carerStatusLabel = statusLabels[booking.status] || booking.status;
+    const scheduledDate = booking.scheduledAt ? new Date(booking.scheduledAt) : null;
+    const scheduledEnd = booking.scheduledEndAt ? new Date(booking.scheduledEndAt) : null;
     return <div className="stitch-page carer-case-page"><Navbar/><main className="container carer-case-main">
       <header className="carer-case-heading"><div><p><span>Ca chăm sóc</span> Mã đặt lịch: #{String(booking._id).slice(-8).toUpperCase()}</p><h1>{booking.service?.title}: {parent.firstName} {parent.lastName}</h1></div><div><button onClick={openConversation}>Nhắn tin cho phụ huynh</button><button className="primary" onClick={() => navigate(`/bookings/${booking._id}/change`)}>Đổi lịch</button></div></header>
       <div className="carer-case-layout"><div>
-        <section className="carer-case-card care-record"><header><h2><ShieldCheck/>Hồ sơ chăm sóc</h2><small>Cập nhật lần cuối: 2 ngày trước</small></header><div>
-          <article><img src={motherAvatar}/><h3>Lê Thùy Dương</h3><small>Mẹ • 32 tuổi</small><hr/><p>Tình trạng phục hồi: <strong>Sau mổ lấy thai (Ngày 12)</strong></p><p>Ghi chú y tế: <strong>Thiếu sắt, theo dõi vết mổ</strong></p><span>DỊ ỨNG: PENICILLIN</span> <span className="orange">CẦN HỖ TRỢ KÍCH SỮA</span></article>
-          <article className="baby-record"><div className="baby-icon">☺</div><h3>Bé Bơ (Baby Avocado)</h3><small>Trẻ sơ sinh • 12 ngày tuổi</small><hr/><p>Hình thức bú: <strong>Bú mẹ hoàn toàn</strong></p><p>Cân nặng khi sinh: <strong>3.4kg (Khỏe mạnh)</strong></p><span>ĐANG THEO DÕI GIẤC NGỦ</span> <span className="green">THEO DÕI VÀNG DA NHẸ</span></article>
+        <section className="carer-case-card care-record"><header><h2><ShieldCheck/>Hồ sơ chăm sóc</h2><small>Cập nhật lần cuối: {booking.updatedAt ? new Date(booking.updatedAt).toLocaleDateString('vi-VN') : 'Chưa cập nhật'}</small></header><div>
+          <article><img src={parent.avatar || motherAvatar}/><h3>{parent.firstName} {parent.lastName}</h3><small>Mẹ</small><hr/><p>Tình trạng sức khỏe: <strong>{booking.motherCondition || 'Chưa cập nhật'}</strong></p><p>Ghi chú y tế: <strong>{booking.medicalNotes || 'Không có'}</strong></p>{booking.allergies && <span>DỊ ỨNG: {booking.allergies}</span>}</article>
+          {booking.careFor !== 'postpartum_mom' && <article className="baby-record"><div className="baby-icon">☺</div><h3>{booking.babyName || 'Thông tin bé'}</h3><small>{booking.babyBirthDate ? `${Math.ceil((Date.now() - new Date(booking.babyBirthDate).getTime()) / 86400000)} ngày tuổi` : 'Chưa cập nhật'}</small><hr/><p>Hình thức bú: <strong>{booking.feedingMethod || 'Chưa cập nhật'}</strong></p><p>Cân nặng khi sinh: <strong>{booking.birthWeight ? `${booking.birthWeight}kg` : 'Chưa cập nhật'}</strong></p></article>}
         </div></section>
         <section className="carer-case-card care-journal"><h2>Nhật ký ca chăm sóc</h2><p>Ghi lại các quan sát chuyên môn, thời gian bú và các hoạt động trong buổi làm việc. Thông tin này sẽ hiển thị cho phụ huynh sau khi kết thúc.</p><div><input placeholder="Cân nặng (kg)" value={journal.weightKg} onChange={(event) => setJournal((value) => ({ ...value, weightKg: event.target.value }))}/><textarea placeholder="Ghi chú chuyên môn, hướng dẫn của bác sĩ nhi khoa..." value={journal.notes} onChange={(event) => setJournal((value) => ({ ...value, notes: event.target.value }))}/></div><label><input type="checkbox" checked={journal.medicationChecked} onChange={(event) => setJournal((value) => ({ ...value, medicationChecked: event.target.checked }))}/>Đã cho uống thuốc</label><label><input type="checkbox" checked={journal.safetyChecked} onChange={(event) => setJournal((value) => ({ ...value, safetyChecked: event.target.checked }))}/>Đã kiểm tra an toàn tiêu chuẩn</label><button className="primary" onClick={saveJournal} disabled={savingJournal}>{savingJournal ? 'Đang lưu...' : 'Lưu nhật ký'}</button></section>
-      </div><aside className="carer-case-sidebar"><div className="map-cover"><Map/></div><section><h3>123 Bạch Đằng</h3><p>Hải Châu, Đà Nẵng</p></section><section><small>Ngày</small><strong>Thứ Năm, 14 Th11, 2024</strong><small>Thời gian</small><strong>08:00 AM - 17:00PM (8 tiếng)</strong><small>Phí dịch vụ</small><strong>10.000.000 đ • Đã thanh toán qua thẻ</strong></section></aside></div>
-      <footer className="carer-case-action"><p><strong>Trạng thái hiện tại: {booking.status}</strong><small>{new Date(booking.scheduledAt).toLocaleString('vi-VN')}</small></p><button onClick={() => navigate('/carer/bookings')}>Quay lại</button>{['paid_confirmed','confirmed'].includes(booking.status) && <button className="primary" onClick={checkIn}><PlayCircle/>Bắt đầu điểm danh</button>}</footer>
+      </div><aside className="carer-case-sidebar"><div className="map-cover"><Map/></div><section><h3>{booking.address || 'Chưa có địa chỉ'}</h3><p>{booking.fullAddress || ''}</p></section><section><small>Ngày</small><strong>{scheduledDate ? scheduledDate.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Chưa xác định'}</strong><small>Thời gian</small><strong>{scheduledDate ? `${scheduledDate.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})} - ${scheduledEnd ? scheduledEnd.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}) : ''} (${booking.hours || '?'} tiếng)` : 'Chưa xác định'}</strong><small>Phí dịch vụ</small><strong>{total.toLocaleString('vi-VN')}đ • {booking.paidAt ? 'Đã thanh toán' : 'Chưa thanh toán'}</strong></section></aside></div>
+      <footer className="carer-case-action"><p><strong>Trạng thái hiện tại: {carerStatusLabel}</strong><small>{new Date(booking.scheduledAt).toLocaleString('vi-VN')}</small></p><button onClick={() => navigate('/carer/bookings')}>Quay lại</button>{['paid_confirmed','confirmed'].includes(booking.status) && <button className="primary" onClick={checkIn}><PlayCircle/>Bắt đầu điểm danh</button>}</footer>
     </main><Footer/></div>;
   }
 
@@ -123,7 +148,12 @@ const BookingDetail = () => {
         </div>
 
         <section className="booking-progress">
-          {steps.map((label, index) => <div className={index < 2 ? 'done' : index === 2 ? 'current' : ''} key={label}><span>{index < 2 ? <Check /> : index + 1}</span><p>{label}</p></div>)}
+          {steps.map((label, index) => {
+            const currentStep = statusToStep[booking.status] ?? -1;
+            const isDone = index < currentStep;
+            const isCurrent = index === currentStep;
+            return <div className={isDone ? 'done' : isCurrent ? 'current' : ''} key={label}><span>{isDone ? <Check /> : index + 1}</span><p>{label}</p></div>;
+          })}
         </section>
 
         <div className="booking-detail-layout">
@@ -187,8 +217,8 @@ const BookingDetail = () => {
           <aside className="booking-detail-right">
             <section className="booking-side-card payment-status">
               <h3>TRẠNG THÁI THANH TOÁN</h3>
-              <div><span><CheckCircle2 /></span><strong>{booking.paidAt ? 'Đã thanh toán' : 'Chưa thanh toán'}</strong><small>{booking.paidAt ? 'Qua payOS' : booking.status}</small></div>
-              <p><span>Giá gói (14 ngày)</span><span>{(total + 500000).toLocaleString('vi-VN')}đ</span></p>
+              <div><span><CheckCircle2 /></span><strong>{booking.paidAt ? 'Đã thanh toán' : 'Chưa thanh toán'}</strong><small>{booking.paidAt ? 'Qua payOS' : (statusLabels[booking.status] || booking.status)}</small></div>
+              {booking.priceSnapshot && <p><span>Đơn giá ({booking.hours || 1} tiếng × {booking.numSessions || 1} buổi)</span><span>{total.toLocaleString('vi-VN')}đ</span></p>}
               <p className="payment-total"><strong>Tổng cộng</strong><b>{total.toLocaleString('vi-VN')}đ</b></p>
               {booking.paidAt && <button onClick={() => booking?._id && downloadBookingInvoice(booking._id)}><Download />Tải hóa đơn điện tử</button>}
               {refund?.refund && <div className="booking-refund-status"><strong>Hoàn tiền: {refund.refund.status}</strong><small>{refund.refund.providerReference ? `Mã tham chiếu: ${refund.refund.providerReference}` : refund.refund.reason}</small></div>}

@@ -88,9 +88,10 @@ const FindService = () => {
           <div className="stitch-category-chips">
             {[
               ['', 'Tất cả'],
-              ['Mẹ bầu', 'Mẹ bầu'],
-              ['Chăm sóc sau sinh', 'Mẹ sau sinh'],
-              ['Chăm sóc em bé', 'Bé'],
+              ['postpartum', 'Mẹ sau sinh'],
+              ['consultation', 'Tư vấn'],
+              ['prenatal', 'Mẹ bầu'],
+              ['newborn_care', 'Bé'],
             ].map(([value, label]) => (
               <button key={label} type="button" className={filters.category === value ? 'active' : ''} onClick={() => updateFilter('category', value)}>{label}</button>
             ))}

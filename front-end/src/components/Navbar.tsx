@@ -69,10 +69,11 @@ const Navbar = ({ currentMode }: NavbarProps) => {
 
             <div className="nav-group left desktop-only">
               <Link to="/" className={navClass('/')}>Trang chủ</Link>
+              <Link to="/about" className={navClass('/about')}>Về chúng tôi</Link>
               <Link to="/services" className={navClass('/services')}>Dịch vụ</Link>
               <Link to="/carers" className={navClass('/carers')}>Người chăm sóc</Link>
-              <Link to="/account/request" className={navClass('/account/request')}>Đơn đặt</Link>
-              <Link to="/account/profile" className={navClass('/account/profile')}>Hồ sơ chăm sóc</Link>
+              {user && user.role === 'parent' && <Link to="/account/request" className={navClass('/account/request')}>Đơn đặt</Link>}
+              {user && user.role === 'parent' && <Link to="/account/profile" className={navClass('/account/profile')}>Hồ sơ chăm sóc</Link>}
             </div>
 
             <div className="nav-group right desktop-only">
@@ -81,7 +82,7 @@ const Navbar = ({ currentMode }: NavbarProps) => {
                   <NotificationBell />
                   <button className="user-dropdown-toggle" onClick={() => setAccountOpen(!accountOpen)}>
                     <span className="user-avatar"><UserIcon size={18} /></span>
-                    <span className="user-name">{user.firstName}</span>
+                    <span className="user-name">{user.firstName} {user.lastName}</span>
                     <ChevronDown size={16} className={accountOpen ? 'rotate' : ''} />
                   </button>
                   <AnimatePresence>
@@ -116,10 +117,11 @@ const Navbar = ({ currentMode }: NavbarProps) => {
             <div className="mobile-menu-content">
               <div className="mobile-nav-links">
                 <Link to="/" className="mobile-nav-link">Trang chủ</Link>
+                <Link to="/about" className="mobile-nav-link">Về chúng tôi</Link>
                 <Link to="/services" className="mobile-nav-link">Dịch vụ</Link>
                 <Link to="/carers" className="mobile-nav-link">Người chăm sóc</Link>
-                <Link to="/account/request" className="mobile-nav-link">Đơn đặt</Link>
-                <Link to="/account/profile" className="mobile-nav-link">Hồ sơ chăm sóc</Link>
+                {user && user.role === 'parent' && <Link to="/account/request" className="mobile-nav-link">Đơn đặt</Link>}
+                {user && user.role === 'parent' && <Link to="/account/profile" className="mobile-nav-link">Hồ sơ chăm sóc</Link>}
               </div>
               <div className="mobile-auth-actions">
                 {user ? (

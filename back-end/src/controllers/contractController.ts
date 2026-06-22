@@ -14,8 +14,8 @@ const getClientIp = (req: AuthRequest) => {
 
 const isValidSignatureImage = (signatureImage: unknown) =>
   typeof signatureImage === 'string' &&
-  signatureImage.startsWith('data:image/') &&
-  signatureImage.length > 100;
+  (signatureImage.startsWith('data:image/') || signatureImage.startsWith('http')) &&
+  signatureImage.length > 20;
 
 // @desc    Get current carer's contract
 // @route   GET /api/contracts/me

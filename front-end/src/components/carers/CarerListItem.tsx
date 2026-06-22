@@ -1,7 +1,6 @@
 import { BadgeCheck, BriefcaseBusiness, Languages, MapPin, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
-  formatAge,
   formatExperience,
   formatHourlyRate,
   formatLocation,
@@ -26,7 +25,6 @@ const CarerListItem = ({ carer, onSelect, serviceId, serviceTitle }: CarerListIt
   const displayRating = getDisplayRating(carer);
   const displayReviews = formatReviewLabel(carer);
   const displayLoc = formatLocation(carer.location || carer.loc);
-  const displayAge = formatAge(carer.age);
   const displayExp = formatExperience(carer.experienceYears);
   const displayPrice = formatHourlyRate(carer.hourlyRate || carer.price);
   const subtitle = carer.position

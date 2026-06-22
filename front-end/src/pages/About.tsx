@@ -33,6 +33,40 @@ const About = () => (
           </div>
         </div>
       </section>
+
+      <section className="about-vision-band">
+        <div className="container">
+          <span>TẦM NHÌN VÀ SỨ MỆNH</span>
+          <h2>Tại sao MomMate ra đời?</h2>
+          <p>MomMate tự mình tìm kiếm, sàng lọc từng hộ sinh có chứng chỉ, có kinh nghiệm thực chiến và trên hết là có tâm. MomMate hiểu rằng: mẹ sau sinh không cần một lời an ủi xa xôi - mẹ cần một đôi tay vững vàng để thay ca, để mẹ được ngủ. Tầm nhìn của chúng tôi là chuẩn hóa quy trình chăm sóc hậu sản tại Việt Nam, mang đến sự an tâm tuyệt đối cho mẹ và sự khởi đầu tốt nhất cho bé thông qua mạng lưới chuyên gia được đào tạo bài bản.</p>
+        </div>
+      </section>
+
+      <section className="about-founders" id="about-team">
+        <div className="container">
+          <div className="about-section-heading">
+            <h2>Đội ngũ chuyên môn</h2>
+            <p>Những người đứng sau nền tảng MomMate, kết nối chuyên gia y tế với các gia đình.</p>
+          </div>
+          <div className="about-founder-grid">
+            <article>
+              <div><BadgeCheck size={32} /></div>
+              <h3>BS. Nguyễn Thị A</h3>
+              <p>Trưởng ban Y tế</p>
+            </article>
+            <article>
+              <div><HeartHandshake size={32} /></div>
+              <h3>Trần Minh Tâm</h3>
+              <p>Giám đốc Vận hành</p>
+            </article>
+            <article>
+              <div><ShieldCheck size={32} /></div>
+              <h3>Lê Hoàng Yến</h3>
+              <p>Giám đốc Chất lượng</p>
+            </article>
+          </div>
+        </div>
+      </section>
     </main>
     <Footer />
     <BackToTop />

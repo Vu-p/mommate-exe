@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { BadgeCheck, BriefcaseBusiness, CalendarDays, Loader2, MapPin, Medal, Star } from 'lucide-react';
+import { BadgeCheck, BriefcaseBusiness, CalendarDays, Loader2, MapPin, Medal } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';

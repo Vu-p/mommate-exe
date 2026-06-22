@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BriefcaseMedical } from 'lucide-react';
+import { ArrowLeft, BriefcaseMedical } from 'lucide-react';
 import SignUpForm from '../components/auth/SignUpForm.tsx';
 import LoginForm from '../components/auth/LoginForm.tsx';
 import SocialLogins from '../components/auth/SocialLogins.tsx';
@@ -15,7 +15,7 @@ interface AuthProps {
 }
 
 const Auth = ({ defaultMode = 'signup' }: AuthProps) => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user, loading, logout } = useAuth();
   const mode = searchParams.get('mode') || defaultMode;
@@ -65,6 +65,11 @@ const Auth = ({ defaultMode = 'signup' }: AuthProps) => {
             </div>
             
             <div className="auth-form-side">
+              {!isAdminApp && (
+                <Link to="/" className="auth-back-home">
+                  <ArrowLeft size={16} /> Quay lại trang chủ
+                </Link>
+              )}
               <div className="auth-brand"><img src={logo} alt="" /><strong>Mommate</strong></div>
               <div className="auth-tabs">
                 <button className={isLogin ? 'active' : ''} onClick={toggleToLogin}>Đăng nhập</button>
@@ -80,7 +85,7 @@ const Auth = ({ defaultMode = 'signup' }: AuthProps) => {
                   transition={{ duration: 0.3 }}
                 >
                   <div className="auth-form-intro">
-                    <h2>{isLogin ? 'Chào mừng quay trở lại' : 'Tạo tài khoản MaternalCare'}</h2>
+                    <h2>{isLogin ? 'Chào mừng quay trở lại' : 'Tạo tài khoản MomMate'}</h2>
                     <p>{isLogin ? 'Nhập thông tin của bạn để truy cập bảng điều khiển chăm sóc.' : 'Tìm kiếm sự hỗ trợ chuyên nghiệp mà gia đình bạn xứng đáng có được.'}</p>
                   </div>
                   {!isAdminApp && <SocialLogins isLogin={isLogin} />}
@@ -96,9 +101,9 @@ const Auth = ({ defaultMode = 'signup' }: AuthProps) => {
                   <aside className="auth-expert-card">
                     <BriefcaseMedical aria-hidden="true" />
                     <span><strong>Bạn là Chuyên gia?</strong><small>Truy cập cổng thông tin chuyên gia</small></span>
-                    <a href="/carer/login">Đăng nhập cho<br />Chuyên gia →</a>
+                  <a href="/login">Đăng nhập cho<br />Chuyên gia →</a>
                   </aside>
-                  <p className="auth-copyright">© 2024 Dịch vụ Chuyên nghiệp MaternalCare. Bảo lưu mọi quyền.</p>
+                  <p className="auth-copyright">© 2026 Dịch vụ Chuyên nghiệp MomMate. Bảo lưu mọi quyền.</p>
                 </>
               )}
             </div>
