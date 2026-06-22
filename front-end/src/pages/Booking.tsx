@@ -7,6 +7,8 @@ import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import './Booking.css';
+import AddressAutocomplete from '../components/common/AddressAutocomplete';
+import MapPreview from '../components/common/MapPreview';
 
 const Booking = () => {
   const { user } = useAuth();
@@ -257,13 +259,14 @@ const Booking = () => {
               {serviceMode === 'at_home' && (
                 <>
                   <div className="input-field">
-                    <label>Địa chỉ chi tiết</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Số nhà, tên đường, tòa nhà, căn hộ..."
+                    <label>Địa chỉ chi tiết (Vị trí đặt lịch)</label>
+                    <AddressAutocomplete 
                       value={formData.fullAddress}
-                      onChange={e => setFormData({...formData, fullAddress: e.target.value})}
+                      onChange={(val, coords) => {
+                        setFormData({...formData, fullAddress: val});
+                        if (coords) setLocationCoords(coords);
+                      }}
+                      placeholder="Số nhà, tên đường, phường/xã..."
                     />
                   </div>
                   <div className="input-field">
@@ -283,12 +286,15 @@ const Booking = () => {
                           }
                         }}
                       >
-                        <MapPin size={16} style={{marginRight: '5px'}}/> Lấy Vị Trí
+                        <MapPin size={16} style={{marginRight: '5px'}}/> Lấy Vị Trí Của Tôi
                       </button>
                       <span style={{ fontSize: '13px', color: '#666' }}>
-                        {locationCoords ? `Đã lưu: ${locationCoords.lat.toFixed(4)}, ${locationCoords.lng.toFixed(4)}` : 'Chưa có tọa độ'}
+                        {locationCoords ? `Đã lưu: ${locationCoords.lat.toFixed(4)}, ${locationCoords.lng.toFixed(4)}` : 'Chưa có tọa độ (Vui lòng chọn địa chỉ từ gợi ý)'}
                       </span>
                     </div>
+                    {locationCoords && (
+                      <MapPreview lat={locationCoords.lat} lng={locationCoords.lng} />
+                    )}
                   </div>
                 </>
               )}

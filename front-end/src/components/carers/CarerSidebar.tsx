@@ -192,9 +192,14 @@ const CarerSidebar = ({ filters, onChange, onClear, areaOptions = [] }: CarerSid
       )}
 
       <div className="sidebar-group">
-        <label>Mức giá (VNĐ/Giờ)</label>
+        <label style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <span>Mức giá (VNĐ/Giờ)</span>
+          <strong style={{ color: 'var(--primary)', fontSize: '0.9rem' }}>
+            Tối đa: {parseInt(filters.maxPrice || '1000000').toLocaleString('vi-VN')}đ
+          </strong>
+        </label>
         <input className="carer-price-range" type="range" min="100000" max="1000000" step="50000"
-          value={filters.maxPrice || '500000'} onChange={(event) => onChange('maxPrice', event.target.value)} />
+          value={filters.maxPrice || '1000000'} onChange={(event) => onChange('maxPrice', event.target.value)} />
         <div className="price-range-labels"><span>100k</span><span>1.000k</span></div>
       </div>
 

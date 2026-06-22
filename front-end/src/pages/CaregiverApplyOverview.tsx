@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ImageUpload from '../components/common/ImageUpload';
 import api from '../utils/api';
+import AddressAutocomplete from '../components/common/AddressAutocomplete';
 import { useAuth } from '../context/AuthContext';
 import './CaregiverApplyOverview.css';
 
@@ -268,12 +269,10 @@ const CaregiverApplyOverview = () => {
                 </div>
                 <div className="input-group">
                   <label>Địa chỉ</label>
-                  <input
-                    type="text"
-                    placeholder="Số nhà, đường, quận, thành phố"
+                  <AddressAutocomplete
                     value={formData.location}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, location: e.target.value }))}
-                    required
+                    onChange={(val) => setFormData((prev) => ({ ...prev, location: val }))}
+                    placeholder="Số nhà, đường, quận, thành phố"
                   />
                 </div>
               </div>

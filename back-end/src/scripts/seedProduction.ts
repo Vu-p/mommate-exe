@@ -69,10 +69,7 @@ const run = async () => {
   await Contract.deleteMany({});
   await User.deleteMany({ role: { $ne: UserRole.ADMIN } });
 
-  const services = await Promise.all([
-    upsertService('Chăm sóc mẹ và bé sau sinh', 250000, 'postpartum', 'Theo giờ'),
-    upsertService('Tư vấn nuôi con bằng sữa mẹ', 180000, 'consultation', '90 phút'),
-  ]);
+  const services = await Service.find({});
 
   const admin = await upsertUser('admin.demo@mommate.local', { 
     role: UserRole.ADMIN, 
@@ -87,7 +84,7 @@ const run = async () => {
       firstName: 'Nguyễn Thị',
       lastName: 'Trà My',
       phone: '0901000001',
-      avatar: 'https://images.unsplash.com/photo-1594824432258-2953265eb45e?w=500&auto=format&fit=crop',
+      avatar: '/carers/carer1.png',
       district: 'Hải Châu',
       bio: 'Điều dưỡng nhi khoa với 8 năm kinh nghiệm. Chuyên hỗ trợ các mẹ bỉm sữa phục hồi sau sinh và chăm sóc trẻ sơ sinh.',
       age: 32,
@@ -99,7 +96,7 @@ const run = async () => {
       firstName: 'Lê Hoàng',
       lastName: 'Lan',
       phone: '0901000002',
-      avatar: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=500&auto=format&fit=crop',
+      avatar: '/carers/carer2.png',
       district: 'Thanh Khê',
       bio: 'Chuyên viên tư vấn sữa mẹ, có chứng chỉ quốc tế IBCLC. Kinh nghiệm làm việc tại khoa Phụ Sản.',
       age: 29,
@@ -111,7 +108,7 @@ const run = async () => {
       firstName: 'Trần Thanh',
       lastName: 'Hương',
       phone: '0901000003',
-      avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=500&auto=format&fit=crop',
+      avatar: '/carers/carer3.png',
       district: 'Liên Chiểu',
       bio: 'Nữ hộ sinh giàu tình cảm, chu đáo. Luôn đặt sức khỏe của mẹ và sự phát triển của bé lên hàng đầu.',
       age: 35,
@@ -123,7 +120,7 @@ const run = async () => {
       firstName: 'Võ Minh',
       lastName: 'Tâm',
       phone: '0901000004',
-      avatar: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=500&auto=format&fit=crop',
+      avatar: '/carers/carer4.png',
       district: 'Sơn Trà',
       bio: 'Tốt nghiệp chuyên ngành Điều dưỡng đa khoa. Đặc biệt có kinh nghiệm xử lý các tình huống vàng da ở trẻ sơ sinh.',
       age: 26,
@@ -135,7 +132,7 @@ const run = async () => {
       firstName: 'Phạm Thị',
       lastName: 'Hoa',
       phone: '0901000005',
-      avatar: 'https://images.unsplash.com/photo-1582750433449-648ed1279098?w=500&auto=format&fit=crop',
+      avatar: '/carers/carer5.png',
       district: 'Ngũ Hành Sơn',
       bio: 'Cô bảo mẫu hiền lành, yêu trẻ. Kinh nghiệm đồng hành cùng hơn 100 gia đình nhỏ tại khu vực Đà Nẵng.',
       age: 40,
