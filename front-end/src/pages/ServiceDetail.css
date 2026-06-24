@@ -1,6 +1,10 @@
 .service-detail-page {
-  background: var(--bg);
-  padding-top: 88px;
+  min-height: 100vh;
+  padding-top: 0;
+  background:
+    radial-gradient(circle at 12% 6%, rgba(210, 194, 255, 0.46), transparent 24rem),
+    radial-gradient(circle at 86% 14%, rgba(231, 180, 206, 0.22), transparent 18rem),
+    linear-gradient(145deg, #fffafd 0%, #f7f2ff 42%, #fbf8ff 100%);
 }
 
 .service-detail-state {
@@ -10,14 +14,14 @@
 }
 
 .service-detail-content {
-  padding-top: 28px;
-  padding-bottom: 96px;
+  padding-top: 120px;
+  padding-bottom: 128px;
 }
 
 .service-detail-loading,
 .service-not-found {
   flex: 1;
-  min-height: 60vh;
+  min-height: 64vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -26,480 +30,368 @@
   text-align: center;
 }
 
-.service-detail-loading {
-  color: var(--text-muted);
-}
-
-.service-not-found h2 {
-  font-size: 2rem;
-  color: var(--secondary);
-}
-
+.service-detail-loading,
 .service-not-found p {
   color: var(--text-muted);
 }
 
-.service-not-found .btn-primary {
-  margin-top: 8px;
+.service-not-found h2 {
+  color: var(--text);
+  font-size: clamp(2rem, 3vw, 3rem);
 }
 
 .service-detail-breadcrumb {
-  margin-bottom: 28px;
+  margin-bottom: 22px;
 }
 
-.service-top-section {
-  margin-bottom: 88px;
-}
-
-.service-page-heading {
-  text-align: center;
-  margin-bottom: 36px;
-}
-
-.section-eyebrow {
-  color: var(--primary-dark);
-  font-size: 0.95rem;
-  font-weight: 700;
-  margin-bottom: 10px;
-}
-
-.service-page-heading h1 {
-  font-size: clamp(2.1rem, 3vw, 3rem);
-  line-height: 1.1;
-  color: var(--secondary);
-  font-weight: 800;
-}
-
-.gallery-container {
+.stitch-service-layout {
   display: grid;
-  grid-template-columns: 100px minmax(0, 1fr) 280px;
-  gap: 30px;
-  align-items: center;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.8fr);
+  gap: 24px;
+  align-items: start;
 }
 
-.thumbnails {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.stitch-service-main {
+  min-width: 0;
 }
 
-.thumb {
-  width: 100px;
-  height: 100px;
-  border-radius: 18px;
+.stitch-service-hero {
+  position: relative;
+  height: 480px;
   overflow: hidden;
-  background: var(--white);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  border-radius: 36px;
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 24px 70px rgba(88, 71, 128, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.84);
 }
 
-.thumb img,
-.main-image img,
-.step-image img {
+.stitch-service-hero > img,
+.stitch-service-hero .image-placeholder-inner {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.stitch-service-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 250, 253, 0.04), rgba(41, 34, 58, 0.46));
+}
+
+.stitch-service-hero-overlay {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 1;
+  padding: 42px;
+  color: #fff;
+}
+
+.stitch-service-hero-overlay > div {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.stitch-service-hero-overlay span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px);
+  font-size: .78rem;
+  font-weight: 750;
+}
+
+.stitch-service-hero-overlay span:first-child {
+  color: #2d2640;
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.public-app .stitch-service-hero-overlay h1 {
+  color: #fff;
+  font-family: "PP Editorial New", "Canela", Georgia, serif;
+  font-size: clamp(2.2rem, 4vw, 4.2rem);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+
+.stitch-service-about {
+  padding: 34px 0 20px;
+}
+
+.stitch-service-about h2,
+.stitch-service-faq h2 {
+  margin-bottom: 14px;
+  color: var(--text);
+  font-size: clamp(1.5rem, 2vw, 2rem);
+}
+
+.stitch-service-about p {
+  color: var(--text-muted);
+  font-size: 1.03rem;
+  line-height: 1.84;
+}
+
+.stitch-service-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.stitch-service-info-grid > section {
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 28px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.34)),
+    rgba(255, 255, 255, 0.52);
+  box-shadow: 0 18px 46px rgba(88, 71, 128, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+}
+
+.stitch-service-info-grid h3 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 18px;
+  color: #6f56ad;
+  font-size: 1rem;
+}
+
+.stitch-service-info-grid li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  color: var(--text-muted);
+  font-size: .92rem;
+  line-height: 1.65;
+}
+
+.stitch-service-info-grid li svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: #6f56ad;
+}
+
+.stitch-price-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(111, 86, 173, 0.12);
+  font-size: .88rem;
+}
+
+.stitch-price-row strong {
+  color: #6f56ad;
+  text-align: right;
+}
+
+.stitch-service-info-grid small {
+  display: block;
+  margin-top: 14px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.stitch-service-faq {
+  padding-top: 42px;
+}
+
+.stitch-service-faq details {
+  margin-bottom: 10px;
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.84);
+}
+
+.stitch-service-faq summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  color: var(--text);
+  font-weight: 750;
+  list-style: none;
+}
+
+.stitch-service-faq details p {
+  padding-top: 12px;
+  color: var(--text-muted);
+  line-height: 1.72;
+}
+
+.stitch-service-sidebar {
+  position: sticky;
+  top: 112px;
+  display: grid;
+  gap: 18px;
+}
+
+.stitch-booking-card,
+.stitch-trust-card,
+.stitch-support-card {
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 28px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.34)),
+    rgba(255, 255, 255, 0.52);
+  box-shadow: 0 18px 46px rgba(88, 71, 128, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+}
+
+.stitch-booking-card > span {
+  color: var(--text-muted);
+  font-size: .7rem;
+  font-weight: 850;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.stitch-booking-card > div {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin: 8px 0 18px;
+  color: #6f56ad;
+}
+
+.stitch-booking-card > div strong {
+  font-size: 2.1rem;
+}
+
+.stitch-booking-card > p {
+  color: var(--text-muted);
+  font-size: .92rem;
+  line-height: 1.68;
+}
+
+.stitch-booking-card > button {
+  width: 100%;
+  min-height: 54px;
+  margin-top: 20px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(135deg, #6f56ad, #a98fe8);
+  font-weight: 800;
+  box-shadow: 0 14px 28px rgba(111, 86, 173, 0.18);
+}
+
+.stitch-booking-card footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(111, 86, 173, 0.12);
+  color: var(--text-muted);
+  font-size: .78rem;
+}
+
+.stitch-trust-card h3 {
+  margin-bottom: 18px;
+  color: var(--text);
+}
+
+.stitch-trust-card > div {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.stitch-trust-card > div > svg {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  padding: 8px;
+  border-radius: 18px;
+  color: #6f56ad;
+  background: rgba(233, 224, 255, 0.74);
+}
+
+.stitch-trust-card p strong,
+.stitch-trust-card p span {
   display: block;
 }
 
-.main-image {
-  min-height: 370px;
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
-  background: var(--white);
+.stitch-trust-card p span {
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-size: .78rem;
+  line-height: 1.5;
 }
 
-.service-intro-card {
-  background: var(--white);
-  border-radius: 28px;
-  padding: 28px;
-  box-shadow: var(--shadow-md);
-  border: 1px solid rgba(167, 139, 250, 0.16);
-}
-
-.intro-category {
-  color: var(--primary-dark);
-  font-size: 0.92rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 12px;
-}
-
-.service-intro-card h2 {
-  color: var(--secondary);
-  font-size: 1.5rem;
-  line-height: 1.25;
-  margin-bottom: 18px;
-  font-weight: 800;
-}
-
-.intro-meta {
+.stitch-support-card {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 10px;
-  margin-bottom: 18px;
+  color: var(--text);
 }
 
-.meta-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 34px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: rgba(167, 139, 250, 0.12);
-  color: var(--secondary);
-  font-size: 0.88rem;
-  font-weight: 700;
+.stitch-support-card span {
+  flex: 1;
+  font-size: .86rem;
 }
 
-.intro-description {
-  color: var(--text-muted);
-  line-height: 1.75;
-  margin-bottom: 22px;
-}
-
-.intro-price {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 24px;
-}
-
-.price-label {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-}
-
-.intro-price strong {
-  color: var(--secondary);
-  font-size: 1.35rem;
+.stitch-support-card a {
+  color: #6f56ad;
   font-weight: 800;
 }
 
-.btn-booking-primary,
-.btn-booking-secondary,
-.btn-consultation,
-.btn-book-now-large,
-.btn-explore {
-  min-height: 52px;
-  border-radius: var(--radius-pill);
-  font-weight: 800;
-  transition: transform var(--transition-fast), background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
-}
-
-.btn-booking-primary,
-.btn-booking-secondary,
-.btn-book-now-large {
-  background: var(--primary);
-  color: var(--white);
-  padding: 0 26px;
-}
-
-.btn-booking-primary {
-  width: 100%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.btn-booking-secondary {
-  min-width: 170px;
-}
-
-.btn-consultation {
-  min-width: 190px;
-  background: var(--secondary);
-  color: var(--white);
-  padding: 0 26px;
-}
-
-.btn-explore {
-  border: 1px solid rgba(92, 90, 128, 0.25);
-  color: var(--secondary);
-  background: transparent;
-  padding: 0 26px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-booking-primary:hover,
-.btn-booking-secondary:hover,
-.btn-consultation:hover,
-.btn-book-now-large:hover,
-.btn-explore:hover {
-  transform: translateY(-1px);
-}
-
-.btn-booking-primary:hover,
-.btn-booking-secondary:hover,
-.btn-book-now-large:hover {
-  background: var(--primary-dark);
-}
-
-.btn-consultation:hover {
-  background: #4a4f68;
-}
-
-.btn-explore:hover {
-  border-color: var(--primary-dark);
-  color: var(--primary-dark);
-}
-
-.service-benefits {
-  max-width: 780px;
-  margin: 0 auto 92px;
-  text-align: center;
-}
-
-.service-benefits h3,
-.treatment-details h3 {
-  color: var(--secondary);
-  font-size: clamp(1.6rem, 2vw, 2.2rem);
-  font-weight: 800;
-  margin-bottom: 22px;
-}
-
-.service-benefits p {
-  color: var(--text-muted);
-  line-height: 1.8;
-  margin-bottom: 34px;
-}
-
-.action-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  flex-wrap: wrap;
-}
-
-.treatment-details {
-  margin-bottom: 92px;
-}
-
-.treatment-details h3 {
-  text-align: center;
-  margin-bottom: 36px;
-}
-
-.steps-list {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-}
-
-.treatment-step-card {
-  border-radius: 18px;
-  overflow: hidden;
-  background: var(--white);
-  border: 1px solid rgba(92, 90, 128, 0.12);
-  box-shadow: var(--shadow-sm);
-}
-
-.step-header {
-  padding: 10px 22px;
-  background: linear-gradient(90deg, rgba(167, 139, 250, 0.14), rgba(235, 229, 255, 0.92));
-  border-bottom: 1px solid rgba(167, 139, 250, 0.12);
-  text-align: center;
-}
-
-.step-header h4 {
-  color: var(--secondary);
-  font-size: 1rem;
-  font-weight: 800;
-  margin: 0;
-}
-
-.step-body {
-  display: grid;
-  grid-template-columns: 200px minmax(0, 1fr);
-  gap: 30px;
-  padding: 24px;
-  align-items: center;
-}
-
-.step-image {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  border-radius: 14px;
-  overflow: hidden;
-  background: var(--bg);
-}
-
-.step-text h5 {
-  color: var(--secondary);
-  font-size: 1.02rem;
-  font-weight: 800;
-  margin-bottom: 10px;
-}
-
-.step-text p {
-  color: var(--text-muted);
-  line-height: 1.75;
-}
-
-.bottom-cta {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 18px;
-}
-
-.book-now-section {
-  display: flex;
-  justify-content: center;
-}
-
-.btn-book-now-large {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 170px;
-  padding: 0 30px;
+.public-app .service-detail-page .site-footer {
+  margin-top: 124px;
 }
 
 @media (max-width: 1080px) {
-  .gallery-container {
-    grid-template-columns: 80px minmax(0, 1fr);
-    align-items: start;
+  .stitch-service-layout {
+    grid-template-columns: 1fr;
   }
 
-  .service-intro-card {
-    grid-column: 1 / -1;
-  }
-
-  .main-image {
-    min-height: 320px;
+  .stitch-service-sidebar {
+    position: static;
   }
 }
 
 @media (max-width: 720px) {
-  .service-detail-page {
-    padding-top: 76px;
-  }
-
   .service-detail-content {
-    padding-top: 20px;
-    padding-bottom: 76px;
+    padding-top: 100px;
+    padding-bottom: 96px;
   }
 
-  .service-top-section {
-    margin-bottom: 64px;
+  .stitch-service-hero {
+    height: 360px;
+    border-radius: 28px;
   }
 
-  .gallery-container {
-    grid-template-columns: 1fr;
-    gap: 18px;
+  .stitch-service-hero-overlay {
+    padding: 26px;
   }
 
-  .thumbnails {
-    flex-direction: row;
-    overflow-x: auto;
-    padding-bottom: 4px;
-  }
-
-  .thumb {
-    flex: 0 0 88px;
-    height: 88px;
-  }
-
-  .main-image {
-    min-height: 240px;
-  }
-
-  .service-intro-card {
-    padding: 22px;
-    border-radius: 22px;
-  }
-
-  .service-benefits,
-  .treatment-details {
-    margin-bottom: 64px;
-  }
-
-  .action-buttons,
-  .bottom-cta {
-    flex-direction: column;
-  }
-
-  .btn-booking-secondary,
-  .btn-consultation,
-  .btn-explore,
-  .btn-book-now-large {
-    width: 100%;
-    max-width: 320px;
-  }
-
-  .step-body {
+  .stitch-service-info-grid {
     grid-template-columns: 1fr;
   }
-}
-.stitch-service-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
-  gap: 48px;
-  align-items: start;
-}
 
-.stitch-service-main { min-width: 0; }
-.stitch-service-hero { position: relative; height: 400px; overflow: hidden; border-radius: var(--radius-lg); }
-.stitch-service-hero > img { width: 100%; height: 100%; object-fit: cover; }
-.stitch-service-hero-overlay { position: absolute; inset: auto 0 0; padding: 48px; color: #fff; background: linear-gradient(transparent, rgba(0,0,0,.68)); }
-.stitch-service-hero-overlay > div { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
-.stitch-service-hero-overlay span { display: inline-flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 999px; background: rgba(0,0,0,.28); font-size: .78rem; backdrop-filter: blur(6px); }
-.stitch-service-hero-overlay span:first-child { color: var(--primary-dark); background: var(--primary-light); }
-.public-app .stitch-service-hero-overlay h1 { color: #fff; font-size: clamp(2rem, 3vw, 3rem); line-height: 1.1; }
-.public-app .service-detail-page { padding-top: 0; }
-.public-app .service-detail-page .site-footer { margin-top: 291px; }
-.stitch-service-about { padding: 44px 0 28px; }
-.stitch-service-about h2,
-.stitch-service-faq h2 { margin-bottom: 18px; color: var(--primary); font-size: 1.5rem; }
-.stitch-service-about p { color: var(--text-muted); font-size: 1.05rem; line-height: 1.8; }
-.stitch-service-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.stitch-service-info-grid > section { padding: 24px; border: 1px solid var(--glass-border); border-radius: var(--radius-lg); background: var(--surface-container, #F3EEFF); }
-.stitch-service-info-grid h3 { display: flex; align-items: center; gap: 9px; margin-bottom: 20px; color: var(--primary); }
-.stitch-service-info-grid ul { display: grid; gap: 13px; list-style: none; }
-.stitch-service-info-grid li { display: flex; align-items: flex-start; gap: 9px; color: var(--text-muted); font-size: .9rem; }
-.stitch-service-info-grid li svg { flex: 0 0 auto; color: var(--primary); margin-top: 2px; }
-.stitch-price-row { display: flex; justify-content: space-between; gap: 18px; padding: 13px 0; border-bottom: 1px solid var(--glass-border); font-size: .88rem; }
-.stitch-price-row strong { color: var(--primary); text-align: right; }
-.stitch-service-info-grid small { display: block; margin-top: 14px; color: var(--text-light); font-style: italic; }
-.stitch-service-faq { padding-top: 48px; }
-.stitch-service-faq details { margin-bottom: 10px; padding: 18px 20px; border-radius: var(--radius-lg); background: #edeeef; }
-.stitch-service-faq summary { display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 700; list-style: none; }
-.stitch-service-faq details p { padding-top: 12px; color: #5f675f; line-height: 1.65; }
-.stitch-service-sidebar { position: sticky; top: 96px; display: grid; gap: 24px; }
-.stitch-booking-card,
-.stitch-trust-card { padding: 30px; border: 1px solid var(--glass-border); border-radius: var(--radius-lg); background: #e1e3e4; }
-.stitch-booking-card > span { color: var(--text-light); font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; }
-.stitch-booking-card > div { display: flex; align-items: baseline; gap: 5px; margin: 8px 0 18px; color: var(--primary); }
-.stitch-booking-card > div strong { font-size: 2rem; }
-.stitch-booking-card > div b { font-size: 1rem; }
-.stitch-booking-card > div small { color: #5f675f; }
-.stitch-booking-card > p { color: #5f675f; font-size: .88rem; line-height: 1.6; }
-.stitch-booking-card > button { width: 100%; min-height: 52px; margin-top: 22px; display: flex; justify-content: center; align-items: center; gap: 8px; border-radius: var(--radius-lg); color: #fff; background: var(--primary); font-weight: 750; }
-.stitch-booking-card footer { display: flex; justify-content: center; align-items: center; gap: 7px; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--glass-border); color: #5f675f; font-size: .78rem; }
-.stitch-trust-card { background: var(--glass-bg-strong); }
-.stitch-trust-card h3 { margin-bottom: 22px; color: var(--primary); }
-.stitch-trust-card > div { display: flex; gap: 13px; margin-top: 18px; }
-.stitch-trust-card > div > svg { flex: 0 0 auto; width: 38px; height: 38px; padding: 8px; border-radius: var(--radius-lg); color: var(--primary); background: var(--lavender-soft, #F0E8FF); }
-.stitch-trust-card p strong,
-.stitch-trust-card p span { display: block; }
-.stitch-trust-card p span { margin-top: 3px; color: var(--text-light); font-size: .76rem; line-height: 1.45; }
-.stitch-support-card { display: flex; align-items: center; gap: 10px; padding: 16px; border: 1px solid #d88ca0; border-radius: var(--radius-lg); color: #5d2537; background: #ffd9e1; }
-.stitch-support-card span { flex: 1; font-size: .82rem; }
-.stitch-support-card button { color: #8b4b5d; font-weight: 750; }
-
-@media (max-width: 900px) {
-  .stitch-service-layout { grid-template-columns: 1fr; gap: 30px; }
-  .stitch-service-sidebar { position: static; }
-}
-
-@media (max-width: 640px) {
-  .stitch-service-hero { height: 330px; }
-  .stitch-service-hero-overlay { padding: 24px; }
-  .stitch-service-info-grid { grid-template-columns: 1fr; }
+  .stitch-booking-card,
+  .stitch-trust-card,
+  .stitch-support-card {
+    border-radius: 24px;
+  }
 }

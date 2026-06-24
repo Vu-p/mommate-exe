@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, ChevronLeft, ChevronRight, Loader2, Search, Sparkles, Users } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, Loader2, Search, Users } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -187,43 +187,25 @@ const FindCarer = () => {
       <Navbar />
 
       <main className="container find-carer-content">
-        <nav className="breadcrumb">
-          <Link to="/">Trang chủ</Link>
-          <ChevronRight size={14} />
-          <span>Tìm chuyên gia chăm sóc</span>
-        </nav>
-
-        <section className="carer-hero-card">
-          <div className="carer-hero-copy">
-            <span className="carer-hero-eyebrow">Tìm chuyên gia</span>
+        <section className="discovery-hero discovery-hero-carer">
+          <div className="discovery-hero-copy">
+            <nav className="breadcrumb">
+              <Link to="/">Trang chủ</Link>
+              <ChevronRight size={14} />
+              <span>Tìm chuyên gia chăm sóc</span>
+            </nav>
+            <span className="discovery-kicker">Discovery Experience</span>
             <h1>{flowTitle}</h1>
             <p>{flowDescription}</p>
           </div>
-          <div className="stitch-sort-tabs">
-            <button type="button" className={sortBy === 'default' ? 'active' : ''} onClick={() => setSortBy('default')}>Phù hợp nhất</button>
-            <button type="button" className={sortBy === 'rating-desc' ? 'active' : ''} onClick={() => setSortBy('rating-desc')}>Được đánh giá cao</button>
-            <button type="button" className={sortBy === 'price-asc' ? 'active' : ''} onClick={() => setSortBy('price-asc')}>Giá thấp nhất</button>
-          </div>
-
-          <div className="carer-hero-stats">
-            <div className="carer-stat">
-              <Users size={18} />
-              <div>
-                <strong>{totalItems.toLocaleString('vi-VN')}</strong>
-                <span>Chuyên gia phù hợp</span>
-              </div>
-            </div>
-            <div className="carer-stat">
-              <Sparkles size={18} />
-              <div>
-                <strong>{serviceId ? 'Theo dịch vụ' : 'Tất cả dịch vụ'}</strong>
-                <span>Chế độ khám phá</span>
-              </div>
-            </div>
+          <div className="discovery-hero-aside">
+            <article><span>Chuyên gia phù hợp</span><strong>{totalItems.toLocaleString('vi-VN')}</strong></article>
+            <article><span>Chế độ</span><strong>{serviceId ? 'Theo dịch vụ' : 'Khám phá'}</strong></article>
+            <article><span>Bộ sàng lọc</span><strong>{sortOptions.find((option) => option.value === sortBy)?.label || 'Phù hợp nhất'}</strong></article>
           </div>
         </section>
 
-        <div className="carer-browser-main">
+        <div className="discovery-browser">
           <aside className="carer-sidebar-area">
             <CarerSidebar
               filters={filters}
@@ -242,8 +224,8 @@ const FindCarer = () => {
               </div>
             ) : (
               <>
-                <div className="carer-list-controls">
-                  <div className="listing-search-box">
+                <div className="carer-list-controls discovery-list-controls">
+                  <div className="listing-search-box discovery-search-box">
                     <Search size={20} />
                     <input
                       type="search"
@@ -256,7 +238,7 @@ const FindCarer = () => {
                   <SortDropdown value={sortBy} onChange={setSortBy} />
                 </div>
 
-                <div className="carer-results-toolbar">
+                <div className="carer-results-toolbar discovery-results-toolbar">
                   <span>{totalItems.toLocaleString('vi-VN')} chuyên gia phù hợp</span>
                   <button type="button" onClick={clearFilters} className="btn-reset-inline">
                     Đặt lại bộ lọc

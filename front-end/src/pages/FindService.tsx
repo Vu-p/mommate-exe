@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, Loader2, Search } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { ChevronLeft, ChevronRight, Loader2, MapPin, Search, Sparkles } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import type { ServiceFilters } from '../components/services/FilterBar';
@@ -74,47 +75,81 @@ const FindService = () => {
     setFilters((current) => ({ ...current, [name]: value }));
   };
 
+  const summary = useMemo(() => ([
+    { label: 'Đang hiển thị', value: `${services.length.toLocaleString('vi-VN')} dịch vụ` },
+    { label: 'Khu vực', value: filters.area || 'Tất cả khu vực' },
+    { label: 'Chế độ', value: carerId ? 'Theo chuyên gia' : 'Khám phá' },
+  ]), [carerId, filters.area, services.length]);
+
   return (
     <div className="find-service-page">
       <Navbar />
 
-      <div className="stitch-service-filter-shell">
-        <div className="container stitch-service-filter-inner">
-          <div className="listing-search-box">
-              <Search size={18} />
-              <input type="search" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)}
-                placeholder="Tìm kiếm dịch vụ..." aria-label="Tìm dịch vụ" />
+      <main className="container main-content">
+        <motion.section
+          className="discovery-hero discovery-hero-service"
+          initial={{ opacity: 0, y: 24, filter: 'blur(10px)' }}
+          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="discovery-hero-copy">
+            <span className="discovery-kicker">Discovery Experience</span>
+            <h1>{carerId && carerName ? `Dịch vụ của chuyên gia ${carerName}` : 'Dịch vụ chăm sóc mẹ & bé'}</h1>
+            <p>{carerId ? 'Khám phá các dịch vụ mà chuyên gia này có thể hỗ trợ và tiếp tục đặt lịch nhanh chóng.' : 'Khám phá các gói dịch vụ chuẩn y khoa từ đội ngũ chuyên gia tận tâm.'}</p>
           </div>
-          <div className="stitch-category-chips">
-            {[
-              ['', 'Tất cả'],
-              ['postpartum', 'Mẹ sau sinh'],
-              ['consultation', 'Tư vấn'],
-              ['prenatal', 'Mẹ bầu'],
-              ['newborn_care', 'Bé'],
-            ].map(([value, label]) => (
-              <button key={label} type="button" className={filters.category === value ? 'active' : ''} onClick={() => updateFilter('category', value)}>{label}</button>
+          <div className="discovery-hero-aside">
+            {summary.map((item) => (
+              <article key={item.label}>
+                <span>{item.label}</span>
+                <strong>{item.value}</strong>
+              </article>
             ))}
           </div>
-          <select className="stitch-area-select" value={filters.area} onChange={(event) => updateFilter('area', event.target.value)}>
-            <option value="">⌖ Tất cả khu vực đang hoạt động</option>
-            {!areaOptions.some((area) => area.value === 'Đà Nẵng') && <option value="Đà Nẵng">Đà Nẵng</option>}
-            {areaOptions.map((area) => <option value={area.value} key={area.value}>{area.label}{area.count ? ` (${area.count})` : ''}</option>)}
-          </select>
-          <label className="stitch-sort-select">Sắp xếp:
-            <select value={filters.sort} onChange={(event) => updateFilter('sort', event.target.value)}>
-              <option value="default">Phổ biến nhất</option><option value="price-asc">Giá thấp đến cao</option><option value="price-desc">Giá cao đến thấp</option>
-            </select>
-          </label>
-        </div>
-      </div>
+        </motion.section>
 
-      <main className="container main-content">
-        <header className="page-header">
-          <div><h1>{carerId && carerName ? `Dịch vụ của chuyên gia ${carerName}` : 'Dịch vụ chăm sóc mẹ & bé'}</h1>
-          <p>{carerId ? 'Khám phá các dịch vụ mà chuyên gia này có thể hỗ trợ và tiếp tục đặt lịch nhanh chóng.' : 'Khám phá các gói dịch vụ chuẩn y khoa từ đội ngũ chuyên gia tận tâm.'}</p></div>
-          <span>Hiển thị <strong>{totalItems}</strong> kết quả</span>
-        </header>
+        <div className="discovery-search-shell">
+          <div className="discovery-search-row">
+            <div className="listing-search-box discovery-search-box">
+              <Search size={18} />
+              <input
+                type="search"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                placeholder="Tìm kiếm dịch vụ..."
+                aria-label="Tìm dịch vụ"
+              />
+            </div>
+            <div className="discovery-search-pills">
+              {[
+                ['', 'Tất cả'],
+                ['postpartum', 'Mẹ sau sinh'],
+                ['consultation', 'Tư vấn'],
+                ['prenatal', 'Mẹ bầu'],
+                ['newborn_care', 'Bé'],
+              ].map(([value, label]) => (
+                <button key={label} type="button" className={filters.category === value ? 'active' : ''} onClick={() => updateFilter('category', value)}>{label}</button>
+              ))}
+            </div>
+          </div>
+          <div className="discovery-filters discovery-filters-sticky">
+            <label className="discovery-filter-field">
+              <span><MapPin size={14} /> Khu vực</span>
+              <select value={filters.area} onChange={(event) => updateFilter('area', event.target.value)}>
+                <option value="">Tất cả khu vực đang hoạt động</option>
+                {!areaOptions.some((area) => area.value === 'Đà Nẵng') && <option value="Đà Nẵng">Đà Nẵng</option>}
+                {areaOptions.map((area) => <option value={area.value} key={area.value}>{area.label}{area.count ? ` (${area.count})` : ''}</option>)}
+              </select>
+            </label>
+            <label className="discovery-filter-field">
+              <span><Sparkles size={14} /> Sắp xếp</span>
+              <select value={filters.sort} onChange={(event) => updateFilter('sort', event.target.value)}>
+                <option value="default">Phổ biến nhất</option>
+                <option value="price-asc">Giá thấp đến cao</option>
+                <option value="price-desc">Giá cao đến thấp</option>
+              </select>
+            </label>
+          </div>
+        </div>
 
         {loading ? (
           <div className="loading-state">

@@ -71,6 +71,7 @@ type ReviewCard = {
 };
 
 const initials = (name: string) => name.split(' ').slice(-2).map((part) => part[0]).join('').toUpperCase();
+const toArray = <T,>(value: unknown): T[] => (Array.isArray(value) ? value : []);
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -84,14 +85,17 @@ const Landing = () => {
 
   useEffect(() => {
     api.get('/carers', { params: { limit: 3 } })
-      .then((res) => setFeaturedCarers(res.data.items || res.data || []))
+      .then((res) => {
+        const items = toArray<Carer>(res.data?.items) || toArray<Carer>(res.data);
+        setFeaturedCarers(items.slice(0, 3));
+      })
       .catch(console.error);
   }, []);
 
   useEffect(() => {
     api.get('/services', { params: { page: 1, limit: 4, area: 'Đà Nẵng' } })
       .then(({ data }) => {
-        const items = Array.isArray(data) ? data : data.items || [];
+        const items = toArray<Service>(data?.items).length ? toArray<Service>(data.items) : toArray<Service>(data);
         setServices(items.slice(0, 4));
       })
       .catch((error) => {
@@ -104,7 +108,7 @@ const Landing = () => {
   useEffect(() => {
     api.get('/reviews', { params: { limit: 4 } })
       .then(({ data }) => {
-        const items: Review[] = Array.isArray(data) ? data : data.items || [];
+        const items = toArray<Review>(data?.items).length ? toArray<Review>(data.items) : toArray<Review>(data);
         setReviews(items.map((review) => {
           const parent = review.parent || {};
           const carerUser = review.carer?.user || {};
