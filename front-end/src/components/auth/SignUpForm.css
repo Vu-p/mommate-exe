@@ -2,15 +2,6 @@
   width: 100%;
 }
 
-.form-title {
-  color: #121142;
-  font-size: 2.25rem;
-  font-weight: 900;
-  line-height: 1.15;
-  margin-bottom: 34px;
-  text-align: center;
-}
-
 .signup-form {
   width: 100%;
 }
@@ -22,7 +13,7 @@
 }
 
 .auth-message {
-  margin-bottom: 18px;
+  margin-bottom: 16px;
   text-align: center;
   font-size: 0.92rem;
   font-weight: 700;
@@ -39,7 +30,7 @@
 .auth-submit-row {
   display: flex;
   justify-content: center;
-  margin-top: 26px;
+  margin-top: 22px;
 }
 
 .submit-btn {
@@ -48,14 +39,15 @@
   min-height: 54px;
   padding: 0 28px;
   border-radius: var(--radius-pill);
-  background: var(--primary);
+  background: linear-gradient(135deg, #6f56ad, #a98fe8);
   color: var(--white);
   font-size: 1rem;
-  font-weight: 900;
+  font-weight: 850;
+  box-shadow: 0 14px 28px rgba(111, 86, 173, 0.18);
 }
 
 .submit-btn:hover {
-  background: var(--primary-dark);
+  background: linear-gradient(135deg, #654ba7, #9f86e4);
 }
 
 .submit-btn:disabled {
@@ -64,15 +56,15 @@
 }
 
 .toggle-auth-text {
-  margin-top: 44px;
+  margin-top: 32px;
   color: var(--text-muted);
-  font-size: 1rem;
+  font-size: 0.92rem;
   text-align: center;
 }
 
 .toggle-auth-text button {
   color: var(--primary-dark);
-  font-weight: 900;
+  font-weight: 800;
 }
 
 @media (max-width: 480px) {

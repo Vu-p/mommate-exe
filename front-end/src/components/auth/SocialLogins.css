@@ -8,12 +8,12 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  color: #3f4840;
+  color: var(--text-muted);
   font-size: .72rem;
   letter-spacing: .12em;
-  margin: 34px 0 30px;
+  margin: 24px 0 22px;
 }
-.social-text span { flex: 1; height: 1px; background: var(--glass-border); }
+.social-text span { flex: 1; height: 1px; background: rgba(111, 86, 173, 0.12); }
 
 .social-buttons {
   display: grid;
@@ -33,12 +33,13 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  border: 1px solid var(--glass-border);
-  border-radius: 8px;
-  color: #191c1d;
-  background: #fff;
+  border: 1px solid rgba(111, 86, 173, 0.12);
+  border-radius: 16px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.78);
   font-size: .92rem;
   font-weight: 700;
+  box-shadow: 0 10px 24px rgba(88, 71, 128, 0.08);
 }
 
 .social-btn:disabled {
@@ -47,7 +48,7 @@
 }
 
 .social-btn:hover {
-  color: var(--secondary);
+  color: #6f56ad;
 }
 
 .social-btn.facebook {

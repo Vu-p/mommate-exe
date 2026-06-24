@@ -6,14 +6,18 @@
   width: 100%;
 }
 
+.login-form .input-field {
+  margin-bottom: 16px;
+}
+
 .form-options {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  margin-top: -13px;
+  margin-top: -6px;
   width: 100%;
-  font-size: 0.86rem;
+  font-size: 0.84rem;
 }
 
 .checkbox-container {
@@ -65,7 +69,7 @@
 
 .forgot-password {
   color: var(--primary);
-  font-weight: 500;
+  font-weight: 750;
 }
 
 .forgot-password:hover {
