@@ -3,6 +3,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
 import { useAuth } from '../../context/AuthContext';
 import './AdminLayout.css';
+import './AdminRedesign.css';
 
 const AdminLayout = () => {
   const { user, loading } = useAuth();

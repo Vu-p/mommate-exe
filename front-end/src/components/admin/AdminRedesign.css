@@ -1,0 +1,823 @@
+/* High-density, route-scoped MomMate admin layer. */
+.admin-layout {
+  min-height: 100dvh;
+  color: var(--mm-color-text);
+  background:
+    radial-gradient(circle at 96% 0%, rgba(211, 194, 255, 0.16), transparent 28rem),
+    var(--mm-color-bg);
+}
+
+.admin-layout .admin-sidebar {
+  width: 248px;
+  padding: 20px 10px;
+  border-color: rgba(130, 106, 176, 0.14);
+  background: rgba(247, 243, 252, 0.96);
+  box-shadow: 10px 0 30px rgba(88, 71, 128, 0.05);
+}
+
+.admin-layout .sidebar-header {
+  margin-bottom: 22px;
+}
+
+.admin-layout .admin-logo {
+  color: var(--mm-color-primary-strong);
+  font-size: 1.35rem;
+}
+
+.admin-layout .nav-item,
+.admin-layout .sidebar-help,
+.admin-layout .logout-btn {
+  min-height: 42px;
+  border-radius: var(--mm-radius-sm);
+  color: var(--mm-color-text-muted);
+  font-size: var(--mm-type-admin);
+  transition:
+    color var(--mm-motion-fast) var(--mm-motion-ease-soft),
+    background-color var(--mm-motion-fast) var(--mm-motion-ease-soft),
+    box-shadow var(--mm-motion-fast) var(--mm-motion-ease-soft);
+}
+
+.admin-layout :is(.nav-item, .sidebar-help, .logout-btn):hover {
+  color: var(--mm-color-primary-strong);
+  background: rgba(233, 225, 251, 0.72);
+}
+
+.admin-layout .nav-item.active {
+  color: var(--mm-color-primary-strong);
+  background: var(--mm-color-primary-soft);
+  box-shadow: inset 3px 0 0 var(--mm-color-primary);
+}
+
+.admin-layout .admin-main {
+  min-height: 100dvh !important;
+  height: auto !important;
+  margin-left: 248px;
+  overflow: visible !important;
+}
+
+.admin-layout .admin-content,
+.admin-layout .admin-main:has(.admin-ops-page) .admin-content {
+  width: 100%;
+  max-width: 1540px;
+  padding: 28px 32px;
+}
+
+.admin-layout .admin-footer {
+  width: calc(100% - 64px);
+  max-width: 1476px;
+  margin-top: 30px;
+  padding: 28px 0 24px;
+  border-color: var(--mm-color-border);
+  color: var(--mm-color-text-muted);
+}
+
+.admin-layout .dashboard-footer {
+  min-height: auto;
+  margin-top: 30px;
+  padding: 30px 32px;
+  border-top: 1px solid var(--mm-color-border);
+  background: rgba(239, 233, 255, 0.46);
+}
+
+.admin-layout :is(input, select, textarea) {
+  border-color: rgba(130, 106, 176, 0.2);
+  border-radius: var(--mm-radius-sm);
+  color: var(--mm-color-text);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: var(--mm-shadow-inset-highlight);
+}
+
+.admin-layout :is(input, select, textarea):focus-visible {
+  border-color: var(--mm-color-primary);
+  outline: 2px solid var(--mm-color-primary);
+  outline-offset: 2px;
+  box-shadow: var(--mm-shadow-focus), var(--mm-shadow-inset-highlight);
+}
+
+.admin-layout :is(button, a):focus-visible {
+  outline: 2px solid var(--mm-color-primary);
+  outline-offset: 2px;
+  box-shadow: var(--mm-shadow-focus);
+}
+
+.admin-layout button {
+  transition:
+    transform var(--mm-motion-fast) var(--mm-motion-ease-soft),
+    box-shadow var(--mm-motion-fast) var(--mm-motion-ease-soft),
+    border-color var(--mm-motion-fast) var(--mm-motion-ease-soft),
+    background-color var(--mm-motion-fast) var(--mm-motion-ease-soft);
+}
+
+.admin-layout button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* Shared admin headings and controls */
+.admin-layout :is(.page-header, .admin-operations-heading, .ops-page-heading, .admin-bookings-heading, .dashboard-heading) {
+  min-height: auto;
+  margin-bottom: 24px;
+  gap: 20px;
+}
+
+.admin-layout :is(.header-text h1, .admin-operations-heading h1, .ops-page-heading h1, .admin-bookings-heading h1, .dashboard-heading h1) {
+  color: var(--mm-color-text);
+  font-size: clamp(1.65rem, 2.4vw, 2.15rem);
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+.admin-layout :is(.header-text p, .admin-operations-heading p, .ops-page-heading p, .admin-bookings-heading p, .dashboard-heading p) {
+  max-width: 70ch;
+  color: var(--mm-color-text-muted);
+  line-height: 1.55;
+}
+
+.admin-layout :is(.add-btn, .admin-primary-action, .ops-actions .primary, .incident-actions .primary) {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--mm-radius-sm);
+  color: var(--mm-color-text-on-color);
+  background: var(--mm-gradient-primary);
+  box-shadow: var(--mm-shadow-sm);
+}
+
+.admin-layout :is(.table-controls, .admin-filter-row, .booking-filter-bar, .review-filters, .incident-actions) {
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 14px;
+  border: 1px solid var(--mm-color-border);
+  border-radius: var(--mm-radius-md);
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: var(--mm-shadow-xs);
+}
+
+.admin-layout :is(.search-box, .admin-search, .review-filters label, .incident-actions label, .payment-queue header label) {
+  min-height: 42px;
+  border-color: rgba(130, 106, 176, 0.18);
+  border-radius: var(--mm-radius-sm);
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.admin-layout :is(.filter-btn, .admin-advanced-filter, .outline-action, .ops-actions button, .incident-actions button) {
+  min-height: 42px;
+  border-color: rgba(130, 106, 176, 0.2);
+  border-radius: var(--mm-radius-sm);
+  color: var(--mm-color-text);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+/* Tables and CRUD forms */
+.admin-layout :is(.admin-card, .admin-operation-card, .ops-panel, .booking-admin-table, .workflow-table-wrap, .review-table, .incident-table) {
+  border: 1px solid var(--mm-color-border);
+  border-radius: var(--mm-radius-md);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: var(--mm-shadow-sm), var(--mm-shadow-inset-highlight);
+}
+
+.admin-layout .admin-card {
+  padding: 20px;
+}
+
+.admin-layout :is(.table-responsive, .booking-admin-table, .workflow-table-wrap, .admin-operation-card, .admin-operation-table, .review-table, .incident-table, .payment-queue) {
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-color: rgba(130, 106, 176, 0.3) transparent;
+}
+
+.admin-layout :is(.admin-table, .admin-operation-table table, .booking-admin-table table, .workflow-table-wrap table, .review-table table, .incident-table table, .payment-queue table) {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  font-size: var(--mm-type-admin);
+}
+
+.admin-layout :is(.admin-table th, .admin-operation-table th, .booking-admin-table th, .workflow-table-wrap th, .review-table th, .incident-table th, .payment-queue th) {
+  height: auto;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--mm-color-border);
+  color: var(--mm-color-text-muted);
+  background: rgba(239, 233, 255, 0.5);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-align: left;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.admin-layout :is(.admin-table td, .admin-operation-table td, .booking-admin-table td, .workflow-table-wrap td, .review-table td, .incident-table td, .payment-queue td) {
+  height: auto;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(130, 106, 176, 0.1);
+  color: var(--mm-color-text);
+  vertical-align: middle;
+}
+
+.admin-layout :is(.admin-table tbody tr, .admin-operation-table tbody tr, .booking-admin-table tbody tr, .workflow-table-wrap tbody tr, .review-table tbody tr, .incident-table tbody tr, .payment-queue tbody tr):hover {
+  background: rgba(239, 233, 255, 0.26);
+}
+
+.admin-layout :is(.price-tag, .admin-table td[data-money], .net-income strong) {
+  color: var(--mm-color-primary-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-layout :is(.badge, .pay-status, .incident-pill, .event-status, .status-badge) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 8px;
+  border-radius: var(--mm-radius-sm);
+  font-size: var(--mm-type-caption);
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.admin-layout .status-select {
+  min-height: 34px;
+  border-radius: var(--mm-radius-sm);
+  font-size: var(--mm-type-caption);
+}
+
+.admin-layout .action-group {
+  gap: 5px;
+}
+
+.admin-layout .icon-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(130, 106, 176, 0.14);
+  border-radius: var(--mm-radius-sm);
+}
+
+.admin-layout .icon-btn.edit,
+.admin-layout .icon-btn.view {
+  color: var(--mm-color-primary-strong);
+  background: var(--mm-color-primary-soft);
+}
+
+.admin-layout .icon-btn.delete {
+  color: var(--mm-color-danger);
+  background: var(--mm-color-danger-bg);
+}
+
+.admin-layout .admin-form {
+  border-radius: var(--mm-radius-md);
+  color: var(--mm-color-text);
+}
+
+.admin-layout .admin-form :is(input, select, textarea) {
+  min-height: 44px;
+}
+
+.admin-layout .admin-form textarea {
+  min-height: 110px;
+}
+
+.admin-layout :is(.submit-btn, .form-actions .submit-btn) {
+  border-radius: var(--mm-radius-sm);
+  color: var(--mm-color-text-on-color);
+  background: var(--mm-gradient-primary);
+}
+
+/* Dashboard */
+.admin-layout .dashboard-heading {
+  margin-bottom: 26px;
+}
+
+.admin-layout .dashboard-metrics {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.admin-layout .dashboard-metric {
+  min-height: 124px;
+  padding: 18px;
+  border-color: var(--mm-color-border);
+  border-radius: var(--mm-radius-md);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: var(--mm-shadow-sm), var(--mm-shadow-inset-highlight);
+}
+
+.admin-layout .dashboard-metric > div {
+  margin-bottom: 10px;
+}
+
+.admin-layout .metric-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--mm-radius-sm);
+  color: var(--mm-color-primary-strong) !important;
+  background: var(--mm-color-primary-soft) !important;
+}
+
+.admin-layout .metric-icon svg {
+  width: 19px;
+}
+
+.admin-layout .dashboard-metric strong {
+  font-size: 1.45rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-layout .dashboard-visuals {
+  grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.8fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.admin-layout .dashboard-panel {
+  border-color: var(--mm-color-border);
+  border-radius: var(--mm-radius-md);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: var(--mm-shadow-sm);
+}
+
+.admin-layout :is(.revenue-panel, .recent-panel) {
+  min-height: 390px;
+  padding: 20px;
+}
+
+.admin-layout .dashboard-bars {
+  height: 260px;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.admin-layout .dashboard-bars i {
+  background: rgba(130, 106, 176, 0.25);
+}
+
+.admin-layout .dashboard-bars i:last-child,
+.admin-layout .dashboard-bars i:hover {
+  background: var(--mm-color-primary);
+}
+
+/* Booking list and detail */
+.admin-layout .booking-stat-grid {
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.admin-layout .booking-stat-grid > * {
+  min-height: 112px;
+  border-color: var(--mm-color-border);
+  border-radius: var(--mm-radius-md);
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow: var(--mm-shadow-sm);
+}
+
+.admin-layout .admin-main:has(.admin-bookings-page) {
+  min-height: 100dvh !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.admin-layout .admin-bookings-page {
+  min-height: auto;
+}
+
+.admin-layout .admin-main:has(.admin-booking-detail-page),
+.admin-layout .admin-main:has(.revenue-page),
+.admin-layout .admin-main:has(.reviews-page),
+.admin-layout .admin-main:has(.reconciliation-page),
+.admin-layout .admin-main:has(.incidents-page) {
+  min-height: 100dvh !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.admin-layout :is(.admin-booking-detail-page, .revenue-page, .reviews-page, .reconciliation-page, .incidents-page) {
+  min-height: auto;
+}
+
+.admin-layout .booking-detail-heading {
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.admin-layout .booking-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-layout .booking-detail-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(270px, 340px);
+  gap: 16px;
+}
+
+.admin-layout :is(.booking-detail-card, .booking-progress-card, .booking-finance-card) {
+  border-color: var(--mm-color-border);
+  border-radius: var(--mm-radius-md);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: var(--mm-shadow-sm);
+}
+
+.admin-layout .booking-finance-card {
+  background: rgba(239, 233, 255, 0.38);
+}
+
+/* Operational KPI and finance pages */
+.admin-layout :is(.ops-metrics.four, .review-metrics, .recon-metrics, .incident-metrics, .admin-user-metrics, .analytics-stat-grid, .moderation-grid) {
+  gap: 14px;
+  margin: 20px 0 24px;
+}
+
+.admin-layout :is(.ops-metric, .review-metrics article, .incident-metrics article, .admin-user-metrics article, .analytics-stat-grid article, .moderation-grid article) {
+  min-height: 122px;
+  padding: 18px;
+  border-color: var(--mm-color-border);
+  border-radius: var(--mm-radius-md);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: var(--mm-shadow-sm);
+}
+
+.admin-layout .incident-metrics article.new {
+  color: #7c3347;
+  background: rgba(255, 240, 245, 0.88);
+}
+
+.admin-layout .incident-metrics article > svg {
+  top: 28px;
+  right: 24px;
+  width: 42px;
+  height: 42px;
+  padding: 10px;
+  color: #8b4b5d;
+  background: rgba(244, 188, 210, 0.3);
+}
+
+.admin-layout .incident-metrics strong {
+  margin: 8px 0;
+  font-size: 1.7rem;
+}
+
+.admin-layout :is(.revenue-trend, .revenue-bottom-grid, .review-table, .payment-queue, .recon-bottom, .incident-table) {
+  margin-top: 24px;
+}
+
+.admin-layout .revenue-trend {
+  padding: 22px;
+}
+
+.admin-layout .trend-grid {
+  height: 270px;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.admin-layout .trend-grid > div {
+  min-width: 0;
+}
+
+.admin-layout .revenue-bottom-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.admin-layout .revenue-bottom-grid > article {
+  min-height: 390px;
+  padding: 20px;
+}
+
+.admin-layout .donut {
+  margin: 52px auto;
+}
+
+.admin-layout .next-batch {
+  min-height: 150px;
+  padding: 20px;
+  border-radius: var(--mm-radius-md);
+  background: var(--mm-gradient-primary);
+  box-shadow: var(--mm-shadow-md);
+}
+
+.admin-layout .recon-bottom {
+  grid-template-columns: minmax(0, 1.7fr) minmax(260px, 0.8fr);
+  gap: 14px;
+}
+
+.admin-layout :is(.volume-chart, .recent-activity) {
+  min-height: 350px;
+  padding: 20px;
+}
+
+.admin-layout .review-filters {
+  margin-top: 20px;
+}
+
+.admin-layout .review-filters label {
+  min-width: 240px;
+}
+
+.admin-layout .review-table td,
+.admin-layout .incident-table td {
+  height: auto;
+}
+
+.admin-layout .stars {
+  color: #a56b30;
+  font-size: 1rem;
+  letter-spacing: 0;
+}
+
+.admin-layout .incidents-page :is(.stitch-error, .workflow-error) {
+  color: var(--mm-color-danger);
+  background: var(--mm-color-danger-bg);
+}
+
+/* Workflows */
+.admin-layout .admin-workflows {
+  color: var(--mm-color-text);
+}
+
+.admin-layout .workflow-tabs {
+  gap: 6px;
+  padding: 5px;
+  overflow-x: auto;
+  border: 1px solid var(--mm-color-border);
+  border-radius: var(--mm-radius-md);
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.admin-layout .workflow-tabs button {
+  min-height: 38px;
+  flex: 0 0 auto;
+  border-radius: var(--mm-radius-sm);
+}
+
+.admin-layout .workflow-tabs button.active {
+  color: var(--mm-color-primary-strong);
+  background: var(--mm-color-primary-soft);
+}
+
+.admin-layout .workflow-empty,
+.admin-layout .table-loading {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  color: var(--mm-color-text-muted);
+  text-align: center;
+}
+
+.admin-layout .workflow-error {
+  padding: 12px 14px;
+  border: 1px solid rgba(177, 82, 105, 0.22);
+  border-radius: var(--mm-radius-sm);
+  color: #7c3347;
+  background: rgba(255, 240, 245, 0.82);
+}
+
+.admin-layout .workflow-actions {
+  gap: 5px;
+}
+
+.admin-layout .workflow-actions button {
+  min-height: 34px;
+  border-radius: var(--mm-radius-sm);
+}
+
+.admin-layout .workflow-actions .approve {
+  color: var(--mm-color-success);
+  background: var(--mm-color-success-bg);
+}
+
+.admin-layout .workflow-actions .reject {
+  color: var(--mm-color-danger);
+  background: var(--mm-color-danger-bg);
+}
+
+/* Compact admin messaging */
+.admin-layout .messages-page {
+  min-height: calc(100dvh - 120px);
+  background: transparent;
+}
+
+.admin-layout .messages-shell {
+  width: min(100%, 1000px);
+  min-height: 660px;
+  display: grid;
+  grid-template-rows: auto minmax(360px, 1fr) auto;
+  gap: 10px;
+  padding: 0;
+}
+
+.admin-layout .messages-heading,
+.admin-layout .messages-thread,
+.admin-layout .message-composer {
+  border: 1px solid var(--mm-color-border);
+  border-radius: var(--mm-radius-md);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: var(--mm-shadow-sm);
+}
+
+.admin-layout .messages-heading {
+  min-height: 54px;
+  padding: 0 16px;
+}
+
+.admin-layout .messages-heading h1 {
+  font-size: 1.35rem;
+}
+
+.admin-layout .messages-thread {
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.admin-layout .message-bubble {
+  max-width: min(70%, 560px);
+  padding: 9px 12px;
+  border-radius: 4px 12px 12px;
+  font-size: var(--mm-type-admin);
+}
+
+.admin-layout .message-bubble.is-own {
+  margin-left: auto;
+  border-radius: 12px 4px 12px 12px;
+  background: var(--mm-color-primary-soft);
+}
+
+.admin-layout .message-composer {
+  position: static;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 8px;
+}
+
+.admin-layout .message-composer button {
+  min-width: 90px;
+  border-radius: var(--mm-radius-sm);
+  color: var(--mm-color-text-on-color);
+  background: var(--mm-gradient-primary);
+}
+
+@media (max-width: 1180px) {
+  .admin-layout .dashboard-metrics,
+  .admin-layout :is(.ops-metrics.four, .review-metrics, .recon-metrics) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-layout .dashboard-visuals,
+  .admin-layout .booking-detail-layout,
+  .admin-layout .recon-bottom {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-layout .revenue-bottom-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 968px) {
+  .admin-layout {
+    display: block;
+  }
+
+  .admin-layout .admin-sidebar {
+    position: sticky;
+    inset: 0 0 auto;
+    z-index: 50;
+    width: 100%;
+    height: auto;
+    display: block;
+    padding: 8px 12px;
+    transform: none;
+    border: 0;
+    border-bottom: 1px solid var(--mm-color-border);
+    box-shadow: var(--mm-shadow-sm);
+  }
+
+  .admin-layout :is(.sidebar-header, .sidebar-footer) {
+    display: none;
+  }
+
+  .admin-layout .sidebar-nav {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .admin-layout .sidebar-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-layout .nav-item {
+    min-height: 38px;
+    flex: 0 0 auto;
+    padding: 0 12px;
+  }
+
+  .admin-layout .nav-item.active {
+    box-shadow: inset 0 -2px 0 var(--mm-color-primary);
+  }
+
+  .admin-layout .admin-main {
+    margin-left: 0;
+    min-width: 0;
+  }
+
+  .admin-layout :is(.admin-content, .admin-operations, .admin-ops-page, .admin-filter-row) {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .admin-layout .admin-filter-row {
+    flex-wrap: wrap;
+  }
+
+  .admin-layout .admin-content,
+  .admin-layout .admin-main:has(.admin-ops-page) .admin-content {
+    padding: 22px 18px;
+  }
+
+  .admin-layout .dashboard-footer {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .admin-layout .admin-content,
+  .admin-layout .admin-main:has(.admin-ops-page) .admin-content {
+    padding: 18px 14px;
+  }
+
+  .admin-layout :is(.page-header, .admin-operations-heading, .ops-page-heading, .admin-bookings-heading, .dashboard-heading) {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-layout :is(.table-controls, .admin-filter-row, .booking-filter-bar, .review-filters, .incident-actions, .ops-actions) {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-layout :is(.search-box, .admin-search, .review-filters label, .incident-actions label, .payment-queue header label) {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+  }
+
+  .admin-layout .dashboard-metrics,
+  .admin-layout .booking-stat-grid,
+  .admin-layout :is(.ops-metrics.four, .review-metrics, .recon-metrics, .incident-metrics, .admin-user-metrics, .analytics-stat-grid, .moderation-grid),
+  .admin-layout .revenue-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-layout .dashboard-metric,
+  .admin-layout :is(.ops-metric, .review-metrics article, .incident-metrics article, .admin-user-metrics article) {
+    min-height: 108px;
+  }
+
+  .admin-layout .dashboard-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-layout .admin-footer {
+    width: calc(100% - 28px);
+  }
+
+  .admin-layout .messages-shell {
+    min-height: calc(100dvh - 110px);
+  }
+
+  .admin-layout .message-bubble {
+    max-width: 88%;
+  }
+
+  .admin-layout .trend-grid {
+    gap: 8px;
+    padding-inline: 10px;
+  }
+
+  .admin-layout .trend-grid span {
+    width: min(14px, 38%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-layout *,
+  .admin-layout *::before,
+  .admin-layout *::after,
+  .admin-loading *,
+  .admin-loading *::before,
+  .admin-loading *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
