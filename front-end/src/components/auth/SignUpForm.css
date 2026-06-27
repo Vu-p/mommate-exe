@@ -73,3 +73,37 @@
     gap: 0;
   }
 }
+
+/* Public redesign pass: auth form polish */
+.submit-btn {
+  background: var(--mm-gradient-primary);
+  box-shadow: var(--mm-shadow-md);
+  transition:
+    transform var(--mm-motion-base) var(--mm-motion-ease-soft),
+    box-shadow var(--mm-motion-base) var(--mm-motion-ease-soft),
+    opacity var(--mm-motion-base) var(--mm-motion-ease-soft);
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: var(--mm-gradient-primary);
+  box-shadow: var(--mm-shadow-lg);
+}
+
+.submit-btn:focus-visible,
+.toggle-auth-text button:focus-visible {
+  outline: none;
+  box-shadow: var(--mm-shadow-focus);
+}
+
+.auth-message {
+  padding: 12px 14px;
+  border-radius: var(--mm-radius-lg);
+}
+
+.error-message {
+  background: var(--mm-color-danger-bg);
+}
+
+.success-message {
+  background: var(--mm-color-success-bg);
+}

@@ -1,210 +1,283 @@
 :root {
-  /* ═══════════════════════════════════════════════
-     Core Palette — Soft Lavender & Pastel
-     ═══════════════════════════════════════════════ */
-  --primary: #B79CED;
-  --primary-light: #DCCEF9;
-  --primary-dark: #9B7FD4;
-  --primary-container: #E9E1FF;
-  --on-primary-container: #3B2D66;
-  --secondary: #C4B1E0;
-  --secondary-container: #F0E8FF;
-  --on-secondary-container: #5A4A7A;
-  --tertiary: #E8B4CB;
-  --tertiary-container: #FFE0ED;
+  /* MomMate foundation tokens: soft lavender, calm care, accessible surfaces. */
+  --mm-color-bg: #fbf8ff;
+  --mm-color-bg-mist: #f4efff;
+  --mm-color-bg-lavender: #ece4fb;
+  --mm-color-surface: #ffffff;
+  --mm-color-surface-soft: rgba(255, 255, 255, 0.78);
+  --mm-color-surface-strong: rgba(255, 255, 255, 0.92);
+  --mm-color-surface-tint: rgba(247, 243, 255, 0.84);
+  --mm-color-primary: #a98fe8;
+  --mm-color-primary-strong: #7357b4;
+  --mm-color-primary-soft: #e9e1ff;
+  --mm-color-secondary: #b49acb;
+  --mm-color-accent: #df9fbd;
+  --mm-color-accent-soft: #ffe3ef;
+  --mm-color-text: #2d2640;
+  --mm-color-text-muted: #665b80;
+  --mm-color-text-subtle: #8f83a8;
+  --mm-color-text-on-color: #ffffff;
+  --mm-color-border: rgba(97, 78, 135, 0.16);
+  --mm-color-border-strong: rgba(97, 78, 135, 0.26);
+  --mm-color-glass-border: rgba(255, 255, 255, 0.68);
+  --mm-color-success: #3f8f62;
+  --mm-color-success-bg: #e7f6ed;
+  --mm-color-warning: #b87922;
+  --mm-color-warning-bg: #fff1d8;
+  --mm-color-danger: #bd3f52;
+  --mm-color-danger-bg: #ffe7ea;
 
-  /* ═══════════════════════════════════════════════
-     Background & Surfaces
-     ═══════════════════════════════════════════════ */
-  --bg: #EBE6F5;
-  --background: #F7F3FF;
-  --surface: #ffffff;
-  --surface-dim: #EDE6F7;
+  --mm-gradient-page: radial-gradient(circle at 16% 10%, rgba(210, 194, 255, 0.5), transparent 26rem),
+    radial-gradient(circle at 86% 18%, rgba(223, 159, 189, 0.28), transparent 24rem),
+    linear-gradient(145deg, #fffdfd 0%, #f7f2ff 46%, #fbf8ff 100%);
+  --mm-gradient-soft: linear-gradient(135deg, #fbf8ff 0%, #f0e8ff 46%, #ffeaf3 100%);
+  --mm-gradient-primary: linear-gradient(135deg, #7357b4 0%, #a98fe8 58%, #c9b8f2 100%);
+  --mm-gradient-surface: linear-gradient(145deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.42));
+  --mm-gradient-shine: linear-gradient(135deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0));
+
+  --mm-font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mm-font-size-base: 16px;
+  --mm-type-display: clamp(2.75rem, 6vw, 5.5rem);
+  --mm-type-page-title: clamp(2rem, 4vw, 3.5rem);
+  --mm-type-section-title: clamp(1.65rem, 3vw, 2.55rem);
+  --mm-type-card-title: clamp(1.1rem, 1.6vw, 1.35rem);
+  --mm-type-body-lg: 1.125rem;
+  --mm-type-body: 1rem;
+  --mm-type-body-sm: 0.875rem;
+  --mm-type-caption: 0.75rem;
+  --mm-type-form-label: 0.86rem;
+  --mm-type-admin: 0.875rem;
+  --mm-leading-display: 1.04;
+  --mm-leading-heading: 1.16;
+  --mm-leading-body: 1.65;
+  --mm-tracking: 0;
+
+  --mm-space-1: 4px;
+  --mm-space-2: 8px;
+  --mm-space-3: 12px;
+  --mm-space-4: 16px;
+  --mm-space-5: 20px;
+  --mm-space-6: 24px;
+  --mm-space-8: 32px;
+  --mm-space-10: 40px;
+  --mm-space-12: 48px;
+  --mm-space-16: 64px;
+  --mm-space-20: 80px;
+  --mm-container: 1280px;
+  --mm-grid-max: 1200px;
+  --mm-grid-gap: 24px;
+  --mm-gutter-desktop: 32px;
+  --mm-gutter-tablet: 24px;
+  --mm-gutter-mobile: 16px;
+
+  --mm-radius-xs: 6px;
+  --mm-radius-sm: 8px;
+  --mm-radius-md: 12px;
+  --mm-radius-lg: 16px;
+  --mm-radius-xl: 24px;
+  --mm-radius-2xl: 32px;
+  --mm-radius-pill: 999px;
+
+  --mm-shadow-xs: 0 1px 2px rgba(45, 38, 64, 0.06);
+  --mm-shadow-sm: 0 4px 14px rgba(88, 71, 128, 0.08);
+  --mm-shadow-md: 0 12px 34px rgba(88, 71, 128, 0.1), 0 4px 12px rgba(169, 143, 232, 0.1);
+  --mm-shadow-lg: 0 22px 60px rgba(88, 71, 128, 0.14), 0 10px 26px rgba(169, 143, 232, 0.12);
+  --mm-shadow-floating: 0 30px 90px rgba(88, 71, 128, 0.16), 0 12px 34px rgba(169, 143, 232, 0.14);
+  --mm-shadow-focus: 0 0 0 4px rgba(169, 143, 232, 0.24);
+  --mm-shadow-inset-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+
+  --mm-glass-bg: rgba(255, 255, 255, 0.58);
+  --mm-glass-bg-hover: rgba(255, 255, 255, 0.72);
+  --mm-glass-bg-strong: rgba(255, 255, 255, 0.82);
+  --mm-glass-border: rgba(255, 255, 255, 0.66);
+  --mm-glass-blur-light: blur(12px) saturate(135%);
+  --mm-glass-blur: blur(22px) saturate(145%);
+  --mm-glass-blur-strong: blur(30px) saturate(155%);
+
+  --mm-motion-ease: cubic-bezier(0.2, 0, 0, 1);
+  --mm-motion-ease-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --mm-motion-ease-float: cubic-bezier(0.34, 1.02, 0.64, 1);
+  --mm-motion-fast: 140ms;
+  --mm-motion-base: 220ms;
+  --mm-motion-slow: 420ms;
+  --mm-motion-float: 18s;
+  --mm-motion-hover-lift: -3px;
+  --mm-motion-admin-hover-lift: -1px;
+
+  --mm-admin-bg: #f6f3fb;
+  --mm-admin-surface: rgba(255, 255, 255, 0.9);
+  --mm-admin-border: rgba(72, 58, 105, 0.14);
+  --mm-admin-row-height: 48px;
+  --mm-admin-cell-padding: 10px 12px;
+  --mm-admin-panel-padding: 20px;
+  --mm-admin-density-gap: 12px;
+
+  /* Backward-compatible aliases used across existing CSS. */
+  --primary: var(--mm-color-primary);
+  --primary-light: #d8cdf8;
+  --primary-dark: var(--mm-color-primary-strong);
+  --primary-container: var(--mm-color-primary-soft);
+  --on-primary-container: #3b2d66;
+  --secondary: var(--mm-color-secondary);
+  --secondary-container: #f0e8ff;
+  --on-secondary-container: #5a4a7a;
+  --tertiary: var(--mm-color-accent);
+  --tertiary-container: var(--mm-color-accent-soft);
+
+  --bg: var(--mm-color-bg-mist);
+  --background: var(--mm-color-bg);
+  --surface: var(--mm-color-surface);
+  --surface-dim: var(--mm-color-bg-lavender);
   --surface-bright: #ffffff;
   --surface-container-lowest: #ffffff;
-  --surface-container-low: #FAF7FF;
-  --surface-container: #F3EEFF;
-  --surface-container-high: #EDE6F9;
-  --surface-container-highest: #E9E1FF;
-  --surface-variant: #E9E1FF;
-  --inverse-surface: #2D2640;
-  --inverse-on-surface: #F3EEFF;
+  --surface-container-low: #faf7ff;
+  --surface-container: var(--mm-color-bg-mist);
+  --surface-container-high: #eee7fb;
+  --surface-container-highest: var(--mm-color-primary-soft);
+  --surface-variant: var(--mm-color-primary-soft);
+  --inverse-surface: var(--mm-color-text);
+  --inverse-on-surface: #f8f5ff;
 
-  /* ═══════════════════════════════════════════════
-     Glassmorphism System — Multi-layer
-     ═══════════════════════════════════════════════ */
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-bg-hover: rgba(255, 255, 255, 0.10);
-  --glass-bg-strong: rgba(255, 255, 255, 0.18);
-  --glass-border: rgba(255, 255, 255, 0.15);
-  --glass-border-strong: rgba(255, 255, 255, 0.25);
-  --glass-shadow: 0 12px 40px 0 rgba(183, 156, 237, 0.08);
-  --glass-blur: blur(24px);
-  --glass-blur-strong: blur(36px);
-  --glass-blur-light: blur(12px);
-  --glass-inner-glow: inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+  --glass-bg: var(--mm-glass-bg);
+  --glass-bg-hover: var(--mm-glass-bg-hover);
+  --glass-bg-strong: var(--mm-glass-bg-strong);
+  --glass-border: var(--mm-glass-border);
+  --glass-border-strong: rgba(255, 255, 255, 0.82);
+  --glass-shadow: var(--mm-shadow-md);
+  --glass-blur: var(--mm-glass-blur);
+  --glass-blur-strong: var(--mm-glass-blur-strong);
+  --glass-blur-light: var(--mm-glass-blur-light);
+  --glass-inner-glow: var(--mm-shadow-inset-highlight);
 
-  /* Solid Premium Cards */
-  --card-bg: rgba(255, 255, 255, 0.95);
-  --card-border: rgba(255, 255, 255, 1);
-  --card-shadow: 0 12px 40px rgba(183, 156, 237, 0.12), 0 4px 12px rgba(183, 156, 237, 0.05);
+  --card-bg: var(--mm-color-surface-strong);
+  --card-border: var(--mm-glass-border);
+  --card-shadow: var(--mm-shadow-md);
 
-  /* ═══════════════════════════════════════════════
-     Gradients & Aurora
-     ═══════════════════════════════════════════════ */
-  --gradient-bg: linear-gradient(135deg, #F7F3FF 0%, #EDE6F9 25%, #F3EEFF 50%, #FAF7FF 75%, #F7F3FF 100%);
-  --gradient-aurora: linear-gradient(135deg, #DCCEF9 0%, #E9E1FF 25%, #F0E8FF 50%, #FFE0ED 75%, #DCCEF9 100%);
-  --gradient-primary: linear-gradient(135deg, #B79CED, #DCCEF9);
-  --gradient-hero: linear-gradient(160deg, #E9E1FF 0%, #F7F3FF 30%, #FFE0ED 60%, #DCCEF9 100%);
-  --gradient-cta: linear-gradient(135deg, #9B7FD4 0%, #B79CED 50%, #C4B1E0 100%);
-  --gradient-card-shine: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 60%);
+  --gradient-bg: var(--mm-gradient-page);
+  --gradient-aurora: var(--mm-gradient-soft);
+  --gradient-primary: var(--mm-gradient-primary);
+  --gradient-hero: var(--mm-gradient-soft);
+  --gradient-cta: var(--mm-gradient-primary);
+  --gradient-card-shine: var(--mm-gradient-shine);
 
-  /* ═══════════════════════════════════════════════
-     Text & Outline
-     ═══════════════════════════════════════════════ */
   --white: #ffffff;
-  --text: #2D2640;
-  --on-surface: #2D2640;
-  --on-background: #2D2640;
-  --text-muted: #6B5E87;
-  --on-surface-variant: #6B5E87;
-  --text-light: #9B8FBE;
-  --outline: #DCCEF9;
-  --border: rgba(183, 156, 237, 0.2);
-  --outline-variant: #F0E8FF;
+  --text: var(--mm-color-text);
+  --on-surface: var(--mm-color-text);
+  --on-background: var(--mm-color-text);
+  --text-muted: var(--mm-color-text-muted);
+  --on-surface-variant: var(--mm-color-text-muted);
+  --text-light: var(--mm-color-text-subtle);
+  --outline: #d8cdf8;
+  --border: var(--mm-color-border);
+  --outline-variant: rgba(169, 143, 232, 0.12);
 
-  /* ═══════════════════════════════════════════════
-     Feedback Colors
-     ═══════════════════════════════════════════════ */
-  --error: #D64545;
-  --error-container: #FFE5E5;
-  --on-error-container: #8B1A1A;
-  --warning: #E8A940;
-  --success: #5CB87A;
-  --success-container: #E5F6EC;
+  --error: var(--mm-color-danger);
+  --error-container: var(--mm-color-danger-bg);
+  --on-error-container: #7a1d2b;
+  --warning: var(--mm-color-warning);
+  --warning-container: var(--mm-color-warning-bg);
+  --success: var(--mm-color-success);
+  --success-container: var(--mm-color-success-bg);
 
-  /* ═══════════════════════════════════════════════
-     Typography
-     ═══════════════════════════════════════════════ */
-  --font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-size-base: 16px;
+  --font-family: var(--mm-font-sans);
+  --font-size-base: var(--mm-font-size-base);
+  --type-display: var(--mm-type-display);
+  --type-h1: var(--mm-type-page-title);
+  --type-h2: var(--mm-type-section-title);
+  --type-h3: var(--mm-type-card-title);
+  --type-body-lg: var(--mm-type-body-lg);
+  --type-body: var(--mm-type-body);
+  --type-body-sm: var(--mm-type-body-sm);
+  --type-caption: var(--mm-type-caption);
+  --leading-display: var(--mm-leading-display);
+  --leading-heading: var(--mm-leading-heading);
+  --leading-body: var(--mm-leading-body);
+  --tracking-default: var(--mm-tracking);
 
-  /* ═══════════════════════════════════════════════
-     Spacing
-     ═══════════════════════════════════════════════ */
-  --spacing-xs: 4px;
-  --spacing-base: 8px;
-  --spacing-sm: 12px;
-  --spacing-md: 24px;
-  --spacing-lg: 48px;
-  --spacing-xl: 80px;
-  --spacing-gutter: 24px;
-  --spacing-margin-mobile: 16px;
-  --spacing-margin-desktop: 64px;
-  --container: 1280px;
+  --spacing-xs: var(--mm-space-1);
+  --spacing-base: var(--mm-space-2);
+  --spacing-sm: var(--mm-space-3);
+  --spacing-md: var(--mm-space-6);
+  --spacing-lg: var(--mm-space-12);
+  --spacing-xl: var(--mm-space-20);
+  --spacing-gutter: var(--mm-space-6);
+  --spacing-margin-mobile: var(--mm-space-4);
+  --spacing-margin-desktop: var(--mm-space-16);
+  --container: var(--mm-container);
+  --grid-max: var(--mm-grid-max);
+  --grid-gutter-desktop: var(--mm-gutter-desktop);
+  --grid-gutter-tablet: var(--mm-gutter-tablet);
+  --grid-gutter-mobile: var(--mm-gutter-mobile);
+  --grid-gap: var(--mm-grid-gap);
 
-  /* ═══════════════════════════════════════════════
-     Borders & Shadows — Layered depth system
-     ═══════════════════════════════════════════════ */
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 22px;
-  --radius-xl: 28px;
-  --radius-2xl: 36px;
-  --radius-pill: 9999px;
+  --radius-sm: var(--mm-radius-sm);
+  --radius-md: var(--mm-radius-md);
+  --radius-lg: var(--mm-radius-lg);
+  --radius-xl: var(--mm-radius-xl);
+  --radius-2xl: var(--mm-radius-2xl);
+  --radius-pill: var(--mm-radius-pill);
+  --ds-radius-xs: var(--mm-radius-xs);
+  --ds-radius-sm: var(--mm-radius-sm);
+  --ds-radius-md: var(--mm-radius-md);
+  --ds-radius-lg: var(--mm-radius-lg);
+  --ds-radius-xl: var(--mm-radius-xl);
+  --ds-radius-round: var(--mm-radius-pill);
 
-  --shadow-sm: 0 2px 8px rgba(183, 156, 237, 0.06), 0 1px 2px rgba(183, 156, 237, 0.04);
-  --shadow-md: 0 4px 16px rgba(183, 156, 237, 0.08), 0 2px 6px rgba(183, 156, 237, 0.05);
-  --shadow-lg: 0 12px 40px rgba(183, 156, 237, 0.08), 0 4px 12px rgba(183, 156, 237, 0.04);
-  --shadow-xl: 0 20px 60px rgba(183, 156, 237, 0.12), 0 8px 24px rgba(183, 156, 237, 0.06);
-  --shadow-glow: 0 0 40px rgba(183, 156, 237, 0.15);
-  --shadow-glass: 0 12px 40px rgba(183, 156, 237, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  --shadow-sm: var(--mm-shadow-sm);
+  --shadow-md: var(--mm-shadow-md);
+  --shadow-lg: var(--mm-shadow-lg);
+  --shadow-xl: var(--mm-shadow-floating);
+  --shadow-glow: 0 0 34px rgba(169, 143, 232, 0.18);
+  --shadow-glass: var(--mm-shadow-md), var(--mm-shadow-inset-highlight);
 
-  /* ═══════════════════════════════════════════════
-     Transitions — Spring-inspired easing
-     ═══════════════════════════════════════════════ */
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-normal: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-slow: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: var(--mm-motion-ease-float);
+  --ease-smooth: var(--mm-motion-ease);
+  --ease-out: var(--mm-motion-ease-soft);
+  --transition-fast: var(--mm-motion-fast) var(--mm-motion-ease);
+  --transition-normal: var(--mm-motion-base) var(--mm-motion-ease-soft);
+  --transition-slow: var(--mm-motion-slow) var(--mm-motion-ease-soft);
+  --motion-ease-standard: var(--mm-motion-ease);
+  --motion-ease-emphasized: var(--mm-motion-ease-soft);
+  --motion-ease-living: var(--mm-motion-ease-float);
+  --motion-fast: var(--mm-motion-fast);
+  --motion-base: var(--mm-motion-base);
+  --motion-slow: var(--mm-motion-slow);
 
-  /* ═══════════════════════════════════════════════
-     Aurora Care Design System — Global semantic layer
-     ═══════════════════════════════════════════════ */
-  --brand-aura-lavender: #B79CED;
-  --brand-aura-mist: #EEE8FF;
-  --brand-aura-veil: #F8F5FF;
-  --brand-rose-care: #EAB8CE;
-  --brand-mint-clinical: #BFE7D2;
-  --brand-sky-calm: #BFDDF2;
-  --brand-ink: #2D2640;
-  --brand-ink-soft: #675B80;
-  --brand-line: rgba(99, 83, 132, 0.14);
+  --brand-aura-lavender: var(--mm-color-primary);
+  --brand-aura-mist: var(--mm-color-bg-mist);
+  --brand-aura-veil: var(--mm-color-bg);
+  --brand-rose-care: var(--mm-color-accent);
+  --brand-mint-clinical: #bfe7d2;
+  --brand-sky-calm: #bfddef;
+  --brand-ink: var(--mm-color-text);
+  --brand-ink-soft: var(--mm-color-text-muted);
+  --brand-line: var(--mm-color-border);
 
-  --ds-bg-page: #F8F5FF;
-  --ds-bg-ambient: radial-gradient(circle at 18% 12%, rgba(215, 201, 251, 0.72), transparent 34%),
-    radial-gradient(circle at 82% 18%, rgba(234, 184, 206, 0.44), transparent 30%),
-    linear-gradient(135deg, #FDFBFF 0%, #F4EEFF 48%, #F8F5FF 100%);
-  --ds-surface: rgba(255, 255, 255, 0.88);
-  --ds-surface-soft: rgba(248, 245, 255, 0.78);
-  --ds-surface-raised: rgba(255, 255, 255, 0.94);
-  --ds-surface-inverse: #2D2640;
-  --ds-border: rgba(99, 83, 132, 0.14);
-  --ds-border-strong: rgba(99, 83, 132, 0.24);
-  --ds-text: #2D2640;
-  --ds-text-muted: #675B80;
-  --ds-text-subtle: #8F83A8;
-  --ds-text-on-color: #FFFFFF;
-  --ds-accent: #9B7FD4;
-  --ds-accent-soft: #E9E1FF;
-  --ds-care: #D98EAF;
-  --ds-success: #4FAD74;
-  --ds-warning: #D99A32;
-  --ds-danger: #C94D5D;
-
-  --type-display: clamp(2.5rem, 5vw, 4.5rem);
-  --type-h1: clamp(2rem, 3.8vw, 3.5rem);
-  --type-h2: clamp(1.65rem, 2.8vw, 2.5rem);
-  --type-h3: clamp(1.3rem, 2vw, 1.75rem);
-  --type-body-lg: 1.125rem;
-  --type-body: 1rem;
-  --type-body-sm: 0.875rem;
-  --type-caption: 0.75rem;
-  --leading-display: 1.04;
-  --leading-heading: 1.16;
-  --leading-body: 1.65;
-  --tracking-default: 0;
-
-  --grid-max: 1200px;
-  --grid-gutter-desktop: 32px;
-  --grid-gutter-tablet: 24px;
-  --grid-gutter-mobile: 16px;
-  --grid-gap: 24px;
-
-  --ds-radius-xs: 6px;
-  --ds-radius-sm: 8px;
-  --ds-radius-md: 12px;
-  --ds-radius-lg: 16px;
-  --ds-radius-xl: 24px;
-  --ds-radius-round: 999px;
-
-  --ds-shadow-rest: 0 1px 2px rgba(45, 38, 64, 0.06), 0 10px 28px rgba(183, 156, 237, 0.08);
-  --ds-shadow-raised: 0 8px 24px rgba(45, 38, 64, 0.08), 0 18px 52px rgba(183, 156, 237, 0.14);
-  --ds-shadow-floating: 0 18px 60px rgba(45, 38, 64, 0.12), 0 28px 80px rgba(183, 156, 237, 0.18);
-  --ds-shadow-focus: 0 0 0 4px rgba(183, 156, 237, 0.22);
-
-  --ds-glass-bg: rgba(255, 255, 255, 0.58);
-  --ds-glass-bg-strong: rgba(255, 255, 255, 0.74);
-  --ds-glass-border: rgba(255, 255, 255, 0.62);
-  --ds-glass-blur: blur(22px) saturate(145%);
-  --ds-glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.72);
-
-  --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
-  --motion-ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
-  --motion-ease-living: cubic-bezier(0.34, 1.12, 0.64, 1);
-  --motion-fast: 140ms;
-  --motion-base: 220ms;
-  --motion-slow: 420ms;
+  --ds-bg-page: var(--mm-color-bg);
+  --ds-bg-ambient: var(--mm-gradient-page);
+  --ds-surface: var(--mm-color-surface-soft);
+  --ds-surface-soft: var(--mm-color-surface-tint);
+  --ds-surface-raised: var(--mm-color-surface-strong);
+  --ds-surface-inverse: var(--mm-color-text);
+  --ds-border: var(--mm-color-border);
+  --ds-border-strong: var(--mm-color-border-strong);
+  --ds-text: var(--mm-color-text);
+  --ds-text-muted: var(--mm-color-text-muted);
+  --ds-text-subtle: var(--mm-color-text-subtle);
+  --ds-text-on-color: var(--mm-color-text-on-color);
+  --ds-accent: var(--mm-color-primary-strong);
+  --ds-accent-soft: var(--mm-color-primary-soft);
+  --ds-care: var(--mm-color-accent);
+  --ds-success: var(--mm-color-success);
+  --ds-warning: var(--mm-color-warning);
+  --ds-danger: var(--mm-color-danger);
+  --ds-shadow-rest: var(--mm-shadow-sm);
+  --ds-shadow-raised: var(--mm-shadow-md);
+  --ds-shadow-floating: var(--mm-shadow-floating);
+  --ds-shadow-focus: var(--mm-shadow-focus);
+  --ds-glass-bg: var(--mm-glass-bg);
+  --ds-glass-bg-strong: var(--mm-glass-bg-strong);
+  --ds-glass-border: var(--mm-glass-border);
+  --ds-glass-blur: var(--mm-glass-blur);
+  --ds-glass-highlight: var(--mm-shadow-inset-highlight);
 }

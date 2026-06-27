@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, ChevronLeft, ChevronRight, Loader2, Search, Users } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, Loader2, Search } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -194,11 +194,12 @@ const FindCarer = () => {
               <ChevronRight size={14} />
               <span>Tìm chuyên gia chăm sóc</span>
             </nav>
-            <span className="discovery-kicker">Discovery Experience</span>
+            <span className="discovery-kicker">Khám phá chuyên gia</span>
             <h1>{flowTitle}</h1>
             <p>{flowDescription}</p>
           </div>
           <div className="discovery-hero-aside">
+            <span className="discovery-summary-label">Tổng quan chuyên gia</span>
             <article><span>Chuyên gia phù hợp</span><strong>{totalItems.toLocaleString('vi-VN')}</strong></article>
             <article><span>Chế độ</span><strong>{serviceId ? 'Theo dịch vụ' : 'Khám phá'}</strong></article>
             <article><span>Bộ sàng lọc</span><strong>{sortOptions.find((option) => option.value === sortBy)?.label || 'Phù hợp nhất'}</strong></article>
@@ -225,6 +226,10 @@ const FindCarer = () => {
             ) : (
               <>
                 <div className="carer-list-controls discovery-list-controls">
+                  <div className="discovery-list-heading">
+                    <span>Kết quả phù hợp</span>
+                    <strong>{totalItems.toLocaleString('vi-VN')} chuyên gia đang hiển thị</strong>
+                  </div>
                   <div className="listing-search-box discovery-search-box">
                     <Search size={20} />
                     <input
@@ -239,7 +244,7 @@ const FindCarer = () => {
                 </div>
 
                 <div className="carer-results-toolbar discovery-results-toolbar">
-                  <span>{totalItems.toLocaleString('vi-VN')} chuyên gia phù hợp</span>
+                  <span>Bộ lọc hiện tại: {filters.area || 'Tất cả khu vực'}{filters.district ? `, ${filters.district}` : ''}</span>
                   <button type="button" onClick={clearFilters} className="btn-reset-inline">
                     Đặt lại bộ lọc
                   </button>

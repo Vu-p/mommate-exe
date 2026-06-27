@@ -198,3 +198,35 @@
     border-radius: 24px;
   }
 }
+
+/* Public redesign pass: soft filter panel */
+.carer-sidebar {
+  border-color: var(--mm-color-glass-border);
+  border-radius: var(--mm-radius-2xl);
+  background: var(--mm-gradient-surface), var(--mm-glass-bg);
+  box-shadow: var(--mm-shadow-lg), var(--mm-shadow-inset-highlight);
+  backdrop-filter: var(--mm-glass-blur);
+  -webkit-backdrop-filter: var(--mm-glass-blur);
+}
+
+.carer-select-trigger:focus-visible,
+.sidebar-header button:focus-visible,
+.sidebar-rating-list button:focus-visible {
+  outline: none;
+  box-shadow: var(--mm-shadow-focus);
+}
+
+.sidebar-rating-list button:hover,
+.carer-select-trigger:hover {
+  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carer-sidebar *,
+  .carer-sidebar *::before,
+  .carer-sidebar *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

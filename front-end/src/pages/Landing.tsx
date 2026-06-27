@@ -5,7 +5,6 @@ import {
   ArrowRight,
   Baby,
   BriefcaseMedical,
-  CalendarCheck,
   ChevronDown,
   HeartHandshake,
   Loader2,
@@ -15,10 +14,10 @@ import {
   ShieldCheck,
   Sparkles,
   Star,
-  Stethoscope,
   WalletCards,
 } from 'lucide-react';
 import api from '../utils/api';
+import { formatExperienceShort, formatLocation, getCarerAvatar, getCarerFullName, getDisplayRating } from '../utils/carerDisplay';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import BackToTop from '../components/common/BackToTop';
@@ -26,10 +25,31 @@ import './Landing.css';
 
 type Carer = {
   _id: string;
+  id?: string;
   displayName?: string;
+  name?: string;
   rating?: number;
   reviewCount?: number;
   location?: string;
+  avatar?: string;
+  img?: string;
+  bio?: string;
+  position?: string;
+  workplaceName?: string;
+  experienceYears?: number;
+  hourlyRate?: number;
+  verificationStatus?: string;
+  isVerified?: boolean;
+  skills?: string[];
+  services?: {
+    category?: string;
+    title?: string;
+  }[];
+  user?: {
+    firstName?: string;
+    lastName?: string;
+    avatar?: string;
+  };
 };
 
 type Service = {
@@ -69,12 +89,13 @@ type ReviewCard = {
 };
 
 const toArray = <T,>(value: unknown): T[] => (Array.isArray(value) ? value : []);
+const calmEase = [0.16, 1, 0.3, 1] as const;
 
 const reveal = {
   initial: { opacity: 0, y: 34, filter: 'blur(10px)' },
   whileInView: { opacity: 1, y: 0, filter: 'blur(0px)' },
   viewport: { once: true, amount: 0.22 },
-  transition: { duration: 0.78, ease: [0.16, 1, 0.3, 1] },
+  transition: { duration: 0.78, ease: calmEase },
 };
 
 const fallbackReviews: ReviewCard[] = [
@@ -93,6 +114,77 @@ const fallbackReviews: ReviewCard[] = [
     rating: 5,
   },
 ];
+
+const fallbackFeaturedCarers: Carer[] = [
+  {
+    _id: 'featured-carer-1',
+    displayName: 'Mai Anh',
+    avatar: '/src/assets/stitch/carer-profile.jpg',
+    rating: 4.9,
+    reviewCount: 18,
+    location: 'Hải Châu, Đà Nẵng',
+    experienceYears: 6,
+    verificationStatus: 'verified',
+    skills: ['Chăm sóc mẹ sau sinh'],
+    bio: 'Theo dõi nhịp hồi phục của mẹ, hỗ trợ sinh hoạt nhẹ nhàng và giữ gia đình luôn nắm rõ từng buổi chăm sóc.',
+  },
+  {
+    _id: 'featured-carer-2',
+    displayName: 'Thu Hà',
+    avatar: '/src/assets/stitch/service-postpartum.jpg',
+    rating: 4.8,
+    reviewCount: 14,
+    location: 'Sơn Trà, Đà Nẵng',
+    experienceYears: 5,
+    verificationStatus: 'verified',
+    skills: ['Tắm bé và chăm sóc sơ sinh'],
+    bio: 'Ưu tiên sự bình tĩnh trong từng thao tác, giúp mẹ an tâm hơn khi chăm sóc bé trong những tuần đầu.',
+  },
+  {
+    _id: 'featured-carer-3',
+    displayName: 'Ngọc Linh',
+    avatar: '/src/assets/stitch/booking-parent.jpg',
+    rating: 5,
+    reviewCount: 11,
+    location: 'Ngũ Hành Sơn, Đà Nẵng',
+    experienceYears: 7,
+    verificationStatus: 'verified',
+    skills: ['Đồng hành sau sinh tại nhà'],
+    bio: 'Giữ lịch chăm sóc rõ ràng, lắng nghe nhu cầu của mẹ và phối hợp với gia đình bằng cách nhẹ nhàng.',
+  },
+  {
+    _id: 'featured-carer-4',
+    displayName: 'Bảo Trân',
+    avatar: '/src/assets/stitch/hero-maternal-care.jpg',
+    rating: 4.9,
+    reviewCount: 16,
+    location: 'Thanh Khê, Đà Nẵng',
+    experienceYears: 4,
+    verificationStatus: 'verified',
+    skills: ['Hỗ trợ mẹ và bé tại nhà'],
+    bio: 'Tập trung vào sự thoải mái của mẹ, nếp sinh hoạt của bé và những chi tiết nhỏ giúp một ngày bớt căng thẳng.',
+  },
+  {
+    _id: 'featured-carer-5',
+    displayName: 'Hồng Vân',
+    avatar: '/src/assets/stitch/hero-maternal-care-aurora.png',
+    rating: 4.8,
+    reviewCount: 12,
+    location: 'Cẩm Lệ, Đà Nẵng',
+    experienceYears: 8,
+    verificationStatus: 'verified',
+    skills: ['Điều phối chăm sóc sau sinh'],
+    bio: 'Giúp gia đình hiểu việc cần chuẩn bị, theo dõi lịch hẹn và giữ nhịp chăm sóc ổn định hơn.',
+  },
+];
+
+const featuredCarerNote = (carer: Carer, specialty: string) => {
+  if (carer.bio && carer.bio.trim()) {
+    return carer.bio.trim().length > 116 ? `${carer.bio.trim().slice(0, 112)}...` : carer.bio.trim();
+  }
+
+  return `Đồng hành cùng gia đình trong các buổi ${specialty.toLowerCase()}, với nhịp chăm sóc rõ ràng và nhẹ nhàng.`;
+};
 
 const faqItems = [
   {
@@ -129,10 +221,16 @@ const Landing = () => {
   const glassY = useTransform(scrollYProgress, [0, 1], [0, -54]);
 
   useEffect(() => {
-    api.get('/carers', { params: { limit: 3 } })
+    api.get('/carers', { params: { limit: 5 } })
       .then((res) => {
         const items = toArray<Carer>(res.data?.items).length ? toArray<Carer>(res.data.items) : toArray<Carer>(res.data);
-        setFeaturedCarers(items.slice(0, 3));
+        const featured = [...items]
+          .sort((first, second) => {
+            const ratingDifference = Number(second.rating || 0) - Number(first.rating || 0);
+            return ratingDifference || Number(second.reviewCount || 0) - Number(first.reviewCount || 0);
+          })
+          .slice(0, 5);
+        setFeaturedCarers(featured);
       })
       .catch(console.error);
   }, []);
@@ -174,6 +272,7 @@ const Landing = () => {
   }, []);
 
   const displayedReviews = reviews.length ? reviews : fallbackReviews;
+  const displayedFeaturedCarers = featuredCarers.length ? featuredCarers : fallbackFeaturedCarers;
 
   const averageRating = useMemo(() => {
     const list = reviews.length ? reviews : fallbackReviews;
@@ -202,9 +301,9 @@ const Landing = () => {
               className="aurora-hero-copy"
               initial={{ opacity: 0, y: 28, filter: 'blur(12px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.9, ease: calmEase }}
             >
-              <span className="aurora-kicker">MomMate postpartum care</span>
+              <span className="aurora-kicker">Chăm sóc sau sinh MomMate</span>
               <h1>Hãy để chúng tôi chăm sóc mẹ trong những ngày đầu sau sinh.</h1>
               <p>MomMate được xây dựng bởi một người từng trải qua khủng hoảng sau sinh, để không người mẹ nào phải tự xoay xở trong im lặng.</p>
               <form className="aurora-search" onSubmit={handleSearch}>
@@ -268,7 +367,7 @@ const Landing = () => {
         <section className="aurora-service-discovery" id="services">
           <div className="container">
             <motion.div className="aurora-section-stack" {...reveal}>
-              <span className="aurora-kicker">Service discovery</span>
+            <span className="aurora-kicker">Khám phá dịch vụ</span>
               <h2>Lựa chọn dịch vụ theo nhu cầu thật của mẹ và bé.</h2>
               <p>Không bắt đầu bằng một danh sách lạnh. MomMate đưa dịch vụ, khu vực và tín hiệu tin cậy vào cùng một bề mặt tìm kiếm.</p>
             </motion.div>
@@ -283,7 +382,7 @@ const Landing = () => {
                     initial={{ opacity: 0, y: 28, filter: 'blur(10px)' }}
                     whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                     viewport={{ once: true, amount: 0.18 }}
-                    transition={{ duration: 0.72, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ duration: 0.72, delay: index * 0.08, ease: calmEase }}
                   >
                     <Link to={`/services/${service._id}`}>
                       <div className="aurora-service-image">
@@ -312,7 +411,7 @@ const Landing = () => {
         <section className="aurora-how">
           <div className="container aurora-how-grid">
             <motion.div className="aurora-section-stack" {...reveal}>
-              <span className="aurora-kicker">How it works</span>
+              <span className="aurora-kicker">Quy trình đặt lịch</span>
               <h2>Một quy trình đủ rõ để mẹ không phải giữ mọi thứ trong đầu.</h2>
             </motion.div>
             <div className="aurora-steps">
@@ -326,7 +425,7 @@ const Landing = () => {
                   initial={{ opacity: 0, x: 34, filter: 'blur(8px)' }}
                   whileInView={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
                   viewport={{ once: true, amount: 0.24 }}
-                  transition={{ duration: 0.7, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.7, delay: index * 0.08, ease: calmEase }}
                 >
                   <b>{step}</b>
                   <div>
@@ -339,25 +438,71 @@ const Landing = () => {
           </div>
         </section>
 
-        <section className="aurora-standards">
-          <div className="container aurora-standards-grid">
-            <motion.div className="aurora-standards-visual" {...reveal}>
-              <img src="/src/assets/stitch/service-postpartum.jpg" alt="Chuyên gia chăm sóc mẹ và bé trong không gian tại nhà" />
-              <div>
-                <CalendarCheck size={20} />
-                <span>Lịch chăm sóc có ngữ cảnh</span>
+        <section className="aurora-featured-carers">
+          <div className="aurora-carer-glow" aria-hidden="true">
+            <span />
+            <span />
+          </div>
+          <div className="container aurora-featured-carers-grid">
+            <motion.div className="aurora-featured-carers-copy" {...reveal}>
+              <span className="aurora-kicker">Đội ngũ MomMate</span>
+              <h2>Những điều dưỡng viên đồng hành cùng mẹ.</h2>
+              <p>Mỗi hồ sơ được đặt trong một không gian dễ đọc để gia đình cảm nhận được con người phía sau lịch chăm sóc: kinh nghiệm, khu vực, đánh giá và cách họ đồng hành.</p>
+              <div className="aurora-featured-carers-actions">
+                <Link to="/carers">Xem đội ngũ chuyên gia <ArrowRight size={17} /></Link>
+                <span><ShieldCheck size={16} /> Hồ sơ, đánh giá và trạng thái xác thực hiển thị trước khi đặt lịch</span>
               </div>
             </motion.div>
-            <motion.div className="aurora-standards-copy" {...reveal}>
-              <span className="aurora-kicker">Care standards</span>
-              <h2>Medical trust without the cold clinic feeling.</h2>
-              <p>MomMate giữ sự mềm mại ở bề mặt, nhưng bên dưới là cấu trúc cần thiết cho chăm sóc sau sinh: hồ sơ chuyên gia, lịch hẹn, giá dịch vụ, đánh giá và trạng thái đặt lịch.</p>
-              <div className="aurora-standard-list">
-                <span><ShieldCheck size={17} /> Hồ sơ và đánh giá dễ kiểm tra</span>
-                <span><Stethoscope size={17} /> Dịch vụ tập trung vào mẹ và bé</span>
-                <span><Sparkles size={17} /> Trải nghiệm giảm tải cảm xúc</span>
-              </div>
-              <Link to="/carers">Tìm chuyên gia <ArrowRight size={17} /></Link>
+
+            <motion.div className="aurora-carer-carousel-shell" {...reveal}>
+              {displayedFeaturedCarers.length ? (
+                <div className="aurora-carer-carousel" aria-label="Điều dưỡng viên nổi bật của MomMate">
+                  <div className="aurora-carer-ring">
+                    {displayedFeaturedCarers.map((carer, index) => {
+                      const carerId = carer._id || carer.id;
+                      const name = carer.displayName || getCarerFullName(carer);
+                      const specialty = carer.skills?.[0] || carer.services?.[0]?.category || carer.position || 'Chăm sóc sau sinh';
+                      const rating = getDisplayRating(carer);
+                      const verified = carer.verificationStatus === 'verified' || carer.isVerified;
+                      const location = formatLocation(carer.location);
+                      const experience = formatExperienceShort(carer.experienceYears);
+
+                      return (
+                        <Link
+                          to={carerId ? `/carers/${carerId}` : '/carers'}
+                          className={`aurora-carer-orbit-card aurora-carer-orbit-card-${index + 1}`}
+                          key={carerId || `${name}-${index}`}
+                        >
+                          <div className="aurora-carer-photo">
+                            <img src={getCarerAvatar(carer)} alt={name} loading="lazy" />
+                            {verified && <span><ShieldCheck size={14} />Đã xác thực</span>}
+                          </div>
+                          <div className="aurora-carer-card-body">
+                            <div>
+                              <span className="aurora-carer-role">{specialty}</span>
+                              <h3>{name}</h3>
+                            </div>
+                            <p>{featuredCarerNote(carer, specialty)}</p>
+                            <footer>
+                              <span className="aurora-carer-rating">
+                                <Star size={15} fill="currentColor" />
+                                {rating || 'Mới'}
+                              </span>
+                              <span>{experience}</span>
+                              <span>{location}</span>
+                            </footer>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <div className="aurora-featured-carers-empty">
+                  <Loader2 className="spinner" />
+                  <p>Đang chuẩn bị hồ sơ điều dưỡng viên nổi bật...</p>
+                </div>
+              )}
             </motion.div>
           </div>
         </section>
@@ -365,7 +510,7 @@ const Landing = () => {
         <section className="aurora-reviews">
           <div className="container aurora-review-grid">
             <motion.div className="aurora-review-lead" {...reveal}>
-              <span className="aurora-kicker">Reviews</span>
+              <span className="aurora-kicker">Đánh giá</span>
               <h2>Những lời nhắn bình tĩnh từ các gia đình đã đi qua giai đoạn đầu.</h2>
               <div className="aurora-score">
                 <strong>{averageRating}/5</strong>
@@ -380,7 +525,7 @@ const Landing = () => {
                   initial={{ opacity: 0, y: 34, rotate: index % 2 ? 1.4 : -1.2 }}
                   whileInView={{ opacity: 1, y: 0, rotate: index % 2 ? 0.6 : -0.4 }}
                   viewport={{ once: true, amount: 0.2 }}
-                  transition={{ duration: 0.78, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.78, delay: index * 0.08, ease: calmEase }}
                 >
                   <Quote size={20} />
                   <p>"{review.text}"</p>
@@ -397,7 +542,7 @@ const Landing = () => {
         <section className="aurora-faq">
           <div className="container aurora-faq-grid">
             <motion.div className="aurora-section-stack" {...reveal}>
-              <span className="aurora-kicker">FAQ</span>
+              <span className="aurora-kicker">Câu hỏi thường gặp</span>
               <h2>Câu hỏi thường gặp trước khi gia đình đặt lịch.</h2>
               <p>Những điểm cần biết được đặt gần cuối trang để mẹ có thể kiểm tra nhanh trước khi chuyển sang tìm dịch vụ.</p>
             </motion.div>
@@ -420,7 +565,7 @@ const Landing = () => {
                     <motion.div
                       initial={false}
                       animate={{ height: active ? 'auto' : 0, opacity: active ? 1 : 0 }}
-                      transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
+                      transition={{ duration: 0.34, ease: calmEase }}
                     >
                       <p>{item.answer}</p>
                     </motion.div>

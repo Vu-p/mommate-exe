@@ -61,3 +61,25 @@
     gap: 36px;
   }
 }
+
+/* Public redesign pass: social buttons */
+.social-btn {
+  border-color: var(--mm-color-border);
+  background: var(--mm-gradient-surface), rgba(255, 255, 255, 0.64);
+  box-shadow: var(--mm-shadow-sm), var(--mm-shadow-inset-highlight);
+  transition:
+    transform var(--mm-motion-base) var(--mm-motion-ease-soft),
+    box-shadow var(--mm-motion-base) var(--mm-motion-ease-soft),
+    border-color var(--mm-motion-base) var(--mm-motion-ease-soft);
+}
+
+.social-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--mm-color-border-strong);
+  box-shadow: var(--mm-shadow-md), var(--mm-shadow-inset-highlight);
+}
+
+.social-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--mm-shadow-focus);
+}

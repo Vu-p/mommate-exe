@@ -377,3 +377,67 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Public redesign pass: calm carer profile detail */
+.carer-detail-page {
+  background: var(--mm-gradient-page);
+}
+
+.stitch-profile-summary,
+.stitch-profile-credentials,
+.stitch-carer-bio,
+.stitch-weekly-calendar,
+.stitch-parent-reviews article {
+  border-color: var(--mm-color-glass-border);
+  background: var(--mm-gradient-surface), var(--mm-glass-bg);
+  box-shadow: var(--mm-shadow-lg), var(--mm-shadow-inset-highlight);
+  backdrop-filter: var(--mm-glass-blur);
+  -webkit-backdrop-filter: var(--mm-glass-blur);
+}
+
+.stitch-profile-avatar img {
+  border-color: var(--mm-color-primary-soft);
+  box-shadow: var(--mm-shadow-md);
+}
+
+.stitch-profile-avatar span,
+.stitch-profile-summary > button,
+.stitch-week-grid article b,
+.carer-not-found a {
+  background: var(--mm-gradient-primary);
+}
+
+.stitch-profile-summary > p,
+.stitch-profile-stats strong,
+.stitch-profile-price strong,
+.stitch-profile-credentials svg,
+.stitch-carer-bio > div span {
+  color: var(--mm-color-primary-strong);
+}
+
+.stitch-profile-summary > button {
+  transition:
+    transform var(--mm-motion-base) var(--mm-motion-ease-soft),
+    box-shadow var(--mm-motion-base) var(--mm-motion-ease-soft);
+}
+
+.stitch-profile-summary > button:hover {
+  transform: translateY(var(--mm-motion-hover-lift));
+  box-shadow: var(--mm-shadow-lg);
+}
+
+.stitch-profile-summary > button:focus-visible,
+.carer-not-found a:focus-visible {
+  outline: none;
+  box-shadow: var(--mm-shadow-focus);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carer-detail-page *,
+  .carer-detail-page *::before,
+  .carer-detail-page *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

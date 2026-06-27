@@ -38,11 +38,11 @@
 .discovery-hero-carer h1 {
   max-width: 860px;
   color: var(--text);
-  font-family: "PP Editorial New", "Canela", "Tiempos Headline", Georgia, serif;
+  font-family: var(--font-family);
   font-size: clamp(2.55rem, 4.7vw, 4.8rem);
-  font-weight: 500;
-  line-height: 0.98;
-  letter-spacing: -0.04em;
+  font-weight: 800;
+  line-height: 1.06;
+  letter-spacing: var(--tracking-default);
 }
 
 .discovery-hero-carer p {
@@ -239,5 +239,416 @@
   .discovery-results-toolbar {
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+/* Public redesign pass: calmer carer marketplace foundation */
+.find-carer-page {
+  background: var(--mm-gradient-page);
+}
+
+.find-carer-page .discovery-hero-carer,
+.find-carer-page .carer-list-controls,
+.find-carer-page .loading-state,
+.find-carer-page .empty-state {
+  border-color: var(--mm-color-glass-border);
+  background: var(--mm-gradient-surface), var(--mm-glass-bg);
+  box-shadow: var(--mm-shadow-lg), var(--mm-shadow-inset-highlight);
+  backdrop-filter: var(--mm-glass-blur);
+  -webkit-backdrop-filter: var(--mm-glass-blur);
+}
+
+.find-carer-page .carer-list-controls {
+  padding: 12px;
+  border: 1px solid var(--mm-color-glass-border);
+  border-radius: var(--mm-radius-2xl);
+}
+
+.find-carer-page .discovery-kicker,
+.find-carer-page .btn-reset-inline {
+  color: var(--mm-color-primary-strong);
+}
+
+.find-carer-page .discovery-hero-aside article {
+  border-color: var(--mm-color-border);
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: var(--mm-shadow-inset-highlight);
+}
+
+.find-carer-page .carer-sort-trigger,
+.find-carer-page .carer-sort-menu,
+.find-carer-page .page-btn {
+  transition:
+    transform var(--mm-motion-base) var(--mm-motion-ease-soft),
+    box-shadow var(--mm-motion-base) var(--mm-motion-ease-soft),
+    border-color var(--mm-motion-base) var(--mm-motion-ease-soft),
+    background-color var(--mm-motion-base) var(--mm-motion-ease-soft);
+}
+
+.find-carer-page .carer-sort-trigger:focus-visible,
+.find-carer-page .discovery-search-box:focus-within,
+.find-carer-page .btn-reset-inline:focus-visible {
+  outline: none;
+  box-shadow: var(--mm-shadow-focus);
+}
+
+.find-carer-page .page-btn.active {
+  background: var(--mm-gradient-primary);
+}
+
+.find-carer-page .carer-sort-select {
+  position: relative;
+  z-index: 10;
+}
+
+.find-carer-page .carer-sort-trigger {
+  min-height: 58px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 18px;
+  border: 1px solid var(--mm-color-border);
+  border-radius: var(--mm-radius-pill);
+  color: var(--mm-color-text);
+  background: rgba(255, 255, 255, 0.76);
+  font-weight: 750;
+}
+
+.find-carer-page .carer-sort-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 230px;
+  display: grid;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid var(--mm-color-border);
+  border-radius: var(--mm-radius-xl);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: var(--mm-shadow-lg);
+  backdrop-filter: var(--mm-glass-blur);
+  -webkit-backdrop-filter: var(--mm-glass-blur);
+}
+
+.find-carer-page .carer-sort-option {
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: var(--mm-radius-lg);
+  color: var(--mm-color-text);
+  text-align: left;
+  font-weight: 700;
+}
+
+.find-carer-page .carer-sort-option:hover,
+.find-carer-page .carer-sort-option.selected {
+  color: var(--mm-color-primary-strong);
+  background: rgba(233, 224, 255, 0.72);
+}
+
+.public-app .find-carer-page .carer-main-info {
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 24px;
+  padding: 24px;
+}
+
+.public-app .find-carer-page .carer-avatar {
+  width: auto;
+  height: auto;
+  min-height: 280px;
+  border-radius: 28px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .find-carer-page *,
+  .find-carer-page *::before,
+  .find-carer-page *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .public-app .find-carer-page .carer-main-info {
+    grid-template-columns: 1fr;
+  }
+
+  .public-app .find-carer-page .carer-avatar {
+    min-height: 240px;
+  }
+}
+
+@media (max-width: 640px) {
+  .public-app .find-carer-page .carer-main-info {
+    padding: 18px;
+  }
+}
+
+/* Prompt 3.1 QA: use the desktop width intentionally */
+.public-app .find-carer-page .find-carer-content {
+  width: min(100%, 1280px);
+  max-width: 1280px;
+  display: block;
+  padding-top: 112px;
+  padding-bottom: 72px;
+}
+
+.public-app .find-carer-page .discovery-hero-carer {
+  grid-column: auto;
+  margin-top: 16px;
+}
+
+.public-app .find-carer-page .discovery-browser {
+  grid-column: auto;
+  grid-template-columns: minmax(280px, 312px) minmax(0, 1fr);
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.public-app .find-carer-page .carer-list-area {
+  min-width: 0;
+}
+
+.public-app .find-carer-page .carers-list {
+  gap: 16px;
+}
+
+.public-app .find-carer-page .pagination {
+  margin-top: 34px;
+}
+
+@media (max-width: 980px) {
+  .public-app .find-carer-page .discovery-browser {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .public-app .find-carer-page .find-carer-content {
+    padding-top: 96px;
+    padding-bottom: 64px;
+  }
+}
+
+/* Prompt 3.2: refined carer listing hero and search/filter rhythm */
+.public-app .find-carer-page .discovery-hero-carer {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 386px);
+  align-items: center;
+  min-height: auto;
+  padding: clamp(24px, 3vw, 38px);
+  gap: clamp(24px, 4vw, 46px);
+}
+
+.public-app .find-carer-page .discovery-hero-carer h1 {
+  max-width: 700px;
+  font-size: clamp(2.35rem, 4.2vw, 4.45rem);
+  line-height: 1.02;
+}
+
+.public-app .find-carer-page .discovery-hero-carer p {
+  max-width: 610px;
+  margin-top: 14px;
+  color: var(--mm-color-text-muted);
+}
+
+.public-app .find-carer-page .discovery-hero-aside {
+  position: relative;
+  display: grid;
+  align-self: center;
+  gap: 0;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  border-radius: var(--mm-radius-2xl);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.86), rgba(246, 240, 255, 0.66)),
+    rgba(255, 255, 255, 0.54);
+  box-shadow: var(--mm-shadow-lg), var(--mm-shadow-inset-highlight);
+  backdrop-filter: var(--mm-glass-blur);
+  -webkit-backdrop-filter: var(--mm-glass-blur);
+  overflow: hidden;
+}
+
+.public-app .find-carer-page .discovery-hero-aside::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(244, 178, 203, 0.2), transparent 34%),
+    radial-gradient(circle at 100% 94%, rgba(170, 145, 226, 0.18), transparent 38%);
+}
+
+.public-app .find-carer-page .discovery-summary-label {
+  position: relative;
+  display: inline-flex;
+  width: fit-content;
+  margin: 0 0 8px;
+  padding: 6px 10px;
+  border: 1px solid rgba(170, 145, 226, 0.18);
+  border-radius: var(--mm-radius-pill);
+  color: var(--mm-color-primary-strong);
+  background: rgba(255, 255, 255, 0.58);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.public-app .find-carer-page .discovery-hero-aside article {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 14px;
+  padding: 13px 2px;
+  border: 0;
+  border-bottom: 1px solid rgba(130, 106, 176, 0.12);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.public-app .find-carer-page .discovery-hero-aside article:last-child {
+  border-bottom: 0;
+}
+
+.public-app .find-carer-page .discovery-hero-aside article span {
+  color: var(--mm-color-text-muted);
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.public-app .find-carer-page .discovery-hero-aside article strong {
+  color: var(--mm-color-text);
+  font-size: clamp(1rem, 2vw, 1.28rem);
+  line-height: 1.15;
+  text-align: right;
+}
+
+.public-app .find-carer-page .discovery-browser {
+  gap: 22px;
+  margin-top: 20px;
+}
+
+.public-app .find-carer-page .carer-list-area {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.public-app .find-carer-page .carer-list-controls {
+  display: grid;
+  grid-template-columns: minmax(170px, 0.46fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--mm-radius-2xl);
+}
+
+.public-app .find-carer-page .discovery-list-heading {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding-left: 4px;
+}
+
+.public-app .find-carer-page .discovery-list-heading span {
+  color: var(--mm-color-primary-strong);
+  font-size: 0.72rem;
+  font-weight: 760;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.public-app .find-carer-page .discovery-list-heading strong {
+  color: var(--mm-color-text);
+  font-size: clamp(0.98rem, 1.55vw, 1.16rem);
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.public-app .find-carer-page .carer-list-controls .discovery-search-box {
+  min-height: 58px;
+  border-color: rgba(130, 106, 176, 0.16);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.public-app .find-carer-page .carer-sort-trigger {
+  min-width: 214px;
+  border-color: rgba(130, 106, 176, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(250, 247, 255, 0.68));
+  box-shadow: var(--mm-shadow-inset-highlight);
+}
+
+.public-app .find-carer-page .discovery-results-toolbar {
+  margin-top: -2px;
+  padding: 0 4px 2px;
+  color: var(--mm-color-text-muted);
+  font-size: 0.92rem;
+}
+
+.public-app .find-carer-page .btn-reset-inline {
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid rgba(130, 106, 176, 0.16);
+  border-radius: var(--mm-radius-pill);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(250, 247, 255, 0.66));
+  box-shadow: var(--mm-shadow-inset-highlight);
+  font-weight: 720;
+  transition:
+    transform var(--mm-motion-base) var(--mm-motion-ease-soft),
+    box-shadow var(--mm-motion-base) var(--mm-motion-ease-soft),
+    border-color var(--mm-motion-base) var(--mm-motion-ease-soft);
+}
+
+.public-app .find-carer-page .btn-reset-inline:hover {
+  transform: translateY(-1px);
+  border-color: rgba(130, 106, 176, 0.28);
+  box-shadow: var(--mm-shadow-sm), var(--mm-shadow-inset-highlight);
+}
+
+.public-app .find-carer-page .carers-list {
+  margin-top: 2px;
+}
+
+@media (max-width: 1120px) {
+  .public-app .find-carer-page .carer-list-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .public-app .find-carer-page .carer-sort-trigger {
+    width: 100%;
+  }
+}
+
+@media (max-width: 980px) {
+  .public-app .find-carer-page .discovery-hero-carer {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .public-app .find-carer-page .discovery-hero-carer {
+    padding: 22px;
+    gap: 20px;
+  }
+
+  .public-app .find-carer-page .discovery-hero-aside {
+    padding: 16px;
+  }
+
+  .public-app .find-carer-page .discovery-hero-aside article strong {
+    max-width: 48%;
+  }
+
+  .public-app .find-carer-page .carer-list-controls {
+    padding: 16px;
+  }
+
+  .public-app .find-carer-page .discovery-results-toolbar {
+    gap: 10px;
   }
 }

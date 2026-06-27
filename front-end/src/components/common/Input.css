@@ -78,3 +78,20 @@
 .input-control::placeholder {
   color: var(--text-light);
 }
+
+/* Public redesign pass: readable glass form controls */
+.input-control {
+  border-color: var(--mm-color-border);
+  background: var(--mm-gradient-surface), rgba(255, 255, 255, 0.62);
+  box-shadow: var(--mm-shadow-inset-highlight);
+}
+
+.input-control:focus {
+  border-color: var(--mm-color-border-strong);
+  box-shadow: var(--mm-shadow-focus);
+}
+
+.input-icon-button:focus-visible {
+  outline: none;
+  box-shadow: var(--mm-shadow-focus);
+}

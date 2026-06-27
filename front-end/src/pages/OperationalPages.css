@@ -125,3 +125,83 @@
 .booking-refund-status { background: #fff4df; border: 1px solid #f0d39b; border-radius: 10px; display: grid; gap: 5px; margin: 12px 0; padding: 11px; }
 .booking-refund-status strong { color: #8a5a00; text-transform: capitalize; }
 .booking-refund-status small { color: #725f39; }
+
+/* Public redesign pass: 404 recovery screen */
+.public-app .stitch-page {
+  min-height: 100vh;
+  background: var(--mm-gradient-page);
+}
+
+.public-app .not-found-screen {
+  min-height: 720px;
+  padding-top: 132px;
+}
+
+.public-app .not-found-illustration {
+  border: 1px solid var(--mm-color-glass-border);
+  border-radius: var(--mm-radius-2xl);
+  background: var(--mm-gradient-surface), var(--mm-glass-bg);
+  box-shadow: var(--mm-shadow-floating), var(--mm-shadow-inset-highlight);
+}
+
+.public-app .not-found-copy {
+  padding: 34px;
+  border: 1px solid var(--mm-color-glass-border);
+  border-radius: var(--mm-radius-2xl);
+  background: var(--mm-gradient-surface), rgba(255, 255, 255, 0.5);
+  box-shadow: var(--mm-shadow-lg), var(--mm-shadow-inset-highlight);
+  backdrop-filter: var(--mm-glass-blur);
+  -webkit-backdrop-filter: var(--mm-glass-blur);
+}
+
+.public-app .stitch-primary-button {
+  background: var(--mm-gradient-primary);
+  box-shadow: var(--mm-shadow-md);
+}
+
+.public-app .stitch-secondary-button {
+  color: var(--mm-color-primary-strong);
+  border-color: var(--mm-color-border);
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.public-app .stitch-primary-button,
+.public-app .stitch-secondary-button {
+  transition:
+    transform var(--mm-motion-base) var(--mm-motion-ease-soft),
+    box-shadow var(--mm-motion-base) var(--mm-motion-ease-soft);
+}
+
+.public-app .stitch-primary-button:hover,
+.public-app .stitch-secondary-button:hover {
+  transform: translateY(var(--mm-motion-hover-lift));
+  box-shadow: var(--mm-shadow-lg);
+}
+
+.public-app .not-found-support a {
+  color: var(--mm-color-primary-strong);
+}
+
+@media (max-width: 800px) {
+  .public-app .not-found-screen {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding-top: 108px;
+  }
+
+  .public-app .not-found-illustration {
+    width: min(100%, 360px);
+    height: auto;
+    aspect-ratio: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-app .stitch-page *,
+  .public-app .stitch-page *::before,
+  .public-app .stitch-page *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

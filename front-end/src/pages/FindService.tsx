@@ -21,7 +21,6 @@ const FindService = () => {
     sort: 'default',
   });
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [areaOptions, setAreaOptions] = useState<{ value: string; label: string; count?: number }[]>([]);
   const location = useLocation();
@@ -50,10 +49,8 @@ const FindService = () => {
           sort: filters.sort === 'default' ? undefined : filters.sort,
         }});
         const allServices = Array.isArray(data) ? data : data.items || [];
-        const total = data.pagination?.total ?? allServices.length;
         const pages = data.pagination?.totalPages ?? 1;
         setServices(allServices);
-        setTotalItems(total);
         setTotalPages(pages);
         setAreaOptions(data.facets?.areas || []);
       } catch (error) {
@@ -93,11 +90,12 @@ const FindService = () => {
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="discovery-hero-copy">
-            <span className="discovery-kicker">Discovery Experience</span>
+            <span className="discovery-kicker">Khám phá dịch vụ</span>
             <h1>{carerId && carerName ? `Dịch vụ của chuyên gia ${carerName}` : 'Dịch vụ chăm sóc mẹ & bé'}</h1>
             <p>{carerId ? 'Khám phá các dịch vụ mà chuyên gia này có thể hỗ trợ và tiếp tục đặt lịch nhanh chóng.' : 'Khám phá các gói dịch vụ chuẩn y khoa từ đội ngũ chuyên gia tận tâm.'}</p>
           </div>
           <div className="discovery-hero-aside">
+            <span className="discovery-summary-label">Tổng quan tìm kiếm</span>
             {summary.map((item) => (
               <article key={item.label}>
                 <span>{item.label}</span>
@@ -108,6 +106,12 @@ const FindService = () => {
         </motion.section>
 
         <div className="discovery-search-shell">
+          <div className="discovery-search-heading">
+            <div>
+              <span>Tinh chỉnh kết quả</span>
+              <strong>Tìm đúng gói chăm sóc cho thời điểm hiện tại.</strong>
+            </div>
+          </div>
           <div className="discovery-search-row">
             <div className="listing-search-box discovery-search-box">
               <Search size={18} />
@@ -119,6 +123,16 @@ const FindService = () => {
                 aria-label="Tìm dịch vụ"
               />
             </div>
+            <label className="discovery-filter-field discovery-sort-field">
+              <span><Sparkles size={14} /> Sắp xếp</span>
+              <select value={filters.sort} onChange={(event) => updateFilter('sort', event.target.value)}>
+                <option value="default">Phổ biến nhất</option>
+                <option value="price-asc">Giá thấp đến cao</option>
+                <option value="price-desc">Giá cao đến thấp</option>
+              </select>
+            </label>
+          </div>
+          <div className="discovery-filter-flow">
             <div className="discovery-search-pills">
               {[
                 ['', 'Tất cả'],
@@ -130,22 +144,12 @@ const FindService = () => {
                 <button key={label} type="button" className={filters.category === value ? 'active' : ''} onClick={() => updateFilter('category', value)}>{label}</button>
               ))}
             </div>
-          </div>
-          <div className="discovery-filters discovery-filters-sticky">
             <label className="discovery-filter-field">
               <span><MapPin size={14} /> Khu vực</span>
               <select value={filters.area} onChange={(event) => updateFilter('area', event.target.value)}>
                 <option value="">Tất cả khu vực đang hoạt động</option>
                 {!areaOptions.some((area) => area.value === 'Đà Nẵng') && <option value="Đà Nẵng">Đà Nẵng</option>}
                 {areaOptions.map((area) => <option value={area.value} key={area.value}>{area.label}{area.count ? ` (${area.count})` : ''}</option>)}
-              </select>
-            </label>
-            <label className="discovery-filter-field">
-              <span><Sparkles size={14} /> Sắp xếp</span>
-              <select value={filters.sort} onChange={(event) => updateFilter('sort', event.target.value)}>
-                <option value="default">Phổ biến nhất</option>
-                <option value="price-asc">Giá thấp đến cao</option>
-                <option value="price-desc">Giá cao đến thấp</option>
               </select>
             </label>
           </div>

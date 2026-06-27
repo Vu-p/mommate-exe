@@ -31,11 +31,11 @@
 .discovery-hero-copy h1 {
   max-width: 860px;
   color: var(--text);
-  font-family: "PP Editorial New", "Canela", "Tiempos Headline", Georgia, serif;
+  font-family: var(--font-family);
   font-size: clamp(2.6rem, 4.9vw, 5rem);
-  font-weight: 500;
-  line-height: 0.98;
-  letter-spacing: -0.04em;
+  font-weight: 800;
+  line-height: 1.06;
+  letter-spacing: var(--tracking-default);
 }
 
 .discovery-hero-copy p {
@@ -301,5 +301,398 @@
 
   .services-grid .service-card-premium {
     grid-column: span 1;
+  }
+}
+
+/* Public redesign pass: token-mapped discovery surfaces */
+.find-service-page {
+  background: var(--mm-gradient-page);
+}
+
+.find-service-page .discovery-hero,
+.find-service-page .discovery-search-shell {
+  border-color: var(--mm-color-glass-border);
+  background: var(--mm-gradient-surface), var(--mm-glass-bg);
+  box-shadow: var(--mm-shadow-floating), var(--mm-shadow-inset-highlight);
+  backdrop-filter: var(--mm-glass-blur);
+  -webkit-backdrop-filter: var(--mm-glass-blur);
+}
+
+.find-service-page .discovery-kicker,
+.find-service-page .discovery-filter-field span {
+  color: var(--mm-color-primary-strong);
+}
+
+.find-service-page .discovery-hero-aside article,
+.find-service-page .loading-state,
+.find-service-page .empty-state {
+  border-color: var(--mm-color-border);
+  background: var(--mm-gradient-surface), rgba(255, 255, 255, 0.5);
+  box-shadow: var(--mm-shadow-sm), var(--mm-shadow-inset-highlight);
+}
+
+.find-service-page .discovery-search-pills button,
+.find-service-page .discovery-filter-field select,
+.find-service-page .page-btn {
+  transition:
+    transform var(--mm-motion-base) var(--mm-motion-ease-soft),
+    box-shadow var(--mm-motion-base) var(--mm-motion-ease-soft),
+    border-color var(--mm-motion-base) var(--mm-motion-ease-soft),
+    background-color var(--mm-motion-base) var(--mm-motion-ease-soft);
+}
+
+.find-service-page .discovery-search-pills button:hover:not(.active) {
+  transform: translateY(-1px);
+  box-shadow: var(--mm-shadow-sm);
+}
+
+.find-service-page .discovery-search-pills button.active,
+.find-service-page .page-btn.active {
+  background: var(--mm-gradient-primary);
+}
+
+.find-service-page .discovery-filter-field select:focus-visible,
+.find-service-page .discovery-search-box:focus-within {
+  outline: none;
+  border-color: var(--mm-color-border-strong);
+  box-shadow: var(--mm-shadow-focus);
+}
+
+.public-app .find-service-page .services-grid {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.public-app .find-service-page .services-grid .service-card-premium {
+  grid-column: span 4;
+}
+
+.public-app .find-service-page .services-grid .service-card-premium:nth-child(5n + 1) {
+  grid-column: span 8;
+}
+
+.public-app .find-service-page .service-card-premium .card-image {
+  height: 220px;
+}
+
+.public-app .find-service-page .service-card-premium:nth-child(5n + 1) .card-image {
+  height: 300px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .find-service-page *,
+  .find-service-page *::before,
+  .find-service-page *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 1080px) {
+  .public-app .find-service-page .services-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .public-app .find-service-page .services-grid .service-card-premium,
+  .public-app .find-service-page .services-grid .service-card-premium:nth-child(5n + 1) {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 720px) {
+  .public-app .find-service-page .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .public-app .find-service-page .services-grid .service-card-premium,
+  .public-app .find-service-page .services-grid .service-card-premium:nth-child(5n + 1) {
+    grid-column: span 1;
+  }
+
+  .public-app .find-service-page .service-card-premium .card-image,
+  .public-app .find-service-page .service-card-premium:nth-child(5n + 1) .card-image {
+    height: 220px;
+  }
+}
+
+/* Prompt 3.1 QA: clean service discovery grid and rhythm */
+.public-app .find-service-page .main-content {
+  width: min(100%, 1240px);
+  max-width: 1240px;
+  padding-top: 112px;
+  padding-bottom: 72px;
+}
+
+.public-app .find-service-page .discovery-search-shell {
+  position: relative;
+  top: auto;
+  z-index: 3;
+  margin-top: 20px;
+}
+
+.public-app .find-service-page .services-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.public-app .find-service-page .services-grid > .empty-state {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-height: 190px;
+  border-radius: var(--mm-radius-2xl);
+}
+
+.public-app .find-service-page .services-grid .service-card-premium,
+.public-app .find-service-page .services-grid .service-card-premium:nth-child(5n + 1) {
+  grid-column: auto;
+}
+
+.public-app .find-service-page .service-card-premium .card-image,
+.public-app .find-service-page .service-card-premium:nth-child(5n + 1) .card-image {
+  height: 210px;
+}
+
+.public-app .find-service-page .pagination {
+  margin-top: 34px;
+}
+
+.public-app .find-service-page .site-footer {
+  margin-top: 0;
+}
+
+@media (max-width: 1024px) {
+  .public-app .find-service-page .services-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .public-app .find-service-page .main-content {
+    padding-top: 96px;
+    padding-bottom: 64px;
+  }
+
+  .public-app .find-service-page .services-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Prompt 3.2: refined listing hero and filter composition */
+.public-app .find-service-page .discovery-hero-service {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 390px);
+  align-items: center;
+  min-height: auto;
+  padding: clamp(24px, 3vw, 38px);
+  gap: clamp(24px, 4vw, 46px);
+}
+
+.public-app .find-service-page .discovery-hero-copy h1 {
+  max-width: 680px;
+  font-size: clamp(2.35rem, 4.2vw, 4.45rem);
+  line-height: 1.02;
+}
+
+.public-app .find-service-page .discovery-hero-copy p {
+  max-width: 600px;
+  margin-top: 14px;
+  color: var(--mm-color-text-muted);
+}
+
+.public-app .find-service-page .discovery-hero-aside {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-self: center;
+  gap: 0;
+  min-height: auto;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  border-radius: var(--mm-radius-2xl);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.86), rgba(246, 240, 255, 0.66)),
+    rgba(255, 255, 255, 0.54);
+  box-shadow: var(--mm-shadow-lg), var(--mm-shadow-inset-highlight);
+  backdrop-filter: var(--mm-glass-blur);
+  -webkit-backdrop-filter: var(--mm-glass-blur);
+  overflow: hidden;
+}
+
+.public-app .find-service-page .discovery-hero-aside::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(244, 178, 203, 0.22), transparent 34%),
+    radial-gradient(circle at 100% 100%, rgba(170, 145, 226, 0.18), transparent 38%);
+}
+
+.public-app .find-service-page .discovery-summary-label {
+  position: relative;
+  grid-column: 1 / -1;
+  display: inline-flex;
+  width: fit-content;
+  margin: 0 0 10px;
+  padding: 6px 10px;
+  border: 1px solid rgba(170, 145, 226, 0.18);
+  border-radius: var(--mm-radius-pill);
+  color: var(--mm-color-primary-strong);
+  background: rgba(255, 255, 255, 0.58);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.public-app .find-service-page .discovery-hero-aside article {
+  position: relative;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 0;
+  border-right: 1px solid rgba(130, 106, 176, 0.14);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.public-app .find-service-page .discovery-hero-aside article:last-child {
+  border-right: 0;
+}
+
+.public-app .find-service-page .discovery-hero-aside article span {
+  color: var(--mm-color-text-muted);
+  font-size: 0.76rem;
+  font-weight: 650;
+}
+
+.public-app .find-service-page .discovery-hero-aside article strong {
+  margin-top: 5px;
+  color: var(--mm-color-text);
+  font-size: clamp(1rem, 2vw, 1.32rem);
+  line-height: 1.15;
+}
+
+.public-app .find-service-page .discovery-search-shell {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border-radius: var(--mm-radius-2xl);
+}
+
+.public-app .find-service-page .discovery-search-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 2px;
+}
+
+.public-app .find-service-page .discovery-search-heading div {
+  display: grid;
+  gap: 4px;
+}
+
+.public-app .find-service-page .discovery-search-heading span {
+  color: var(--mm-color-primary-strong);
+  font-size: 0.76rem;
+  font-weight: 760;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.public-app .find-service-page .discovery-search-heading strong {
+  color: var(--mm-color-text);
+  font-size: clamp(1.02rem, 1.8vw, 1.22rem);
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.public-app .find-service-page .discovery-search-row {
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.public-app .find-service-page .discovery-search-box,
+.public-app .find-service-page .discovery-filter-field select {
+  border-color: rgba(130, 106, 176, 0.16);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.public-app .find-service-page .discovery-sort-field {
+  min-width: 0;
+}
+
+.public-app .find-service-page .discovery-filter-flow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+  align-items: end;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(130, 106, 176, 0.12);
+}
+
+.public-app .find-service-page .discovery-filter-flow .discovery-search-pills {
+  justify-content: flex-start;
+  gap: 9px;
+}
+
+.public-app .find-service-page .discovery-search-pills button {
+  min-height: 42px;
+  padding: 0 15px;
+  border-color: rgba(130, 106, 176, 0.16);
+  color: var(--mm-color-text-muted);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(250, 247, 255, 0.66));
+  box-shadow: var(--mm-shadow-inset-highlight);
+}
+
+.public-app .find-service-page .discovery-search-pills button.active {
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 14px 28px rgba(132, 95, 188, 0.2);
+}
+
+@media (max-width: 980px) {
+  .public-app .find-service-page .discovery-hero-service,
+  .public-app .find-service-page .discovery-search-row,
+  .public-app .find-service-page .discovery-filter-flow {
+    grid-template-columns: 1fr;
+  }
+
+  .public-app .find-service-page .discovery-hero-aside {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .public-app .find-service-page .discovery-hero-service {
+    padding: 22px;
+    gap: 20px;
+  }
+
+  .public-app .find-service-page .discovery-hero-aside {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .public-app .find-service-page .discovery-hero-aside article {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 2px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(130, 106, 176, 0.12);
+  }
+
+  .public-app .find-service-page .discovery-hero-aside article:last-child {
+    border-bottom: 0;
+  }
+
+  .public-app .find-service-page .discovery-search-shell {
+    padding: 16px;
   }
 }

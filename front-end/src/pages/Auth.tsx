@@ -66,7 +66,7 @@ const Auth = ({ defaultMode = 'signup' }: AuthProps) => {
               <img src={logo} alt="" />
               <strong>MomMate</strong>
             </div>
-            <span className="auth-kicker">Emotional onboarding</span>
+            <span className="auth-kicker">Bắt đầu thật nhẹ nhàng</span>
             <h1>Được chăm sóc theo cách đủ dịu dàng cho giai đoạn sau sinh.</h1>
             <p>MomMate kết nối bạn với chuyên gia chăm sóc đáng tin cậy, để từng bước trong hành trình này trở nên rõ ràng, yên tâm và riêng tư hơn.</p>
 
@@ -100,7 +100,7 @@ const Auth = ({ defaultMode = 'signup' }: AuthProps) => {
               <div className="auth-portrait">
                 <span>
                   <BriefcaseMedical size={16} />
-                  Postpartum care
+                  Chăm sóc sau sinh
                 </span>
                 <strong>MomMate</strong>
                 <p>Dẫn bạn vào một trải nghiệm chăm sóc yên tĩnh, rõ ràng, và đủ nâng đỡ.</p>

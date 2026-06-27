@@ -75,3 +75,20 @@
 .forgot-password:hover {
   text-decoration: underline;
 }
+
+/* Public redesign pass: auth utility states */
+.checkmark {
+  border-color: var(--mm-color-border-strong);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.checkbox-container input:checked ~ .checkmark {
+  background: var(--mm-color-primary-strong);
+  border-color: var(--mm-color-primary-strong);
+}
+
+.forgot-password:focus-visible,
+.checkbox-container:focus-within .checkmark {
+  outline: none;
+  box-shadow: var(--mm-shadow-focus);
+}

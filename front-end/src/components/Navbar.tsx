@@ -26,10 +26,29 @@ const Navbar = ({ currentMode }: NavbarProps) => {
     return `nav-link${active ? ' is-active' : ''}`;
   };
 
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
   useEffect(() => {
     setMobileOpen(false);
     setAccountOpen(false);
   }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (typeof window !== 'undefined') {
+        const currentScrollY = window.scrollY;
+        if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+          setIsVisible(false);
+        } else if (currentScrollY < lastScrollY.current) {
+          setIsVisible(true);
+        }
+        lastScrollY.current = currentScrollY;
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const close = (event: MouseEvent) => {
@@ -57,17 +76,17 @@ const Navbar = ({ currentMode }: NavbarProps) => {
 
   return (
     <>
-      <nav className="navbar scrolled">
+      <nav className={`navbar scrolled ${isVisible ? '' : 'hidden-nav'}`}>
         <div className="navbar-main">
           <div className="container navbar-content">
-            <div className="nav-group center">
+            <div className="nav-group left">
               <Link to="/" className="brand-logo">
                 <img src={logo} alt="MomMate" className="logo-img" />
                 <span>Mommate</span>
               </Link>
             </div>
 
-            <div className="nav-group left desktop-only">
+            <div className="nav-group center desktop-only">
               <Link to="/" className={navClass('/')}>Trang chủ</Link>
               <Link to="/about" className={navClass('/about')}>Về chúng tôi</Link>
               <Link to="/services" className={navClass('/services')}>Dịch vụ</Link>

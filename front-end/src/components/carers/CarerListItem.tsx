@@ -68,9 +68,9 @@ const CarerListItem = ({ carer, onSelect, serviceId, serviceTitle }: CarerListIt
           </div>
           <div className="carer-card-footer">
             <div><small>Giá thuê theo giờ</small><strong>{displayPrice}</strong></div>
-            <div>
-              <button type="button">Xem hồ sơ</button>
-              <span>{serviceId ? 'Tiếp tục đặt lịch' : 'Đặt lịch ngay'}</span>
+            <div className="carer-card-actions">
+              <span className="carer-secondary-action">Xem hồ sơ</span>
+              <span className="carer-primary-action">{serviceId ? 'Tiếp tục đặt lịch' : 'Đặt lịch ngay'}</span>
             </div>
           </div>
         </div>

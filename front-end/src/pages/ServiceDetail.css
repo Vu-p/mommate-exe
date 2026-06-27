@@ -114,11 +114,11 @@
 
 .public-app .stitch-service-hero-overlay h1 {
   color: #fff;
-  font-family: "PP Editorial New", "Canela", Georgia, serif;
+  font-family: var(--font-family);
   font-size: clamp(2.2rem, 4vw, 4.2rem);
-  font-weight: 500;
-  line-height: 0.98;
-  letter-spacing: -0.04em;
+  font-weight: 800;
+  line-height: 1.06;
+  letter-spacing: var(--tracking-default);
 }
 
 .stitch-service-about {
@@ -393,5 +393,77 @@
   .stitch-trust-card,
   .stitch-support-card {
     border-radius: 24px;
+  }
+}
+
+/* Public redesign pass: service detail hierarchy */
+.service-detail-page {
+  background: var(--mm-gradient-page);
+}
+
+.service-detail-breadcrumb a,
+.stitch-support-card a {
+  color: var(--mm-color-primary-strong);
+}
+
+.stitch-service-hero,
+.stitch-service-info-grid > section,
+.stitch-service-faq details,
+.stitch-booking-card,
+.stitch-trust-card,
+.stitch-support-card {
+  border-color: var(--mm-color-glass-border);
+  background: var(--mm-gradient-surface), var(--mm-glass-bg);
+  box-shadow: var(--mm-shadow-lg), var(--mm-shadow-inset-highlight);
+  backdrop-filter: var(--mm-glass-blur);
+  -webkit-backdrop-filter: var(--mm-glass-blur);
+}
+
+.stitch-service-hero {
+  border-radius: var(--mm-radius-2xl);
+}
+
+.stitch-service-info-grid > section,
+.stitch-booking-card,
+.stitch-trust-card,
+.stitch-support-card {
+  border-radius: var(--mm-radius-xl);
+}
+
+.stitch-service-info-grid h3,
+.stitch-service-info-grid li svg,
+.stitch-price-row strong,
+.stitch-booking-card > div,
+.stitch-trust-card > div > svg {
+  color: var(--mm-color-primary-strong);
+}
+
+.stitch-booking-card > button {
+  background: var(--mm-gradient-primary);
+  transition:
+    transform var(--mm-motion-base) var(--mm-motion-ease-soft),
+    box-shadow var(--mm-motion-base) var(--mm-motion-ease-soft),
+    opacity var(--mm-motion-base) var(--mm-motion-ease-soft);
+}
+
+.stitch-booking-card > button:hover:not(:disabled) {
+  transform: translateY(var(--mm-motion-hover-lift));
+  box-shadow: var(--mm-shadow-lg);
+}
+
+.stitch-booking-card > button:focus-visible,
+.stitch-service-faq summary:focus-visible,
+.stitch-support-card a:focus-visible {
+  outline: none;
+  box-shadow: var(--mm-shadow-focus);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-detail-page *,
+  .service-detail-page *::before,
+  .service-detail-page *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

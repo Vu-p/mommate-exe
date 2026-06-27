@@ -233,3 +233,158 @@
     justify-content: space-between;
   }
 }
+
+/* Public redesign pass: trustworthy carer list cards */
+.carer-list-item {
+  border-color: var(--mm-color-glass-border);
+  border-radius: var(--mm-radius-2xl);
+  background: var(--mm-gradient-surface), var(--mm-glass-bg);
+  box-shadow: var(--mm-shadow-md), var(--mm-shadow-inset-highlight);
+  transition:
+    transform var(--mm-motion-slow) var(--mm-motion-ease-soft),
+    box-shadow var(--mm-motion-slow) var(--mm-motion-ease-soft),
+    border-color var(--mm-motion-base) var(--mm-motion-ease-soft);
+}
+
+.carer-list-item:hover {
+  transform: translateY(var(--mm-motion-hover-lift));
+  box-shadow: var(--mm-shadow-lg), var(--mm-shadow-inset-highlight);
+}
+
+.carer-list-item:focus-visible {
+  outline: none;
+  box-shadow: var(--mm-shadow-focus), var(--mm-shadow-md);
+}
+
+.verified-label,
+.top-rated-label,
+.carer-card-footer span {
+  box-shadow: var(--mm-shadow-sm);
+}
+
+.carer-card-footer span {
+  background: var(--mm-gradient-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carer-list-item,
+  .carer-list-item *,
+  .carer-list-item *::before,
+  .carer-list-item *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Prompt 3.1 QA: desktop hierarchy and CTA strength */
+.public-app .find-carer-page .carer-list-item {
+  border-radius: var(--mm-radius-2xl);
+}
+
+.public-app .find-carer-page .carer-main-info {
+  grid-template-columns: minmax(220px, 248px) minmax(0, 1fr);
+  gap: 22px;
+  padding: 20px;
+}
+
+.public-app .find-carer-page .carer-avatar {
+  width: 100%;
+  min-height: 220px;
+  height: 236px;
+  border-radius: var(--mm-radius-xl);
+}
+
+.public-app .find-carer-page .name-rating {
+  margin-bottom: 12px;
+}
+
+.public-app .find-carer-page .name-rating h3 {
+  font-size: clamp(1.22rem, 1.6vw, 1.48rem);
+  font-weight: 850;
+}
+
+.public-app .find-carer-page .carer-subtitle {
+  margin-top: 6px;
+  color: var(--mm-color-text-muted);
+}
+
+.public-app .find-carer-page .carer-card-facts {
+  gap: 10px 18px;
+  padding: 14px 0;
+}
+
+.public-app .find-carer-page .carer-card-facts span {
+  min-width: 0;
+  line-height: 1.45;
+}
+
+.public-app .find-carer-page .carer-card-footer {
+  align-items: center;
+  margin-top: 16px;
+}
+
+.public-app .find-carer-page .carer-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.public-app .find-carer-page .carer-secondary-action,
+.public-app .find-carer-page .carer-primary-action {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--mm-radius-pill);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.public-app .find-carer-page .carer-secondary-action {
+  padding: 0 16px;
+  color: var(--mm-color-primary-strong);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--mm-color-border);
+}
+
+.public-app .find-carer-page .carer-primary-action {
+  min-width: 132px;
+  padding: 0 20px;
+  color: #fff;
+  background: var(--mm-gradient-primary);
+  box-shadow: var(--mm-shadow-md);
+}
+
+.public-app .find-carer-page .carer-card-footer > div:last-child {
+  gap: 10px;
+}
+
+.public-app .find-carer-page .carer-card-footer button {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .public-app .find-carer-page .carer-main-info {
+    grid-template-columns: 1fr;
+  }
+
+  .public-app .find-carer-page .carer-avatar {
+    height: 260px;
+  }
+}
+
+@media (max-width: 640px) {
+  .public-app .find-carer-page .carer-card-footer,
+  .public-app .find-carer-page .carer-card-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .public-app .find-carer-page .carer-secondary-action,
+  .public-app .find-carer-page .carer-primary-action {
+    width: 100%;
+  }
+}

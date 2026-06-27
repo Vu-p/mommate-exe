@@ -212,3 +212,131 @@
     font-size: 1.02rem;
   }
 }
+
+/* Public redesign pass: softer, tokenized service cards */
+.service-card-premium {
+  border-color: var(--mm-color-glass-border);
+  border-radius: var(--mm-radius-2xl);
+  background: var(--mm-gradient-surface), var(--mm-glass-bg);
+  box-shadow: var(--mm-shadow-md), var(--mm-shadow-inset-highlight);
+  transition:
+    transform var(--mm-motion-slow) var(--mm-motion-ease-soft),
+    box-shadow var(--mm-motion-slow) var(--mm-motion-ease-soft),
+    border-color var(--mm-motion-base) var(--mm-motion-ease-soft);
+}
+
+.service-card-premium:hover {
+  transform: translateY(var(--mm-motion-hover-lift));
+  box-shadow: var(--mm-shadow-lg), var(--mm-shadow-inset-highlight);
+}
+
+.service-card-premium:hover .card-image img,
+.service-card-hitarea:hover .learn-more {
+  transform: translateY(0);
+}
+
+.service-category-tag,
+.learn-more {
+  background: var(--mm-gradient-primary);
+}
+
+.service-card-hitarea:focus-visible {
+  outline: none;
+  box-shadow: inset var(--mm-shadow-focus);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-card-premium,
+  .service-card-premium *,
+  .service-card-premium *::before,
+  .service-card-premium *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Prompt 3.1 QA: readable marketplace service card */
+.service-card-premium {
+  min-height: 100%;
+}
+
+.service-card-premium::before {
+  opacity: 0.38;
+  background: radial-gradient(circle at 18% 0%, rgba(169, 143, 232, 0.12), transparent 32%);
+}
+
+.service-card-hitarea {
+  min-height: 100%;
+}
+
+.service-card-premium:nth-child(4n + 1) {
+  grid-column: auto;
+}
+
+.service-card-premium:nth-child(4n + 1) .card-image {
+  height: 210px;
+}
+
+.card-image {
+  height: 210px;
+  background: linear-gradient(135deg, rgba(233, 224, 255, 0.9), rgba(255, 250, 253, 0.96));
+}
+
+.card-image img {
+  opacity: 1;
+  filter: saturate(0.96) contrast(1.04);
+}
+
+.card-content {
+  min-height: 238px;
+  padding: 22px;
+}
+
+.card-content h3 {
+  min-height: 52px;
+  color: var(--mm-color-text);
+  font-size: 1.06rem;
+  font-weight: 820;
+}
+
+.service-card-bottom {
+  align-items: center;
+}
+
+.card-content .price strong {
+  color: var(--mm-color-primary-strong);
+  font-size: 1.16rem;
+}
+
+.learn-more {
+  min-width: 118px;
+  min-height: 42px;
+  padding: 0 16px;
+  color: #fff !important;
+  background: var(--mm-gradient-primary) !important;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  box-shadow: var(--mm-shadow-md);
+}
+
+.service-card-hitarea:hover .learn-more,
+.service-card-hitarea:focus-visible .learn-more {
+  transform: translateY(-1px);
+  box-shadow: var(--mm-shadow-lg);
+}
+
+.service-category-tag {
+  color: #fff !important;
+  background: rgba(115, 87, 180, 0.94) !important;
+  box-shadow: var(--mm-shadow-sm);
+}
+
+@media (max-width: 640px) {
+  .card-content {
+    min-height: 0;
+  }
+
+  .learn-more {
+    min-width: 108px;
+  }
+}

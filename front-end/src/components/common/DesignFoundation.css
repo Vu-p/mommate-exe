@@ -1,0 +1,106 @@
+.mm-gradient-button {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 22px;
+  border-radius: var(--mm-radius-pill);
+  color: var(--mm-color-text-on-color);
+  background: var(--mm-gradient-primary);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: var(--mm-shadow-md), var(--mm-shadow-inset-highlight);
+  font-weight: 750;
+  transition:
+    transform var(--mm-motion-base) var(--mm-motion-ease-soft),
+    box-shadow var(--mm-motion-base) var(--mm-motion-ease-soft);
+}
+
+.mm-gradient-button:hover {
+  transform: translateY(var(--mm-motion-hover-lift));
+  box-shadow: var(--mm-shadow-lg), var(--mm-shadow-inset-highlight);
+}
+
+.mm-gradient-button:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.mm-gradient-button:disabled,
+.mm-gradient-button[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.58;
+  transform: none;
+  box-shadow: var(--mm-shadow-xs);
+}
+
+.mm-gradient-button.secondary {
+  color: var(--primary-dark);
+  background: var(--mm-gradient-surface), var(--mm-glass-bg);
+  border-color: var(--mm-color-border);
+}
+
+.mm-form-shell {
+  display: grid;
+  gap: var(--mm-space-5);
+  padding: var(--mm-space-6);
+  border-radius: var(--mm-radius-xl);
+}
+
+.mm-admin-table-shell {
+  overflow: auto;
+}
+
+.mm-floating-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.mm-floating-background span {
+  position: absolute;
+  display: block;
+  border-radius: var(--mm-radius-pill);
+  filter: blur(24px);
+  opacity: 0.48;
+  animation: mmFoundationFloat var(--mm-motion-float) var(--mm-motion-ease-float) infinite alternate;
+}
+
+.mm-floating-background span:nth-child(1) {
+  width: 34vw;
+  height: 34vw;
+  min-width: 260px;
+  min-height: 260px;
+  left: -10vw;
+  top: 8%;
+  background: radial-gradient(circle, rgba(169, 143, 232, 0.42), transparent 68%);
+}
+
+.mm-floating-background span:nth-child(2) {
+  width: 28vw;
+  height: 28vw;
+  min-width: 220px;
+  min-height: 220px;
+  right: -8vw;
+  bottom: 8%;
+  background: radial-gradient(circle, rgba(223, 159, 189, 0.34), transparent 68%);
+  animation-duration: calc(var(--mm-motion-float) * 1.35);
+}
+
+@keyframes mmFoundationFloat {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(22px, -18px, 0) scale(1.05); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mm-gradient-button,
+  .mm-floating-background span {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .mm-gradient-button:hover {
+    transform: none;
+  }
+}
