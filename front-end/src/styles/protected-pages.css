@@ -94,7 +94,19 @@
   transform: translateY(1px) scale(0.99);
 }
 
-.public-app :is(.form-alert, .review-error-banner, .care-profile-message) {
+.public-app :is(
+  .booking-page,
+  .account-requests-page,
+  .booking-detail-page,
+  .booking-change-page,
+  .payment-page,
+  .payment-success-page,
+  .review-page,
+  .care-profile-page,
+  .change-password-page,
+  .incident-report-page,
+  .messages-page
+) :is(.form-alert, .review-error-banner, .care-profile-message) {
   border: 1px solid rgba(177, 82, 105, 0.22);
   border-radius: var(--mm-radius-md);
   color: #7c3347;
@@ -443,6 +455,31 @@
   box-shadow: var(--mm-shadow-md);
 }
 
+.public-app .booking-pay-button {
+  width: 100%;
+  min-height: 46px;
+  margin-bottom: var(--mm-space-3);
+  border: 0;
+  border-radius: var(--mm-radius-md);
+  color: var(--mm-color-text-on-color);
+  background: var(--mm-gradient-primary);
+  box-shadow: var(--mm-shadow-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.public-app .instruction-alert {
+  margin-bottom: var(--mm-space-5);
+  padding: var(--mm-space-4);
+  border: 1px solid rgba(177, 82, 105, 0.2);
+  border-radius: var(--mm-radius-md);
+  color: #7c3347;
+  background: rgba(255, 240, 245, 0.82);
+  font-size: var(--mm-type-body-sm);
+  font-weight: 600;
+  line-height: 1.55;
+}
+
 .public-app .transfer-details {
   border-color: var(--mm-color-border);
   border-radius: var(--mm-radius-lg);
@@ -636,6 +673,25 @@
 
 .public-app .incident-report-page textarea {
   min-height: 150px;
+}
+
+.public-app .incident-report-page input[type="file"] {
+  min-height: auto;
+  padding: 8px;
+  color: var(--mm-color-text-muted);
+  font-size: var(--mm-type-body-sm);
+}
+
+.public-app .incident-report-page input[type="file"]::file-selector-button {
+  margin-right: var(--mm-space-3);
+  padding: 9px 14px;
+  border: 1px solid rgba(130, 106, 176, 0.2);
+  border-radius: var(--mm-radius-sm);
+  color: var(--mm-color-primary-strong);
+  background: rgba(239, 233, 255, 0.86);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .public-app .incident-report-page .stitch-primary-button {

@@ -196,7 +196,7 @@ const Payment = () => {
                     </div>
                     
                     <div className="payment-instructions">
-                      <div className="instruction-alert" style={{ backgroundColor: '#fef2f2', color: '#991b1b', padding: '12px', borderRadius: '8px', marginBottom: '20px', fontSize: '14px', fontWeight: '500' }}>
+                      <div className="instruction-alert">
                         ⚠️ Lưu ý: Bạn BẮT BUỘC phải mở <strong>Ứng dụng Ngân hàng</strong> (Vietcombank, MBBank...) để quét mã này, không dùng Camera thường hay Zalo.
                       </div>
                       <p className="instruction-text">Hoặc chuyển khoản thủ công theo thông tin bên dưới:</p>

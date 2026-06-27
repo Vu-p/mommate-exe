@@ -238,7 +238,7 @@ const BookingDetail = () => {
               {booking.priceSnapshot && <p><span>Đơn giá ({booking.hours || 1} tiếng × {booking.numSessions || 1} buổi)</span><span>{total.toLocaleString('vi-VN')}đ</span></p>}
               <p className="payment-total"><strong>Tổng cộng</strong><b>{total.toLocaleString('vi-VN')}đ</b></p>
               {['pending_payment', 'accepted_pending_payment'].includes(booking.status) && user?.role !== 'carer' && (
-                <button className="btn-primary" onClick={() => navigate(`/payment?bookingId=${booking._id}`)} style={{width: '100%', marginBottom: '10px', backgroundColor: '#16a34a', color: 'white', padding: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'}}>
+                <button className="btn-primary booking-pay-button" onClick={() => navigate(`/payment?bookingId=${booking._id}`)}>
                   Thanh toán ngay
                 </button>
               )}
