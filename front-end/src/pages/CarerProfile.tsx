@@ -7,6 +7,7 @@ import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import { defaultCarerAvatar as fallbackAvatar } from '../utils/carerDisplay';
 import './CarerWorkspace.css';
+import './CarerRedesign.css';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 const slots = ['08:00-10:00', '10:00-12:00', '12:00-14:00', '14:00-16:00', '16:00-18:00'];

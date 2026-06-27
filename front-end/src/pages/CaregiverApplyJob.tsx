@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import ImageUpload from '../components/common/ImageUpload';
 import api from '../utils/api';
 import './CaregiverApplyJob.css';
+import './CarerRedesign.css';
 
 type ServiceOption = {
   _id: string;
@@ -65,7 +66,7 @@ const normalizeAvailability = (availability?: { day: string; slots: string[] }[]
 const CaregiverApplyJob = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const overviewData = location.state?.overviewData || {};
+  const overviewData = useMemo(() => location.state?.overviewData || {}, [location.state]);
 
   const [services, setServices] = useState<ServiceOption[]>([]);
   const [loading, setLoading] = useState(true);
@@ -103,7 +104,8 @@ const CaregiverApplyJob = () => {
         ]);
 
         if (serviceRes.status === 'fulfilled') {
-          setServices(serviceRes.value.data || []);
+          const serviceData = serviceRes.value.data;
+          setServices(Array.isArray(serviceData) ? serviceData : serviceData?.items || []);
         } else {
           setError('Không thể tải danh sách dịch vụ.');
         }
@@ -309,7 +311,7 @@ const CaregiverApplyJob = () => {
 
   if (loading) {
     return (
-      <div className="apply-page apply-state-page">
+      <div className="apply-page apply-state-page caregiver-job-page">
         <Navbar />
         <div className="apply-state-loading">
           <Loader2 className="spinner" />
@@ -321,7 +323,7 @@ const CaregiverApplyJob = () => {
   }
 
   return (
-    <div className="apply-page">
+    <div className="apply-page caregiver-job-page">
       <Navbar />
 
       <main className="container apply-content">

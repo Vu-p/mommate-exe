@@ -8,6 +8,7 @@ import api from '../utils/api';
 import AddressAutocomplete from '../components/common/AddressAutocomplete';
 import { useAuth } from '../context/AuthContext';
 import './CaregiverApplyOverview.css';
+import './CarerRedesign.css';
 
 type OverviewForm = {
   firstName: string;
@@ -128,7 +129,7 @@ const CaregiverApplyOverview = () => {
 
       const { data } = await api.post('/carers/apply/overview', payload);
       login({ ...user, ...data.user, token: user.token });
-      navigate('/caregiver/apply/job', { state: { overviewData: payload } });
+      navigate('/carer/apply/job', { state: { overviewData: payload } });
     } catch (err: any) {
       console.error('Overview submit failed:', err);
       setError(err.response?.data?.message || 'Không thể lưu thông tin cơ bản.');
@@ -139,7 +140,7 @@ const CaregiverApplyOverview = () => {
 
   if (loading) {
     return (
-      <div className="apply-page apply-state-page">
+      <div className="apply-page apply-state-page caregiver-overview-page">
         <Navbar />
         <div className="apply-state-loading">
           <Loader2 className="spinner" />
@@ -151,7 +152,7 @@ const CaregiverApplyOverview = () => {
   }
 
   return (
-    <div className="apply-page">
+    <div className="apply-page caregiver-overview-page">
       <Navbar />
 
       <main className="container apply-content">

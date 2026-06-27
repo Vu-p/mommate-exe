@@ -1,4 +1,4 @@
-import { ArrowRight, Check, CheckCircle2, Download, Headphones, Loader2, LockKeyhole, Map, MapPin, MessageSquare, Phone, PlayCircle, ShieldCheck, Stethoscope, UserRound } from 'lucide-react';
+import { ArrowRight, BriefcaseMedical, Check, CheckCircle2, Download, Headphones, Loader2, LockKeyhole, Map, MapPin, MessageSquare, Phone, PlayCircle, ShieldCheck, Stethoscope, UserRound } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import carerAvatar from '../assets/stitch/generated/stitch-06-ad3697d45210.png';
 import motherAvatar from '../assets/stitch/generated/stitch-03-eac9bf4dc5c9.png';
 import './OperationalPages.css';
+import './CarerRedesign.css';
 
 const steps = ['Chờ Carer', 'Chờ thanh toán', 'Đã thanh toán', 'Đang chăm sóc', 'Hoàn tất'];
 
@@ -40,6 +41,7 @@ const BookingDetail = () => {
   const { user } = useAuth();
   const [booking, setBooking] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [journal, setJournal] = useState({ weightKg: '', notes: '', medicationChecked: false, safetyChecked: false });
   const [savingJournal, setSavingJournal] = useState(false);
   const [refund, setRefund] = useState<any>(null);
@@ -47,7 +49,10 @@ const BookingDetail = () => {
 
   useEffect(() => {
     if (!id) return;
-    api.get(`/bookings/${id}`).then(({ data }) => setBooking(data)).finally(() => setLoading(false));
+    api.get(`/bookings/${id}`)
+      .then(({ data }) => setBooking(data))
+      .catch(() => setLoadError('Không thể tải lịch hẹn này. Lịch có thể không tồn tại hoặc bạn không có quyền truy cập.'))
+      .finally(() => setLoading(false));
   }, [id]);
 
   useEffect(() => {
@@ -114,8 +119,8 @@ const BookingDetail = () => {
     setBooking(data);
   };
 
-  if (loading) return <div className="stitch-page"><Navbar /><main className="stitch-state"><Loader2 className="spinner" />Đang tải chi tiết lịch hẹn...</main></div>;
-  if (!booking) return <div className="stitch-page"><Navbar /><main className="stitch-state">Không tìm thấy lịch hẹn.</main></div>;
+  if (loading) return <div className="stitch-page booking-detail-page booking-state-page"><Navbar /><main className="stitch-state"><Loader2 className="spinner" /><p>Đang tải chi tiết lịch hẹn...</p></main></div>;
+  if (!booking) return <div className="stitch-page booking-detail-page booking-state-page"><Navbar /><main className="stitch-state booking-state-card"><BriefcaseMedical /><h1>Không tìm thấy lịch hẹn</h1><p>{loadError || 'Lịch hẹn không tồn tại hoặc đã được cập nhật.'}</p><Link to="/account/request">Quay lại danh sách yêu cầu</Link></main></div>;
 
   const carer = booking.carer?.user || {};
   const parent = booking.parent || {};

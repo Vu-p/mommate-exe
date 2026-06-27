@@ -303,6 +303,41 @@
   border-radius: var(--mm-radius-sm);
 }
 
+.public-app .requests-state {
+  min-height: 240px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  padding: 32px;
+  border: 1px dashed rgba(130, 106, 176, 0.24);
+  border-radius: var(--mm-radius-xl);
+  color: var(--mm-color-text-muted);
+  text-align: center;
+  background: rgba(255, 255, 255, 0.48);
+}
+
+.public-app .requests-state svg {
+  width: 34px;
+  height: 34px;
+  color: var(--mm-color-primary);
+}
+
+.public-app .requests-state h2 {
+  color: var(--mm-color-text);
+  font-size: var(--mm-type-card-title);
+}
+
+.public-app .requests-state p {
+  max-width: 42ch;
+  line-height: 1.6;
+}
+
+.public-app .requests-state-error {
+  border-color: rgba(177, 82, 105, 0.22);
+  background: rgba(255, 240, 245, 0.6);
+}
+
 .public-app :is(.request-primary-button, .request-review-button) {
   color: var(--mm-color-text-on-color);
   background: var(--mm-gradient-primary);
@@ -310,6 +345,56 @@
 }
 
 /* Booking detail and change request */
+.public-app .booking-state-page {
+  display: flex;
+  flex-direction: column;
+}
+
+.public-app .booking-state-page .stitch-state {
+  width: min(100% - 32px, 640px);
+  min-height: 320px;
+  margin: 140px auto 80px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.public-app .booking-state-card {
+  padding: clamp(28px, 5vw, 48px);
+  border: 1px solid var(--mm-color-border);
+  border-radius: var(--mm-radius-xl);
+  background: var(--mm-gradient-surface), rgba(255, 255, 255, 0.74);
+  box-shadow: var(--mm-shadow-lg), var(--mm-shadow-inset-highlight);
+}
+
+.public-app .booking-state-card > svg {
+  width: 42px;
+  height: 42px;
+  color: var(--mm-color-primary);
+}
+
+.public-app .booking-state-card h1 {
+  font-size: clamp(1.65rem, 4vw, 2.2rem);
+}
+
+.public-app .booking-state-card p {
+  max-width: 48ch;
+  color: var(--mm-color-text-muted);
+  line-height: 1.65;
+}
+
+.public-app .booking-state-card a {
+  margin-top: 8px;
+  padding: 12px 18px;
+  border-radius: var(--mm-radius-md);
+  color: var(--mm-color-text-on-color);
+  background: var(--mm-gradient-primary);
+  box-shadow: var(--mm-shadow-sm);
+  font-weight: 700;
+}
+
 .public-app .booking-detail-page,
 .public-app .booking-detail-main {
   min-height: auto;
@@ -489,6 +574,13 @@
 .public-app .detail-value,
 .public-app .stitch-receipt strong {
   font-variant-numeric: tabular-nums;
+}
+
+.public-app .payment-qr-view,
+.public-app .payment-instructions,
+.public-app .detail-row,
+.public-app .detail-value {
+  min-width: 0;
 }
 
 .public-app .payment-success-card {
@@ -959,6 +1051,13 @@
   .public-app .review-card-footer > div {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+
+  .public-app .review-card-footer button {
+    width: 100%;
+    min-width: 0;
+    padding-inline: 14px;
   }
 
   .public-app .security-header,
@@ -992,6 +1091,28 @@
   .public-app .message-composer button {
     min-width: 52px;
     padding-inline: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .public-app .stitch-gateway-body {
+    padding-inline: 18px;
+  }
+
+  .public-app .payment-qr-view .qr-container,
+  .public-app .payment-qr-view .qr-container img {
+    width: min(100%, 320px) !important;
+    max-width: 100%;
+  }
+
+  .public-app .payment-instructions {
+    text-align: left;
+  }
+
+  .public-app .detail-value {
+    max-width: 100%;
+    text-align: left;
+    overflow-wrap: anywhere;
   }
 }
 

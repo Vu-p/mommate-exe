@@ -7,6 +7,7 @@ import api from '../utils/api';
 import activeAvatar from '../assets/stitch/generated/stitch-09-21ab241a02e0.png';
 import './CarerWorkspace.css';
 import './CarerBookings.css';
+import './CarerRedesign.css';
 
 const tabStatuses: Record<string, string> = {
   pending: 'pending,pending_carer',

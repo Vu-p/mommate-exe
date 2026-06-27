@@ -29,11 +29,15 @@ const AccountRequests = () => {
   const [active, setActive] = useState('all');
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     api.get('/bookings/my', { params: { page: 1, limit: 100 } })
       .then(({ data }) => setBookings(Array.isArray(data) ? data : data.items || []))
-      .catch((error) => console.error('Error fetching bookings:', error))
+      .catch((error) => {
+        console.error('Error fetching bookings:', error);
+        setLoadError('Không thể tải danh sách yêu cầu. Vui lòng thử lại sau.');
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -69,7 +73,9 @@ const AccountRequests = () => {
 
           <section className="requests-list">
             {loading && <div className="dashboard-loading"><Loader2 className="spinner" />Đang tải lịch đặt...</div>}
-            {!loading && visible.map((booking, index) => {
+            {!loading && loadError && <div className="requests-state requests-state-error"><BriefcaseMedical /><h2>Chưa thể tải lịch đặt</h2><p>{loadError}</p></div>}
+            {!loading && !loadError && visible.length === 0 && <div className="requests-state"><Baby /><h2>Chưa có yêu cầu phù hợp</h2><p>Các lịch chăm sóc phù hợp với bộ lọc sẽ xuất hiện tại đây.</p></div>}
+            {!loading && !loadError && visible.map((booking, index) => {
               const carer = booking.carer?.user || {};
               const isPayment = booking.status === 'accepted_pending_payment';
               const isCompleted = booking.status === 'completed';

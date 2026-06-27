@@ -6,6 +6,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
 import './CarerContract.css';
+import './CarerRedesign.css';
 
 const CarerContract = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -17,6 +18,7 @@ const CarerContract = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [signatureLoadFailed, setSignatureLoadFailed] = useState(false);
 
   const loadContract = async () => {
     try {
@@ -34,6 +36,10 @@ const CarerContract = () => {
   useEffect(() => {
     void loadContract();
   }, []);
+
+  useEffect(() => {
+    setSignatureLoadFailed(false);
+  }, [contract?.signatureImage]);
 
   const point = (event: React.PointerEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current!;
@@ -114,7 +120,7 @@ const CarerContract = () => {
 
   if (loading) {
     return (
-      <div className="contract-page">
+      <div className="contract-page carer-contract-page">
         <Navbar />
         <main className="stitch-state">
           <Loader2 className="spinner" size={32} />
@@ -126,7 +132,7 @@ const CarerContract = () => {
 
   if (error || !contract) {
     return (
-      <div className="contract-page">
+      <div className="contract-page carer-contract-page">
         <Navbar />
         <main className="container contract-shell">
           <div className="contract-error-state">
@@ -146,7 +152,7 @@ const CarerContract = () => {
   const isVoided = contract.status === 'voided';
 
   return (
-    <div className="contract-page">
+    <div className="contract-page carer-contract-page">
       <Navbar />
       <main className="container contract-shell">
         {isVoided && (
@@ -200,9 +206,16 @@ const CarerContract = () => {
                   <p>Đã ký điện tử thành công</p>
                   <small>Lúc {new Date(contract.signedAt).toLocaleString('vi-VN')}</small>
                 </div>
-                {contract.signatureImage && (
+                {contract.signatureImage && !signatureLoadFailed && (
                   <div className="signature-preview">
-                    <img src={contract.signatureImage} alt="Chữ ký" />
+                    <img src={contract.signatureImage} alt="Chữ ký" onError={() => setSignatureLoadFailed(true)} />
+                  </div>
+                )}
+                {contract.signatureImage && signatureLoadFailed && (
+                  <div className="signature-preview signature-fallback" role="status">
+                    <ShieldAlert size={24} />
+                    <strong>Chữ ký không tải được</strong>
+                    <span>Thông tin ký điện tử vẫn được ghi nhận. Vui lòng thử lại sau hoặc liên hệ hỗ trợ nếu cần đối chiếu.</span>
                   </div>
                 )}
               </>
