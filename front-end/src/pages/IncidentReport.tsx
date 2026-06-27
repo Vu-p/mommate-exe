@@ -50,7 +50,7 @@ const IncidentReport = () => {
     }
   };
 
-  return <div className="stitch-page"><Navbar /><main className="container narrow-operational">
+  return <div className="stitch-page incident-report-page"><Navbar /><main className="container narrow-operational">
     <Link to={-1 as any} className="back-link"><ChevronLeft />Quay lại</Link>
     <section className="stitch-card incident-form"><AlertTriangle className="incident-symbol" /><p className="stitch-eyebrow">HỖ TRỢ AN TOÀN</p><h1>Báo cáo sự cố</h1><p>MomMate sẽ tiếp nhận và phản hồi theo mức độ ưu tiên.</p>
       {error && <div className="form-alert">{error}</div>}
@@ -61,10 +61,10 @@ const IncidentReport = () => {
         <label className="full">Mô tả<textarea required rows={6} value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} /></label>
         <label className="full">Bằng chứng (Hình ảnh/Video)
           <input type="file" accept="image/*,video/*" onChange={handleFileUpload} disabled={uploading} />
-          {uploading && <span style={{ fontSize: '12px', color: '#666', marginTop: '4px', display: 'block' }}>Đang tải lên...</span>}
+          {uploading && <span className="incident-uploading">Đang tải lên...</span>}
         </label>
         {Array.isArray(form.evidence) && form.evidence.length > 0 && (
-          <ul style={{ gridColumn: '1 / -1', listStyleType: 'disc', paddingLeft: '20px', marginBottom: '20px' }}>
+          <ul className="incident-evidence-list">
             {form.evidence.map((url, idx) => (
               <li key={idx}><a href={url} target="_blank" rel="noreferrer">Bằng chứng {idx + 1}</a></li>
             ))}

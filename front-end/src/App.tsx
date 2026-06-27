@@ -28,6 +28,7 @@ import PublicMotion from './components/common/PublicMotion';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import './styles/global.css';
 import './styles/public-redesign.css';
+import './styles/protected-pages.css';
 
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';

@@ -2,6 +2,7 @@ import { Send } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import { getSocket } from '../utils/socket';
 import { isAdminApp } from '../config/appMode';
@@ -9,6 +10,7 @@ import './OperationalPages.css';
 
 const Messages = () => {
   const { id } = useParams();
+  const { user } = useAuth();
   const [messages, setMessages] = useState<any[]>([]);
   const [body, setBody] = useState('');
 
@@ -43,7 +45,37 @@ const Messages = () => {
     setBody('');
   };
 
-  return <div className="stitch-page">{!isAdminApp && <Navbar/>}<main className="container" style={{maxWidth:900,padding:'48px 0'}}><h1>Tin nhắn</h1><section className="booking-detail-card" style={{minHeight:500}}>{messages.map((message) => <article key={message._id} style={{padding:'12px 0',borderBottom:'1px solid #ddd'}}><strong>{message.sender?.firstName} {message.sender?.lastName}</strong><p>{message.body}</p></article>)}</section><div style={{display:'flex',gap:12,marginTop:16}}><input style={{flex:1,padding:14}} value={body} onChange={(event)=>setBody(event.target.value)} onKeyDown={(event)=>event.key==='Enter'&&void send()} placeholder="Nhập tin nhắn..."/><button className="primary" onClick={send}><Send/> Gửi</button></div></main></div>;
+  return (
+    <div className="stitch-page messages-page">
+      {!isAdminApp && <Navbar />}
+      <main className="container messages-shell">
+        <header className="messages-heading">
+          <h1>Tin nhắn</h1>
+        </header>
+        <section className="messages-thread" aria-live="polite">
+          {messages.map((message) => {
+            const isOwn = message.sender?._id === user?._id || message.sender === user?._id;
+            return (
+              <article className={isOwn ? 'message-bubble is-own' : 'message-bubble'} key={message._id}>
+                <strong>{message.sender?.firstName} {message.sender?.lastName}</strong>
+                <p>{message.body}</p>
+              </article>
+            );
+          })}
+        </section>
+        <div className="message-composer">
+          <input
+            value={body}
+            onChange={(event) => setBody(event.target.value)}
+            onKeyDown={(event) => event.key === 'Enter' && void send()}
+            placeholder="Nhập tin nhắn..."
+            aria-label="Nội dung tin nhắn"
+          />
+          <button className="primary" onClick={send} disabled={!body.trim()}><Send /> Gửi</button>
+        </div>
+      </main>
+    </div>
+  );
 };
 
 export default Messages;

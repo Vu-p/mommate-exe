@@ -63,7 +63,7 @@ const Review = () => {
 
             <div className="review-rating-block">
               <p>Bạn đánh giá trải nghiệm tổng thể như thế nào?</p>
-              <div>{[1,2,3,4,5].map((value) => <button key={value} onClick={() => setRating(value)} aria-label={`${value} sao`}><Star className={value <= rating ? 'active' : ''} /></button>)}</div>
+              <div>{[1,2,3,4,5].map((value) => <button type="button" key={value} onClick={() => setRating(value)} aria-label={`${value} sao`} aria-pressed={value <= rating}><Star className={value <= rating ? 'active' : ''} /></button>)}</div>
             </div>
 
             <div className="review-select-grid">
