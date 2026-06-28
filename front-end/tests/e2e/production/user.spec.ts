@@ -1,6 +1,12 @@
 import { expect, test } from '@playwright/test';
 import { loadE2EEnv } from './helpers/env';
-import { expectRouteLoads, findFirstVisibleCard, safeClick, skipIfMissingRecord } from './helpers/ui';
+import {
+  expectRouteLoads,
+  findFirstVisibleCard,
+  openBookingFormFromFirstAvailableService,
+  safeClick,
+  skipIfMissingRecord,
+} from './helpers/ui';
 
 const env = loadE2EEnv();
 
@@ -19,7 +25,7 @@ test.describe('production user flows', () => {
   test('services and a visible service detail remain navigable', async ({ page }) => {
     await page.goto(`${env.USER_APP_URL}/services`, { waitUntil: 'domcontentloaded' });
     const card = skipIfMissingRecord(
-      await findFirstVisibleCard(page, ['.service-card', '.premium-service-card', '[class*="service-card"]']),
+      await findFirstVisibleCard(page, ['.service-card-premium']),
       'No service card is available in production',
     );
     const link = card.locator('a[href^="/services/"]').first();
@@ -31,7 +37,7 @@ test.describe('production user flows', () => {
   test('carers and a visible carer detail remain navigable', async ({ page }) => {
     await page.goto(`${env.USER_APP_URL}/carers`, { waitUntil: 'domcontentloaded' });
     const card = skipIfMissingRecord(
-      await findFirstVisibleCard(page, ['.carer-card', '.caregiver-card', '[class*="carer-card"]']),
+      await findFirstVisibleCard(page, ['.carer-list-item']),
       'No verified carer card is available in production',
     );
     const link = card.locator('a[href^="/carers/"]').first();
@@ -40,17 +46,20 @@ test.describe('production user flows', () => {
     await expect(page).toHaveURL(/\/carers\/[^/?]+/);
   });
 
-  test('@smoke booking page opens and exposes non-mutating validation', async ({ page }) => {
+  test('@smoke direct booking page shows a safe empty state without context', async ({ page }) => {
     await expectRouteLoads(page, env.USER_APP_URL, '/booking');
-    const form = page.locator('form').first();
+    await expect(page.locator('.booking-empty-state')).toBeVisible();
+    await expect(page.locator('.booking-empty-state')).toContainText(/không đủ thông tin|chọn một dịch vụ/i);
+  });
+
+  test('@smoke context-aware booking form opens without submission', async ({ page }) => {
+    const result = await openBookingFormFromFirstAvailableService(page, env.USER_APP_URL);
+    test.skip(!result.ready, result.ready ? undefined : result.reason);
+    const form = page.locator('form#booking-request-form');
     await expect(form).toBeVisible();
     const requiredFields = form.locator('input[required], select[required], textarea[required]');
-    if (await requiredFields.count()) {
-      const valid = await form.evaluate((element: HTMLFormElement) => element.checkValidity());
-      expect(valid).toBe(false);
-    } else {
-      await expect(form.getByRole('button', { name: /đặt|tiếp tục|xác nhận/i }).first()).toBeVisible();
-    }
+    expect(await requiredFields.count()).toBeGreaterThan(0);
+    expect(await form.evaluate((element: HTMLFormElement) => element.checkValidity())).toBe(false);
   });
 
   test('@smoke account request list loads', async ({ page }) => {

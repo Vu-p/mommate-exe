@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { loadE2EEnv } from './helpers/env';
 import {
-  expectFooterOnce,
+  expectSiteFooterOnce,
   expectNavbarOnce,
   expectNoHorizontalOverflow,
   expectRouteLoads,
@@ -16,7 +16,7 @@ test.describe('production guest and public flows', () => {
   test('@smoke landing loads with one navbar and footer', async ({ page }) => {
     await expectRouteLoads(page, env.USER_APP_URL, '/');
     await expectNavbarOnce(page);
-    await expectFooterOnce(page);
+    await expectSiteFooterOnce(page);
   });
 
   test('primary navbar links resolve', async ({ page }) => {
@@ -34,7 +34,7 @@ test.describe('production guest and public flows', () => {
     for (const route of ['/about', '/services', '/carers']) {
       await expectRouteLoads(page, env.USER_APP_URL, route);
       await expectNavbarOnce(page);
-      await expectFooterOnce(page);
+      await expectSiteFooterOnce(page);
     }
   });
 
@@ -47,7 +47,7 @@ test.describe('production guest and public flows', () => {
       await expect(page).toHaveURL(/\/services/);
     }
     const card = skipIfMissingRecord(
-      await findFirstVisibleCard(page, ['.service-card', '.premium-service-card', '[class*="service-card"]']),
+      await findFirstVisibleCard(page, ['.service-card-premium']),
       'Production currently has no visible service card',
     );
     const detailLink = card.locator('a[href^="/services/"]').first();
@@ -69,7 +69,7 @@ test.describe('production guest and public flows', () => {
       await search.clear();
     }
     const card = skipIfMissingRecord(
-      await findFirstVisibleCard(page, ['.carer-card', '.caregiver-card', '[class*="carer-card"]']),
+      await findFirstVisibleCard(page, ['.carer-list-item']),
       'Production currently has no visible verified carer card',
     );
     const detailLink = card.locator('a[href^="/carers/"]').first();
@@ -107,7 +107,7 @@ test.describe('production guest and public flows', () => {
   test('public information pages load', async ({ page }) => {
     for (const route of ['/privacy', '/terms', '/help', '/contact', '/careers', '/faq', '/guide']) {
       await expectRouteLoads(page, env.USER_APP_URL, route);
-      await expectFooterOnce(page);
+      await expectSiteFooterOnce(page);
     }
   });
 

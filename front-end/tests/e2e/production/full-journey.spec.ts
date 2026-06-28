@@ -1,7 +1,12 @@
 import { expect, test } from '@playwright/test';
 import { loadE2EEnv } from './helpers/env';
 import { guardMutation } from './helpers/safety';
-import { expectRouteLoads, findFirstVisibleCard, skipIfMissingRecord } from './helpers/ui';
+import {
+  expectRouteLoads,
+  findFirstVisibleCard,
+  openBookingFormFromFirstAvailableService,
+  skipIfMissingRecord,
+} from './helpers/ui';
 
 const env = loadE2EEnv();
 
@@ -11,20 +16,21 @@ test.describe('production cross-role journey', () => {
     const guestPage = await guestContext.newPage();
     await expectRouteLoads(guestPage, env.USER_APP_URL, '/services');
     skipIfMissingRecord(
-      await findFirstVisibleCard(guestPage, ['.service-card', '.premium-service-card', '[class*="service-card"]']),
+      await findFirstVisibleCard(guestPage, ['.service-card-premium']),
       'No production service is available for the journey',
     );
     await expectRouteLoads(guestPage, env.USER_APP_URL, '/carers');
     skipIfMissingRecord(
-      await findFirstVisibleCard(guestPage, ['.carer-card', '.caregiver-card', '[class*="carer-card"]']),
+      await findFirstVisibleCard(guestPage, ['.carer-list-item']),
       'No verified production carer is available for the journey',
     );
     await guestContext.close();
 
     const userContext = await browser.newContext({ storageState: '../playwright/.auth/user.json' });
     const userPage = await userContext.newPage();
-    await expectRouteLoads(userPage, env.USER_APP_URL, '/booking');
-    await expect(userPage.locator('form')).toBeVisible();
+    const bookingContext = await openBookingFormFromFirstAvailableService(userPage, env.USER_APP_URL);
+    test.skip(!bookingContext.ready, bookingContext.ready ? undefined : bookingContext.reason);
+    await expect(userPage.locator('form#booking-request-form')).toBeVisible();
     await userContext.close();
   });
 
