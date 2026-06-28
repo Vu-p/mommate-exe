@@ -48,10 +48,17 @@ design-reference/
 
 tests/
 front-end/tests/
+!front-end/tests/
+front-end/tests/*
+!front-end/tests/e2e/
+!front-end/tests/e2e/production/
+!front-end/tests/e2e/production/**
 playwright-report
 test-results
 playwright/.auth
 blob-report
 *.har
+*.webm
+*.zip
 
 .vercel

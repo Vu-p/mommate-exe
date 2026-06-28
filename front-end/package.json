@@ -11,6 +11,11 @@
     "lint": "eslint .",
     "test:visual": "playwright test tests/visual.spec.ts",
     "test:functional": "playwright test tests/functional.spec.ts",
+    "e2e:prod:smoke": "playwright test --config=playwright.production.config.ts --grep @smoke",
+    "e2e:prod:full": "playwright test --config=playwright.production.config.ts",
+    "e2e:prod:destructive": "playwright test --config=playwright.production.config.ts --grep @destructive",
+    "e2e:prod:report": "playwright show-report ../playwright-report/production",
+    "e2e:prod:typecheck": "tsc --project tsconfig.e2e.production.json",
     "test:visual:update-assets": "node scripts/sync-stitch-assets.mjs",
     "test:visual:render-baselines": "node scripts/render-stitch-baselines.mjs",
     "preview": "vite preview"
