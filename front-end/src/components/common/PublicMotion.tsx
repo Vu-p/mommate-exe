@@ -24,6 +24,7 @@ const PublicMotion = () => {
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+    let revealFallback: number | undefined;
     const frame = window.requestAnimationFrame(() => {
       const elements = Array.from(document.querySelectorAll<HTMLElement>(REVEAL_SELECTOR));
       elements.forEach((element, index) => {
@@ -43,11 +44,16 @@ const PublicMotion = () => {
       );
 
       elements.forEach((element) => observer.observe(element));
+      revealFallback = window.setTimeout(() => {
+        elements.forEach((element) => element.classList.add('is-visible'));
+        observer.disconnect();
+      }, 900);
       (window as Window & { __mommateMotionObserver?: IntersectionObserver }).__mommateMotionObserver = observer;
     });
 
     return () => {
       window.cancelAnimationFrame(frame);
+      if (revealFallback !== undefined) window.clearTimeout(revealFallback);
       (window as Window & { __mommateMotionObserver?: IntersectionObserver }).__mommateMotionObserver?.disconnect();
     };
   }, [pathname]);

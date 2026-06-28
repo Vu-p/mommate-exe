@@ -19,6 +19,8 @@ out/
 
 # === Environment ===
 .env
+.env.*
+!.env.e2e.example
 .env.local
 .env.admin
 .env.*.local
@@ -46,7 +48,10 @@ design-reference/
 
 tests/
 front-end/tests/
-playwright-report/
-test-results/
+playwright-report
+test-results
+playwright/.auth
+blob-report
+*.har
 
 .vercel

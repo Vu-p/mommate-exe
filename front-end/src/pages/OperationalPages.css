@@ -80,6 +80,23 @@
 .carer-information-body span { display:inline-flex; align-items:center; gap:7px; margin-right:18px; color:var(--primary); font-size:.82rem; }
 .carer-information-body span svg { width:16px; }
 .carer-information-body .message-carer { color:var(--primary-dark); }
+
+.messages-thread .messages-state {
+  width: min(100%, 420px);
+  min-height: 180px;
+  margin: auto;
+  align-self: center;
+}
+
+.messages-thread .messages-state button {
+  min-height: 40px;
+  margin-top: 4px;
+  padding: 0 18px;
+  border: 1px solid var(--mm-color-primary);
+  border-radius: var(--mm-radius-sm);
+  color: var(--mm-color-primary-strong);
+  background: rgba(255, 255, 255, 0.72);
+}
 .carer-information-body > b { align-self:start; display:flex; align-items:center; gap:6px; padding:7px 12px; border-radius:999px; color:var(--primary); background:var(--lavender-soft, #F0E8FF); font-size:.75rem; }
 .carer-information-body > b svg { width:15px; }
 .booking-service-package { display:flex; align-items:center; gap:16px; padding:18px; border:1px solid var(--glass-border); border-radius: var(--radius-lg); background:var(--bg); }

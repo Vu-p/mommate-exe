@@ -92,7 +92,7 @@ const toArray = <T,>(value: unknown): T[] => (Array.isArray(value) ? value : [])
 const calmEase = [0.16, 1, 0.3, 1] as const;
 
 const reveal = {
-  initial: { opacity: 0, y: 34, filter: 'blur(10px)' },
+  initial: { opacity: 1, y: 0, filter: 'blur(0px)' },
   whileInView: { opacity: 1, y: 0, filter: 'blur(0px)' },
   viewport: { once: true, amount: 0.22 },
   transition: { duration: 0.78, ease: calmEase },
@@ -379,7 +379,7 @@ const Landing = () => {
                   <motion.article
                     key={service._id}
                     className={`aurora-living-card aurora-service-${index + 1}`}
-                    initial={{ opacity: 0, y: 28, filter: 'blur(10px)' }}
+                    initial={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                     whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                     viewport={{ once: true, amount: 0.18 }}
                     transition={{ duration: 0.72, delay: index * 0.08, ease: calmEase }}
@@ -422,7 +422,7 @@ const Landing = () => {
               ].map(([step, title, text], index) => (
                 <motion.article
                   key={step}
-                  initial={{ opacity: 0, x: 34, filter: 'blur(8px)' }}
+                  initial={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
                   whileInView={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
                   viewport={{ once: true, amount: 0.24 }}
                   transition={{ duration: 0.7, delay: index * 0.08, ease: calmEase }}
@@ -522,7 +522,7 @@ const Landing = () => {
               {!reviewsLoading && displayedReviews.map((review, index) => (
                 <motion.article
                   key={review.id || index}
-                  initial={{ opacity: 0, y: 34, rotate: index % 2 ? 1.4 : -1.2 }}
+                  initial={{ opacity: 1, y: 0, rotate: index % 2 ? 0.6 : -0.4 }}
                   whileInView={{ opacity: 1, y: 0, rotate: index % 2 ? 0.6 : -0.4 }}
                   viewport={{ once: true, amount: 0.2 }}
                   transition={{ duration: 0.78, delay: index * 0.08, ease: calmEase }}
@@ -553,7 +553,7 @@ const Landing = () => {
                   <motion.article
                     key={item.question}
                     className={active ? 'is-open' : ''}
-                    initial={{ opacity: 0, y: 22 }}
+                    initial={{ opacity: 1, y: 0 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.2 }}
                     transition={{ duration: 0.52, delay: index * 0.05 }}

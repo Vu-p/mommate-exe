@@ -11,6 +11,7 @@
     "seed": "tsx src/scripts/seedDynamicApp.ts",
     "seed:avatars": "tsx src/scripts/seed.ts",
     "migrate": "tsx src/scripts/migrateDynamicApp.ts",
+    "admin:provision": "tsx src/scripts/provisionAdmin.ts",
     "check:data": "tsx src/scripts/checkDataIntegrity.ts",
     "test": "tsx --test src/**/*.test.ts",
     "test:integration": "tsx src/scripts/testRoleFlows.ts"

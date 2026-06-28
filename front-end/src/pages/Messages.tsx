@@ -2,6 +2,7 @@ import { Send } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { EmptyState, ErrorState, LoadingState } from '../components/common/DesignFoundation';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import { getSocket } from '../utils/socket';
@@ -13,12 +14,21 @@ const Messages = () => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<any[]>([]);
   const [body, setBody] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const load = useCallback(async () => {
     if (!id) return;
-    const { data } = await api.get(`/messages/conversations/${id}/messages`, { params: { page: 1, limit: 100 } });
-    setMessages(data.items || []);
-    await api.patch(`/messages/conversations/${id}/read`);
+    try {
+      const { data } = await api.get(`/messages/conversations/${id}/messages`, { params: { page: 1, limit: 100 } });
+      setMessages(data.items || []);
+      setError('');
+      await api.patch(`/messages/conversations/${id}/read`);
+    } catch {
+      setError('Không thể tải cuộc trò chuyện này.');
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
   useEffect(() => {
@@ -40,9 +50,14 @@ const Messages = () => {
 
   const send = async () => {
     if (!body.trim() || !id) return;
-    const { data } = await api.post(`/messages/conversations/${id}/messages`, { body: body.trim() });
-    setMessages((items) => items.some((item) => item._id === data._id) ? items : [...items, data]);
-    setBody('');
+    try {
+      const { data } = await api.post(`/messages/conversations/${id}/messages`, { body: body.trim() });
+      setMessages((items) => items.some((item) => item._id === data._id) ? items : [...items, data]);
+      setBody('');
+      setError('');
+    } catch {
+      setError('Không thể gửi tin nhắn. Vui lòng thử lại.');
+    }
   };
 
   return (
@@ -53,7 +68,16 @@ const Messages = () => {
           <h1>Tin nhắn</h1>
         </header>
         <section className="messages-thread" aria-live="polite">
-          {messages.map((message) => {
+          {loading ? (
+            <LoadingState className="messages-state" title="Đang tải tin nhắn..." />
+          ) : error ? (
+            <div className="messages-state">
+              <ErrorState title={error} />
+              <button type="button" className="outline" onClick={() => void load()}>Thử lại</button>
+            </div>
+          ) : messages.length === 0 ? (
+            <EmptyState className="messages-state" title="Chưa có tin nhắn" description="Hãy bắt đầu cuộc trò chuyện khi bạn sẵn sàng." />
+          ) : messages.map((message) => {
             const isOwn = message.sender?._id === user?._id || message.sender === user?._id;
             return (
               <article className={isOwn ? 'message-bubble is-own' : 'message-bubble'} key={message._id}>

@@ -66,10 +66,17 @@ const run = async () => {
         mustChangePassword: false,
       });
       console.log(`Created database-backed admin account ${email}.`);
-    } else if (existingAdmin.role !== UserRole.ADMIN) {
+    } else {
+      existingAdmin.password = await bcrypt.hash(process.env.ADMIN_PASSWORD, 12);
       existingAdmin.role = UserRole.ADMIN;
+      existingAdmin.accountStatus = 'active';
+      existingAdmin.emailVerified = true;
+      existingAdmin.mustChangePassword = false;
+      existingAdmin.authProvider = 'local';
+      existingAdmin.suspendedAt = undefined;
+      existingAdmin.suspendedReason = undefined;
       await existingAdmin.save();
-      console.log(`Promoted existing account ${email} to admin.`);
+      console.log(`Synchronized database-backed admin account ${email}.`);
     }
   }
 

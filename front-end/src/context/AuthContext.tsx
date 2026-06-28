@@ -31,6 +31,11 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const isPublicAuthPage = () => {
+  if (typeof window === 'undefined') return false;
+  return ['/login', '/auth', '/signup'].includes(window.location.pathname);
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -51,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Ignored
       }
     }
-    if (!userInfo) {
+    if (!userInfo && !isPublicAuthPage()) {
       api.post('/auth/refresh').then(({ data }) => {
         if (isAdminApp && data.role !== 'admin') {
           setLoading(false);
