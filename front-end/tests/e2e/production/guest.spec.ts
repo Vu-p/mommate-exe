@@ -73,11 +73,8 @@ test.describe('production guest and public flows', () => {
       'Production currently has no visible verified carer card',
     );
     const detailLink = card.locator('a[href^="/carers/"]').first();
-    if (await detailLink.count()) {
-      await safeClick(detailLink);
-    } else {
-      await safeClick(card.getByRole('button', { name: /hồ sơ|chi tiết|xem/i }).first());
-    }
+    if (await detailLink.count()) await safeClick(detailLink);
+    else await safeClick(card);
     await expect(page).toHaveURL(/\/carers\/[^/?]+/);
   });
 
@@ -89,17 +86,30 @@ test.describe('production guest and public flows', () => {
   });
 
   test('@smoke invalid admin login preserves the original error', async ({ page }) => {
+    await page.context().clearCookies();
     let refreshRequests = 0;
     page.on('request', (request) => {
       if (request.url().includes('/auth/refresh')) refreshRequests += 1;
     });
     await page.goto(`${env.ADMIN_APP_URL}/login`, { waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+    });
+    await page.reload({ waitUntil: 'domcontentloaded' });
     const form = page.locator('.login-form');
     await form.locator('input[type="email"]').fill('e2e.invalid.login@example.invalid');
     await form.locator('input[type="password"]').fill('E2E_Invalid_Login_Only_9!');
+    const loginResponse = page.waitForResponse(
+      (response) => response.request().method() === 'POST' && new URL(response.url()).pathname.endsWith('/auth/login'),
+      { timeout: 20_000 },
+    );
     await form.locator('button[type="submit"]').click();
-    const message = form.locator('.auth-message.error-message');
+    const response = await loginResponse;
+    expect([400, 401, 403]).toContain(response.status());
+    const message = page.locator('.auth-message.error-message, .form-alert, [role="alert"]').first();
     await expect(message).toBeVisible();
+    await expect(message).toContainText(/invalid|unauthorized|email|password|mật khẩu|đăng nhập thất bại/i);
     await expect(message).not.toContainText(/refresh token missing/i);
     expect(refreshRequests).toBe(0);
   });

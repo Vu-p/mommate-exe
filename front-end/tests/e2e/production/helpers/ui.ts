@@ -21,14 +21,18 @@ export const skipIfMissingRecord = <T>(record: T | null | undefined, reason: str
   return record;
 };
 
-export const findFirstVisibleCard = async (page: Page, selectors: string[]) => {
-  for (const selector of selectors) {
-    const candidates = page.locator(selector);
-    for (let index = 0; index < await candidates.count(); index += 1) {
-      const candidate = candidates.nth(index);
-      if (await candidate.isVisible()) return candidate;
+export const findFirstVisibleCard = async (page: Page, selectors: string[], timeoutMs = 12_000) => {
+  const deadline = Date.now() + timeoutMs;
+  do {
+    for (const selector of selectors) {
+      const candidates = page.locator(selector);
+      for (let index = 0; index < await candidates.count(); index += 1) {
+        const candidate = candidates.nth(index);
+        if (await candidate.isVisible()) return candidate;
+      }
     }
-  }
+    await page.waitForTimeout(250);
+  } while (Date.now() < deadline);
   return null;
 };
 
@@ -55,8 +59,22 @@ export const openBookingFormFromFirstAvailableService = async (
   userAppUrl: string,
 ): Promise<BookingContextResult> => {
   await page.goto(`${userAppUrl}/services`, { waitUntil: 'domcontentloaded' });
-  const serviceCard = await findFirstVisibleCard(page, ['.service-card-premium']);
-  if (!serviceCard) return { ready: false, reason: 'No visible production service card is available' };
+  await page.locator('.loading-state').waitFor({ state: 'hidden', timeout: 15_000 }).catch(() => undefined);
+  let serviceCard = await findFirstVisibleCard(page, ['.service-card-premium'], 8_000);
+  if (!serviceCard && !(await page.locator('.services-grid .empty-state').isVisible())) {
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.locator('.loading-state').waitFor({ state: 'hidden', timeout: 15_000 }).catch(() => undefined);
+    serviceCard = await findFirstVisibleCard(page, ['.service-card-premium'], 8_000);
+  }
+  if (!serviceCard) {
+    const explicitEmptyState = await page.locator('.services-grid .empty-state').isVisible();
+    return {
+      ready: false,
+      reason: explicitEmptyState
+        ? 'Production service listing returned an explicit empty state'
+        : 'No visible production service card appeared after one retry',
+    };
+  }
 
   const serviceAction = serviceCard.locator('button.service-card-hitarea');
   if (!(await serviceAction.count())) return { ready: false, reason: 'The visible service card has no safe detail action' };
