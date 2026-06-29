@@ -32,8 +32,19 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'production-setup',
+      name: 'production-setup-user',
       testMatch: /auth\.setup\.ts/,
+      grep: /dedicated production user/,
+    },
+    {
+      name: 'production-setup-carer',
+      testMatch: /auth\.setup\.ts/,
+      grep: /dedicated production carer/,
+    },
+    {
+      name: 'production-setup-admin',
+      testMatch: /auth\.setup\.ts/,
+      grep: /dedicated production admin/,
     },
     {
       name: 'production-guest',
@@ -43,26 +54,26 @@ export default defineConfig({
     {
       name: 'production-user',
       testMatch: /user\.spec\.ts/,
-      dependencies: ['production-setup'],
-      use: { storageState: `${authDir}/user.json` },
+      dependencies: ['production-setup-user'],
+      use: { storageState: `${authDir}/production-user.json` },
     },
     {
       name: 'production-carer',
       testMatch: /carer\.spec\.ts/,
-      dependencies: ['production-setup'],
-      use: { storageState: `${authDir}/carer.json` },
+      dependencies: ['production-setup-carer'],
+      use: { storageState: `${authDir}/production-carer.json` },
     },
     {
       name: 'production-admin',
       testMatch: /admin\.spec\.ts/,
-      dependencies: ['production-setup'],
-      use: { storageState: `${authDir}/admin.json` },
+      dependencies: ['production-setup-admin'],
+      use: { storageState: `${authDir}/production-admin.json` },
     },
     {
       name: 'production-journey',
       testMatch: /full-journey\.spec\.ts/,
-      dependencies: ['production-setup'],
-      use: { storageState: `${authDir}/user.json` },
+      dependencies: ['production-setup-user'],
+      use: { storageState: `${authDir}/production-user.json` },
     },
   ],
 });

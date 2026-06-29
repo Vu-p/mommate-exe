@@ -114,12 +114,14 @@ test.describe('production guest and public flows', () => {
     expect(refreshRequests).toBe(0);
   });
 
-  test('public information pages load', async ({ page }) => {
-    for (const route of ['/privacy', '/terms', '/help', '/contact', '/careers', '/faq', '/guide']) {
+  for (const route of ['/privacy', '/terms', '/help', '/contact', '/careers', '/faq', '/guide']) {
+    test(`public information page ${route} loads`, async ({ page }) => {
       await expectRouteLoads(page, env.USER_APP_URL, route);
+      await expect(page.locator('main').first()).toBeVisible();
+      await expect(page.locator('body')).not.toContainText(/404|not found|không tìm thấy trang/i);
       await expectSiteFooterOnce(page);
-    }
-  });
+    });
+  }
 
   test('unknown public route renders NotFound', async ({ page }) => {
     await page.goto(`${env.USER_APP_URL}/e2e-route-that-does-not-exist`, { waitUntil: 'domcontentloaded' });

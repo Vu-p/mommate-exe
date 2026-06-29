@@ -26,7 +26,7 @@ test.describe('production cross-role journey', () => {
     );
     await guestContext.close();
 
-    const userContext = await browser.newContext({ storageState: '../playwright/.auth/user.json' });
+    const userContext = await browser.newContext({ storageState: '../playwright/.auth/production-user.json' });
     const userPage = await userContext.newPage();
     const bookingContext = await openBookingFormFromFirstAvailableService(userPage, env.USER_APP_URL);
     test.skip(!bookingContext.ready, bookingContext.ready ? undefined : bookingContext.reason);

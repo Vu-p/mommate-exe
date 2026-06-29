@@ -38,7 +38,8 @@ export const AUTH_NAV_MAX_ATTEMPTS = 3;
 export const AUTH_NAV_ATTEMPT_TIMEOUT_MS = 12_000;
 export const AUTH_NAV_BACKOFF_MS = [1_000, 2_000] as const;
 
-type NavigationCategory = 'navigation-timeout' | 'network' | 'temporary-server-error' | 'unknown';
+type NavigationCategory = 'navigation-timeout' | 'blank-page' | 'network' | 'temporary-server-error' | 'unknown';
+type PreflightCategory = 'reachable' | 'client-error' | 'server-error' | 'unreachable';
 
 const navigationCategory = (error: unknown): NavigationCategory => {
   const message = error instanceof Error ? error.message.toLowerCase() : '';
@@ -47,12 +48,57 @@ const navigationCategory = (error: unknown): NavigationCategory => {
   return 'unknown';
 };
 
+const preflightLogin = async (page: Page, appUrl: string): Promise<PreflightCategory> => {
+  try {
+    const response = await page.request.get(`${appUrl}/login`, {
+      failOnStatusCode: false,
+      timeout: 8_000,
+    });
+    if (response.status() >= 500) return 'server-error';
+    if (response.status() >= 400) return 'client-error';
+    return 'reachable';
+  } catch {
+    return 'unreachable';
+  }
+};
+
+const inspectNavigationState = async (page: Page) => {
+  if (page.isClosed()) {
+    return { loginForm: false, appRoot: false, dashboard: false, profile: false, blank: true };
+  }
+  const [loginForm, appRoot, dashboard, profile, blank] = await Promise.all([
+    page.locator('.login-form, input[type="email"]').first().isVisible().catch(() => false),
+    page.locator('#root > *').first().isVisible().catch(() => false),
+    page.locator('.admin-layout').isVisible().catch(() => false),
+    page.locator('.user-dropdown-toggle').isVisible().catch(() => false),
+    page.evaluate(() => {
+      const root = document.querySelector('#root');
+      return document.body.innerText.trim() === '' && (!root || root.childElementCount === 0);
+    }).catch(() => true),
+  ]);
+  return { loginForm, appRoot, dashboard, profile, blank };
+};
+
+const waitForNavigationState = async (page: Page, timeoutMs: number) => {
+  const deadline = Date.now() + Math.max(0, timeoutMs);
+  let state = await inspectNavigationState(page);
+  while (!state.loginForm && !state.dashboard && !state.profile && Date.now() < deadline) {
+    await page.waitForTimeout(200);
+    state = await inspectNavigationState(page);
+  }
+  return state;
+};
+
 const gotoLoginWithRetry = async (page: Page, credentials: RoleCredentials) => {
   let finalCategory: NavigationCategory = 'unknown';
   let loginFormVisible = false;
   let dashboardVisible = false;
+  let appRootVisible = false;
+  let pageBlank = false;
   let finalPathname = '/';
   let attempts = 0;
+  const strategy = 'commit+selector';
+  const preflight = await preflightLogin(page, credentials.appUrl);
 
   await page.addInitScript(() => {
     localStorage.clear();
@@ -63,10 +109,11 @@ const gotoLoginWithRetry = async (page: Page, credentials: RoleCredentials) => {
     attempts = attempt;
     await page.context().clearCookies();
     let responseStatus: number | undefined;
+    const attemptStartedAt = Date.now();
     try {
       const response = await page.goto(`${credentials.appUrl}/login`, {
-        waitUntil: 'domcontentloaded',
-        timeout: AUTH_NAV_ATTEMPT_TIMEOUT_MS,
+        waitUntil: 'commit',
+        timeout: Math.min(8_000, AUTH_NAV_ATTEMPT_TIMEOUT_MS),
       });
       responseStatus = response?.status();
       finalCategory = responseStatus && responseStatus >= 500 ? 'temporary-server-error' : 'unknown';
@@ -76,8 +123,23 @@ const gotoLoginWithRetry = async (page: Page, credentials: RoleCredentials) => {
 
     if (!page.isClosed()) {
       finalPathname = new URL(page.url()).pathname;
-      loginFormVisible = await page.locator('.login-form').isVisible().catch(() => false);
-      dashboardVisible = await page.locator('.admin-layout').isVisible().catch(() => false);
+      const remaining = AUTH_NAV_ATTEMPT_TIMEOUT_MS - (Date.now() - attemptStartedAt);
+      let state = await waitForNavigationState(page, Math.min(3_000, Math.max(0, remaining)));
+      if (state.blank && Date.now() - attemptStartedAt < AUTH_NAV_ATTEMPT_TIMEOUT_MS - 1_000) {
+        const reloadBudget = Math.min(5_000, AUTH_NAV_ATTEMPT_TIMEOUT_MS - (Date.now() - attemptStartedAt));
+        await page.reload({ waitUntil: 'commit', timeout: reloadBudget }).catch(() => undefined);
+      }
+      if (!state.loginForm && !state.dashboard && !state.profile) {
+        state = await waitForNavigationState(
+          page,
+          Math.max(0, AUTH_NAV_ATTEMPT_TIMEOUT_MS - (Date.now() - attemptStartedAt)),
+        );
+      }
+      loginFormVisible = state.loginForm;
+      dashboardVisible = state.dashboard || state.profile;
+      appRootVisible = state.appRoot;
+      pageBlank = state.blank;
+      if (pageBlank) finalCategory = 'blank-page';
     }
 
     if (loginFormVisible) return;
@@ -99,9 +161,13 @@ const gotoLoginWithRetry = async (page: Page, credentials: RoleCredentials) => {
     'path=/login',
     `attempts=${attempts}`,
     `attemptTimeoutMs=${AUTH_NAV_ATTEMPT_TIMEOUT_MS}`,
+    `strategy=${strategy}`,
+    `preflight=${preflight}`,
     `category=${finalCategory}`,
     `pathname=${finalPathname}`,
     `loginForm=${loginFormVisible ? 'present' : 'missing'}`,
+    `appRoot=${appRootVisible ? 'present' : 'missing'}`,
+    `blank=${pageBlank ? 'present' : 'missing'}`,
     `dashboard=${dashboardVisible ? 'present' : 'missing'}`,
   ].join(' '));
 };

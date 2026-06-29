@@ -14,15 +14,15 @@ setup.beforeAll(() => {
 
 setup('authenticate dedicated production user', async ({ page }) => {
   await loginAsUser(page);
-  await page.context().storageState({ path: path.join(authDir, 'user.json') });
+  await page.context().storageState({ path: path.join(authDir, 'production-user.json') });
 });
 
 setup('authenticate dedicated production carer', async ({ page }) => {
   await loginAsCarer(page);
-  await page.context().storageState({ path: path.join(authDir, 'carer.json') });
+  await page.context().storageState({ path: path.join(authDir, 'production-carer.json') });
 });
 
 setup('authenticate dedicated production admin', async ({ page }) => {
   await loginAsAdmin(page);
-  await page.context().storageState({ path: path.join(authDir, 'admin.json') });
+  await page.context().storageState({ path: path.join(authDir, 'production-admin.json') });
 });
