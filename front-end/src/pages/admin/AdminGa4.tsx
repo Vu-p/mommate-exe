@@ -63,7 +63,7 @@ const Overview = ({ range, setRange }: { range: ReturnType<typeof initialRange>;
 };
 
 const Realtime = () => {
-  const [data, setData] = useState<{ reports: NamedReports; generatedAt: string }>();
+  const [data, setData] = useState<{ reports: NamedReports; generatedAt: string; errors?: { panel: string }[] }>();
   const [paused, setPaused] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -72,7 +72,7 @@ const Realtime = () => {
   const active = data?.reports.totals?.rows?.[0]?.metrics.activeUsers || 0;
   return <>
     <div className="ga4-toolbar"><span className="ga4-live"><i /> 30 phút gần nhất</span><button onClick={() => setPaused((value) => !value)}>{paused ? <Play size={16} /> : <Pause size={16} />}{paused ? 'Tiếp tục' : 'Tạm dừng'}</button><button onClick={load}><RefreshCw size={16} /> Làm mới</button><span>{data?.generatedAt ? new Date(data.generatedAt).toLocaleTimeString('vi-VN') : ''}</span></div>
-    {loading ? <Skeleton /> : error ? <ErrorState message={error} retry={load} /> : <><section className="ga4-realtime-hero"><Activity /><div><strong>{number(active)}</strong><span>người dùng đang hoạt động</span></div></section><section className="ga4-grid"><Panel title="Trang đang xem"><ReportTable report={data?.reports.pages} /></Panel><Panel title="Sự kiện trực tiếp"><ReportTable report={data?.reports.events} /></Panel><Panel title="Nguồn truy cập"><ReportTable report={data?.reports.sources} /></Panel><Panel title="Thiết bị"><ReportTable report={data?.reports.devices} /></Panel></section></>}
+    {loading ? <Skeleton /> : error ? <ErrorState message={error} retry={load} /> : <><section className="ga4-realtime-hero"><Activity /><div><strong>{number(active)}</strong><span>người dùng đang hoạt động</span></div></section>{Boolean(data?.errors?.length) && <p className="ga4-inline-warning">Một số panel realtime đang tạm thời không khả dụng.</p>}<section className="ga4-grid"><Panel title="Trang đang xem"><ReportTable report={data?.reports.pages} /></Panel><Panel title="Sự kiện trực tiếp"><ReportTable report={data?.reports.events} /></Panel><Panel title="Luồng dữ liệu và nền tảng"><ReportTable report={data?.reports.streams} /></Panel><Panel title="Thiết bị"><ReportTable report={data?.reports.devices} /></Panel></section></>}
   </>;
 };
 

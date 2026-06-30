@@ -131,20 +131,33 @@ export const getGa4Realtime = () => withCache('realtime', {}, 30_000, async () =
     totals: { dimensions: [], metrics: ['activeUsers'] },
     pages: { dimensions: ['unifiedScreenName'], metrics: ['activeUsers'] },
     events: { dimensions: ['eventName'], metrics: ['eventCount'] },
-    sources: { dimensions: ['firstUserSource'], metrics: ['activeUsers'] },
+    streams: { dimensions: ['streamName', 'platform'], metrics: ['activeUsers'] },
     devices: { dimensions: ['deviceCategory'], metrics: ['activeUsers'] },
   };
-  const entries = await Promise.all(Object.entries(specs).map(async ([name, spec]) => {
-    const [response] = await client.runRealtimeReport({
-      property,
-      dimensions: spec.dimensions.map(dim),
-      metrics: spec.metrics.map(metric),
-      limit: 20,
-      returnPropertyQuota: true,
-    });
-    return [name, normalizeReport(response)];
+  const results = await Promise.all(Object.entries(specs).map(async ([name, spec]) => {
+    try {
+      const [response] = await client.runRealtimeReport({
+        property,
+        dimensions: spec.dimensions.map(dim),
+        metrics: spec.metrics.map(metric),
+        limit: 20,
+        returnPropertyQuota: true,
+      });
+      return { name, report: normalizeReport(response) };
+    } catch (error: any) {
+      return { name, error: { code: error.code || 'GA4_REALTIME_REPORT_FAILED', message: 'Realtime panel is temporarily unavailable' } };
+    }
   }));
-  return { generatedAt: new Date().toISOString(), reports: Object.fromEntries(entries) };
+  const reports = Object.fromEntries(results.filter((item) => item.report).map((item) => [item.name, item.report]));
+  const errors = results.filter((item) => item.error).map((item) => ({ panel: item.name, ...item.error }));
+  if (!Object.keys(reports).length) {
+    const error: any = new Error('All Google Analytics realtime reports failed');
+    error.status = 502;
+    error.code = 'GA4_REALTIME_UNAVAILABLE';
+    error.details = errors;
+    throw error;
+  }
+  return { generatedAt: new Date().toISOString(), reports, errors };
 });
 
 export const getGa4Metadata = () => withCache('metadata', {}, 24 * 60 * 60_000, async () => {
