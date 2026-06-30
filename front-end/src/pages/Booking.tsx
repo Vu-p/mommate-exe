@@ -10,6 +10,7 @@ import axios from 'axios';
 import './Booking.css';
 import AddressAutocomplete from '../components/common/AddressAutocomplete';
 import MapPreview from '../components/common/MapPreview';
+import { trackEvent } from '../utils/analytics';
 
 const Booking = () => {
   const { user } = useAuth();
@@ -21,6 +22,10 @@ const Booking = () => {
   const serviceTitle = state.serviceTitle || query.get('serviceTitle');
   const carerId = state.carerId || query.get('carerId');
   const hasRequiredBookingData = Boolean(serviceId && carerId);
+
+  useEffect(() => {
+    if (hasRequiredBookingData) trackEvent('begin_checkout', { source_screen: 'booking', currency: 'VND' });
+  }, [hasRequiredBookingData]);
 
   const [formData, setFormData] = useState({
     name: user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : '',
@@ -165,6 +170,7 @@ const Booking = () => {
         return;
       }
       const { data } = await api.post('/bookings', payload);
+      trackEvent('booking_request_submitted', { source_screen: 'booking', currency: 'VND' });
       navigate(`/account/request/${data._id}`);
     } catch (error) {
       console.error('Booking failed:', error);

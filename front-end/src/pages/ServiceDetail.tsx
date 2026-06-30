@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle2, ChevronDown, ChevronRight, Clock3, Headphones
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
+import { trackEvent } from '../utils/analytics';
 import './ServiceDetail.css';
 
 const ServiceDetail = () => {
@@ -22,6 +23,7 @@ const ServiceDetail = () => {
         setLoading(true);
         const { data } = await api.get(`/services/${id}`);
         setService(data);
+        trackEvent('view_item', { service_category: data.category || 'service', source_screen: 'service_detail' });
       } catch (error) {
         console.error('Error fetching service detail:', error);
         setService(null);
@@ -52,6 +54,7 @@ const ServiceDetail = () => {
   const sessionOptions = service.sessionOptions?.length ? service.sessionOptions : [1];
 
   const handleBooking = () => {
+    trackEvent('select_item', { service_category: service?.category || 'service', source_screen: 'service_detail', item_list_name: 'service_detail' });
     if (carerId) {
       navigate('/booking', { state: { serviceId: service._id, serviceTitle: service.title, carerId, carerName } });
       return;

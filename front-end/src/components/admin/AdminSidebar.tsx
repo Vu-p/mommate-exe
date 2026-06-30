@@ -17,6 +17,7 @@ const links = [
   ['/admin/reviews', 'Đánh giá', Star],
   ['/admin/incidents', 'Sự cố', ShieldAlert],
   ['/admin/revenue', 'Doanh thu', BarChart3],
+  ['/admin/ga4', 'Google Analytics', BarChart3],
 ] as const;
 
 const AdminSidebar = () => {

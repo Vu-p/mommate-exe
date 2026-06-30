@@ -21,6 +21,7 @@ import { formatExperienceShort, formatLocation, getCarerAvatar, getCarerFullName
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import BackToTop from '../components/common/BackToTop';
+import { trackEvent } from '../utils/analytics';
 import './Landing.css';
 
 type Carer = {
@@ -283,6 +284,7 @@ const Landing = () => {
   const handleSearch = (event: FormEvent) => {
     event.preventDefault();
     const query = keyword.trim();
+    if (query) trackEvent('search', { search_term: query, source_screen: 'landing' });
     navigate(query ? `/services?search=${encodeURIComponent(query)}` : '/services');
   };
 

@@ -45,6 +45,8 @@ tsconfig.tsbuildinfo
 # Added by code-review-graph
 .code-review-graph/
 design-reference/
+# Local Google service-account credentials
+docs/mommate-*-*.json
 
 tests/
 front-end/tests/

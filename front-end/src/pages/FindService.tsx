@@ -7,6 +7,7 @@ import Footer from '../components/Footer';
 import type { ServiceFilters } from '../components/services/FilterBar';
 import ServiceCard from '../components/services/ServiceCard';
 import api from '../utils/api';
+import { trackEvent } from '../utils/analytics';
 import './FindService.css';
 
 const SERVICES_PER_PAGE = 12;
@@ -51,6 +52,7 @@ const FindService = () => {
         const allServices = Array.isArray(data) ? data : data.items || [];
         const pages = data.pagination?.totalPages ?? 1;
         setServices(allServices);
+        if (allServices.length) trackEvent('view_item_list', { item_list_name: 'service_search', source_screen: 'find_service', service_category: filters.category || 'all' });
         setTotalPages(pages);
         setAreaOptions(data.facets?.areas || []);
       } catch (error) {

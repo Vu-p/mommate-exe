@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
 import carerAvatar from '../assets/stitch/generated/stitch-06-ad3697d45210.png';
+import { trackEvent } from '../utils/analytics';
 import './Review.css';
 
 const Review = () => {
@@ -39,6 +40,7 @@ const Review = () => {
         comment,
         isAnonymous: !isPublic
       });
+      trackEvent('review_submitted', { service_category: booking.service?.category || 'service', source_screen: 'review' });
       navigate('/account/request');
     } catch {
       alert('Không thể gửi đánh giá. Vui lòng thử lại.');

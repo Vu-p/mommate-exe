@@ -26,6 +26,8 @@ import BookingChange from './pages/BookingChange';
 import InfoPage from './pages/InfoPage';
 import PublicMotion from './components/common/PublicMotion';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import AnalyticsTracker from './components/common/AnalyticsTracker';
+import CookieConsent from './components/common/CookieConsent';
 import './styles/global.css';
 import './styles/public-redesign.css';
 import './styles/protected-pages.css';
@@ -36,6 +38,7 @@ import AdminServices from './pages/admin/AdminServices';
 import AdminCarers from './pages/admin/AdminCarers';
 import AdminBookings from './pages/admin/AdminBookings';
 import AdminWorkflows from './pages/admin/AdminWorkflows';
+import AdminGa4 from './pages/admin/AdminGa4';
 import {
   AdminBookingDetail,
   AdminIncidents,
@@ -65,6 +68,7 @@ const TitleUpdater = () => {
     pathname.startsWith('/review') ? 'Review' :
     pathname.startsWith('/change-password') ? 'Change Password' :
     pathname.startsWith('/auth') ? 'Sign In / Sign Up' :
+    pathname.startsWith('/admin/ga4') ? 'Google Analytics' :
     pathname.startsWith('/admin') ? 'Admin' :
     'Mommate';
 
@@ -96,6 +100,7 @@ function App() {
             <Route path="revenue" element={<AdminRevenue />} />
             <Route path="reconciliation" element={<AdminReconciliation />} />
             <Route path="workflows" element={<AdminWorkflows />} />
+            <Route path="ga4" element={<AdminGa4 />} />
             <Route path="messages/:id" element={<Messages />} />
           </Route>
 
@@ -106,9 +111,11 @@ function App() {
   }
 
   return (
-    <Router>
-      <TitleUpdater />
-      <PublicMotion />
+      <Router>
+        <TitleUpdater />
+        <PublicMotion />
+        <AnalyticsTracker />
+        <CookieConsent />
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/about" element={<About />} />
@@ -150,6 +157,7 @@ function App() {
           <Route path="revenue" element={<AdminRevenue />} />
           <Route path="reconciliation" element={<AdminReconciliation />} />
           <Route path="workflows" element={<AdminWorkflows />} />
+          <Route path="ga4" element={<AdminGa4 />} />
           <Route path="messages/:id" element={<Messages />} />
         </Route>
         <Route path="*" element={<NotFound />} />

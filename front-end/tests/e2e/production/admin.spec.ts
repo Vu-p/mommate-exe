@@ -26,6 +26,7 @@ test.describe('production admin read-only flows', () => {
     '/admin/revenue',
     '/admin/reconciliation',
     '/admin/workflows',
+    '/admin/ga4',
   ]) {
     test(`read-only admin page ${route} loads`, async ({ page }) => {
       await expectRouteLoads(page, env.ADMIN_APP_URL, route);

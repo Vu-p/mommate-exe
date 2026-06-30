@@ -1,9 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { getAnalyticsConsent, openAnalyticsPreferences } from '../utils/analytics';
 
 const content: Record<string, { title: string; paragraphs: string[] }> = {
-  '/privacy': { title: 'Chính sách bảo mật', paragraphs: ['MomMate chỉ thu thập dữ liệu cần thiết để quản lý tài khoản, hồ sơ chăm sóc, booking, thanh toán và hỗ trợ an toàn.', 'Thông tin sức khỏe và thông tin liên hệ chỉ được chia sẻ cho các bên có quyền truy cập theo booking.'] },
+  '/privacy': { title: 'Chính sách bảo mật', paragraphs: ['MomMate chỉ thu thập dữ liệu cần thiết để quản lý tài khoản, hồ sơ chăm sóc, booking, thanh toán và hỗ trợ an toàn.', 'Thông tin sức khỏe và thông tin liên hệ chỉ được chia sẻ cho các bên có quyền truy cập theo booking.', 'Cookie phân tích Google Analytics chỉ được bật sau khi bạn đồng ý. MomMate không gửi tên, email, số điện thoại, địa chỉ, nội dung chăm sóc hoặc mã giao dịch cho Google Analytics.'] },
   '/terms': { title: 'Điều khoản dịch vụ', paragraphs: ['Giá, lịch, chính sách đổi hủy và trách nhiệm của các bên được xác nhận tại thời điểm đặt lịch.', 'MomMate không thay thế dịch vụ cấp cứu hoặc chẩn đoán tại cơ sở y tế.'] },
   '/help': { title: 'Trung tâm trợ giúp', paragraphs: ['Bạn có thể kiểm tra trạng thái booking trong mục Đơn đặt, gửi yêu cầu đổi/hủy từ trang chi tiết hoặc báo cáo sự cố gắn với booking đã phát sinh.', 'Đối với lỗi website hoặc tài khoản, hãy sử dụng trang Liên hệ hỗ trợ.'] },
   '/careers': { title: 'Tuyển dụng và hợp tác', paragraphs: ['MomMate đang ưu tiên xây dựng mạng lưới chuyên gia chăm sóc mẹ và bé tại Đà Nẵng.', 'Chuyên gia có thể tạo hồ sơ, cung cấp chứng chỉ và theo dõi trạng thái xét duyệt trực tiếp trên hệ thống.'] },
@@ -22,6 +23,7 @@ const InfoPage = () => {
   return <div className="stitch-page"><Navbar /><main className="container info-page-content" style={{ minHeight: 600, padding: '80px 0' }}>
     <h1>{page.title}</h1>
     {page.paragraphs.map((paragraph) => <p key={paragraph} style={{ maxWidth: 760, lineHeight: 1.8 }}>{paragraph}</p>)}
+    {pathname === '/privacy' && <button className="privacy-cookie-button" onClick={openAnalyticsPreferences}>Tùy chọn cookie phân tích: {getAnalyticsConsent() === 'granted' ? 'Đang đồng ý' : getAnalyticsConsent() === 'denied' ? 'Đã từ chối' : 'Chưa chọn'}</button>}
     {pathname === '/contact' && <div className="info-contact-actions">
       {contactEmail && <a href={`mailto:${contactEmail}`}>Email: {contactEmail}</a>}
       {contactPhone && <a href={`tel:${contactPhone.replace(/\s/g, '')}`}>Hotline: {contactPhone}</a>}

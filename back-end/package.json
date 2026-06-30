@@ -38,6 +38,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@google-analytics/data": "^6.1.0",
     "@payos/node": "^2.0.5",
     "bcryptjs": "^3.0.3",
     "cloudinary": "1.41.0",

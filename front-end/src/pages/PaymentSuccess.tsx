@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
 import { downloadBookingInvoice } from '../utils/invoice';
+import { trackEvent } from '../utils/analytics';
 
 const formatCurrency = (value: number) => `${Number(value || 0).toLocaleString('vi-VN')} VNĐ`;
 
@@ -32,6 +33,7 @@ const PaymentSuccess = () => {
         }
         const { data } = await api.get(`/bookings/${bookingId}`);
         setBooking(data);
+        trackEvent('payment_success', { service_category: data.service?.category || 'service', source_screen: 'payment_success', currency: 'VND', value: Number(data.totalPrice || 0) });
       } catch (err: any) {
         setError(err.response?.data?.message || 'Không thể tải thông tin thanh toán.');
       } finally {
