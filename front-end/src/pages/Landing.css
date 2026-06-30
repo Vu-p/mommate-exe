@@ -65,7 +65,7 @@
   left: 18px;
   right: 18px;
   width: auto;
-  max-width: 1180px;
+  max-width: min(1500px, calc(100% - 36px));
   margin-inline: auto;
   border: 1px solid rgba(255, 255, 255, 0.66);
   border-radius: 999px;
@@ -85,6 +85,10 @@
   padding-inline: 10px 14px;
 }
 
+.aurora-home .nav-group.center {
+  gap: clamp(18px, 1.9vw, 32px);
+}
+
 .aurora-home .brand-logo {
   color: var(--aurora-ink);
   font-size: 1.16rem;
@@ -98,9 +102,12 @@
 }
 
 .aurora-home .nav-link {
+  flex: 0 0 auto;
   color: rgba(37, 31, 54, 0.68);
   font-size: 0.86rem;
   font-weight: 650;
+  line-height: 1.25;
+  white-space: nowrap;
 }
 
 .aurora-home .nav-link::after {
