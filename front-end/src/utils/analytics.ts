@@ -25,7 +25,7 @@ export const getAnalyticsConsent = (): AnalyticsConsent => {
 
 const ensureGtag = () => {
   window.dataLayer ||= [];
-  window.gtag ||= (...args: unknown[]) => { window.dataLayer!.push(args); };
+  window.gtag ||= function gtag(..._args: unknown[]) { window.dataLayer!.push(arguments); };
 };
 
 export const initializeAnalytics = () => {
