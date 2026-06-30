@@ -1969,10 +1969,8 @@
 }
 
 .aurora-carer-carousel:hover .aurora-carer-orbit-card,
-.aurora-carer-carousel:hover .aurora-carer-card-body p,
 .aurora-carer-carousel:hover .aurora-carer-card-body footer,
 .aurora-carer-carousel:focus-within .aurora-carer-orbit-card,
-.aurora-carer-carousel:focus-within .aurora-carer-card-body p,
 .aurora-carer-carousel:focus-within .aurora-carer-card-body footer {
   animation-play-state: paused;
 }
@@ -1984,15 +1982,12 @@
   left: 50%;
   width: min(72vw, 300px);
   min-height: 420px;
-  display: grid;
-  grid-template-rows: 220px minmax(0, 1fr);
+  display: block;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.76);
   border-radius: 34px;
-  color: var(--aurora-ink);
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.84), rgba(246, 241, 255, 0.68)),
-    var(--mm-glass-bg-strong);
+  color: #fff;
+  background: rgba(37, 31, 54, 0.18);
   box-shadow: var(--mm-shadow-floating), var(--mm-shadow-inset-highlight);
   backdrop-filter: blur(24px) saturate(150%);
   -webkit-backdrop-filter: blur(24px) saturate(150%);
@@ -2004,6 +1999,17 @@
   transition:
     box-shadow 800ms var(--aurora-ease),
     border-color 800ms var(--aurora-ease);
+}
+
+.aurora-carer-orbit-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(37, 31, 54, 0.04) 0%, rgba(37, 31, 54, 0.12) 42%, rgba(37, 31, 54, 0.78) 100%),
+    radial-gradient(circle at 50% 100%, rgba(169, 143, 232, 0.28), transparent 58%);
 }
 
 .aurora-carer-orbit-card-1 {
@@ -2032,7 +2038,9 @@
 }
 
 .aurora-carer-photo {
-  position: relative;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   overflow: hidden;
   background: linear-gradient(135deg, rgba(233, 224, 255, 0.92), rgba(255, 250, 253, 0.72));
 }
@@ -2040,8 +2048,9 @@
 .aurora-carer-photo img {
   width: 100%;
   height: 100%;
+  min-height: 100%;
   object-fit: cover;
-  filter: saturate(0.94) contrast(1.02);
+  filter: saturate(0.96) contrast(1.04);
   transition: transform 1100ms var(--aurora-ease);
 }
 
@@ -2049,58 +2058,38 @@
   transform: scale(1.04);
 }
 
-.aurora-carer-photo span {
-  position: absolute;
-  left: 14px;
-  top: 14px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.74);
-  border-radius: var(--mm-radius-pill);
-  color: var(--aurora-ink);
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow: var(--mm-shadow-inset-highlight);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  font-size: 0.76rem;
-  font-weight: 760;
-}
-
 .aurora-carer-card-body {
+  position: absolute;
+  inset-inline: 14px;
+  bottom: 14px;
+  z-index: 2;
   display: grid;
-  gap: 12px;
+  gap: 13px;
   padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  border-radius: 24px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.08)),
+    rgba(37, 31, 54, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42), 0 18px 46px rgba(37, 31, 54, 0.22);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
 }
 
 .aurora-carer-role {
   display: inline-flex;
-  color: var(--primary-dark);
+  color: rgba(255, 255, 255, 0.92);
   font-size: 0.75rem;
   font-weight: 820;
   letter-spacing: 0.04em;
 }
 
 .aurora-carer-card-body h3 {
-  margin-top: 5px;
-  color: var(--aurora-ink);
-  font-size: 1.22rem;
+  color: #fff;
+  font-size: 1.36rem;
   font-weight: 820;
-  line-height: 1.18;
-}
-
-.aurora-carer-card-body p {
-  display: -webkit-box;
-  min-height: 4.6em;
-  overflow: hidden;
-  color: var(--aurora-ink-soft);
-  font-size: 0.9rem;
-  line-height: 1.54;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  animation: auroraCarerDetails 25s linear infinite;
-  animation-delay: var(--orbit-delay);
+  line-height: 1.08;
+  text-shadow: 0 2px 18px rgba(37, 31, 54, 0.34);
 }
 
 .aurora-carer-card-body footer {
@@ -2119,17 +2108,18 @@
   gap: 5px;
   min-height: 30px;
   padding: 0 10px;
-  border: 1px solid rgba(130, 106, 176, 0.13);
+  border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: var(--mm-radius-pill);
-  color: var(--aurora-ink-soft);
-  background: rgba(255, 255, 255, 0.56);
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.14);
   font-size: 0.78rem;
   font-weight: 720;
+  text-shadow: 0 1px 12px rgba(37, 31, 54, 0.22);
 }
 
 .aurora-carer-card-body .aurora-carer-rating {
-  color: #7b64bd;
-  background: rgba(233, 224, 255, 0.64);
+  color: #fff;
+  background: rgba(169, 143, 232, 0.28);
 }
 
 .aurora-featured-carers-empty {
@@ -2316,7 +2306,6 @@
     scroll-snap-align: start;
   }
 
-  .aurora-carer-card-body p,
   .aurora-carer-card-body footer {
     opacity: 1;
     animation: none;
@@ -2338,7 +2327,6 @@
   }
 
   .aurora-carer-orbit-card {
-    grid-template-rows: 210px minmax(0, 1fr);
     min-height: 410px;
   }
 }
@@ -2395,7 +2383,6 @@
     scroll-snap-align: start;
   }
 
-  .aurora-featured-carers .aurora-carer-card-body p,
   .aurora-featured-carers .aurora-carer-card-body footer {
     opacity: 1;
     animation: none !important;

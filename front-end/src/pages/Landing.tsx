@@ -17,7 +17,7 @@ import {
   WalletCards,
 } from 'lucide-react';
 import api from '../utils/api';
-import { formatExperienceShort, formatLocation, getCarerAvatar, getCarerFullName, getDisplayRating } from '../utils/carerDisplay';
+import { formatExperienceShort, getCarerAvatar, getCarerFullName, getDisplayRating } from '../utils/carerDisplay';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import BackToTop from '../components/common/BackToTop';
@@ -183,14 +183,6 @@ const fallbackFeaturedCarers: Carer[] = [
     bio: 'Giúp gia đình hiểu việc cần chuẩn bị, theo dõi lịch hẹn và giữ nhịp chăm sóc ổn định hơn.',
   },
 ];
-
-const featuredCarerNote = (carer: Carer, specialty: string) => {
-  if (carer.bio && carer.bio.trim()) {
-    return carer.bio.trim().length > 116 ? `${carer.bio.trim().slice(0, 112)}...` : carer.bio.trim();
-  }
-
-  return `Đồng hành cùng gia đình trong các buổi ${specialty.toLowerCase()}, với nhịp chăm sóc rõ ràng và nhẹ nhàng.`;
-};
 
 const faqItems = [
   {
@@ -470,8 +462,6 @@ const Landing = () => {
                       const name = carer.displayName || getCarerFullName(carer);
                       const specialty = carer.skills?.[0] || carer.services?.[0]?.category || carer.position || 'Chăm sóc sau sinh';
                       const rating = getDisplayRating(carer);
-                      const verified = carer.verificationStatus === 'verified' || carer.isVerified;
-                      const location = formatLocation(carer.location);
                       const experience = formatExperienceShort(carer.experienceYears);
 
                       return (
@@ -482,21 +472,18 @@ const Landing = () => {
                         >
                           <div className="aurora-carer-photo">
                             <img src={getCarerAvatar(carer)} alt={name} loading="lazy" />
-                            {verified && <span><ShieldCheck size={14} />Đã xác thực</span>}
                           </div>
                           <div className="aurora-carer-card-body">
                             <div>
-                              <span className="aurora-carer-role">{specialty}</span>
                               <h3>{name}</h3>
                             </div>
-                            <p>{featuredCarerNote(carer, specialty)}</p>
                             <footer>
                               <span className="aurora-carer-rating">
                                 <Star size={15} fill="currentColor" />
                                 {rating || 'Mới'}
                               </span>
                               <span>{experience}</span>
-                              <span>{location}</span>
+                              <span className="aurora-carer-role">{specialty}</span>
                             </footer>
                           </div>
                         </Link>
