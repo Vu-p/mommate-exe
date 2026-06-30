@@ -22,6 +22,11 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import BackToTop from '../components/common/BackToTop';
 import { trackEvent } from '../utils/analytics';
+import bookingParentImage from '../assets/stitch/booking-parent.jpg';
+import carerProfileImage from '../assets/stitch/carer-profile.jpg';
+import heroMaternalCareImage from '../assets/stitch/hero-maternal-care.jpg';
+import heroMaternalCareAuroraImage from '../assets/stitch/hero-maternal-care-aurora.png';
+import servicePostpartumImage from '../assets/stitch/service-postpartum.jpg';
 import './Landing.css';
 
 type Carer = {
@@ -120,7 +125,7 @@ const fallbackFeaturedCarers: Carer[] = [
   {
     _id: 'featured-carer-1',
     displayName: 'Mai Anh',
-    avatar: '/src/assets/stitch/carer-profile.jpg',
+    avatar: carerProfileImage,
     rating: 4.9,
     reviewCount: 18,
     location: 'Hải Châu, Đà Nẵng',
@@ -132,7 +137,7 @@ const fallbackFeaturedCarers: Carer[] = [
   {
     _id: 'featured-carer-2',
     displayName: 'Thu Hà',
-    avatar: '/src/assets/stitch/service-postpartum.jpg',
+    avatar: servicePostpartumImage,
     rating: 4.8,
     reviewCount: 14,
     location: 'Sơn Trà, Đà Nẵng',
@@ -144,7 +149,7 @@ const fallbackFeaturedCarers: Carer[] = [
   {
     _id: 'featured-carer-3',
     displayName: 'Ngọc Linh',
-    avatar: '/src/assets/stitch/booking-parent.jpg',
+    avatar: bookingParentImage,
     rating: 5,
     reviewCount: 11,
     location: 'Ngũ Hành Sơn, Đà Nẵng',
@@ -156,7 +161,7 @@ const fallbackFeaturedCarers: Carer[] = [
   {
     _id: 'featured-carer-4',
     displayName: 'Bảo Trân',
-    avatar: '/src/assets/stitch/hero-maternal-care.jpg',
+    avatar: heroMaternalCareImage,
     rating: 4.9,
     reviewCount: 16,
     location: 'Thanh Khê, Đà Nẵng',
@@ -168,7 +173,7 @@ const fallbackFeaturedCarers: Carer[] = [
   {
     _id: 'featured-carer-5',
     displayName: 'Hồng Vân',
-    avatar: '/src/assets/stitch/hero-maternal-care-aurora.png',
+    avatar: heroMaternalCareAuroraImage,
     rating: 4.8,
     reviewCount: 12,
     location: 'Cẩm Lệ, Đà Nẵng',
@@ -328,7 +333,7 @@ const Landing = () => {
 
             <div className="aurora-hero-stage" aria-hidden="true">
               <motion.div className="aurora-portrait" style={{ y: portraitY }}>
-                <img src="/src/assets/stitch/hero-maternal-care.jpg" alt="" />
+                <img src={heroMaternalCareImage} alt="" />
               </motion.div>
               <motion.div className="aurora-floating-note aurora-floating-note-one" style={{ y: glassY }}>
                 <ShieldCheck size={18} />
