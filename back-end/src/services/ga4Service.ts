@@ -18,16 +18,33 @@ type ReportRequest = {
 
 const propertyId = () => process.env.GA4_PROPERTY_ID?.trim();
 
+const configurationError = (code: string, message: string, cause?: unknown) => {
+  const error: any = new Error(message, cause ? { cause } : undefined);
+  error.status = 503;
+  error.code = code;
+  return error;
+};
+
 const credentials = () => {
   const credentialPath = process.env.GA4_SERVICE_ACCOUNT_PATH?.trim();
   const json = process.env.GA4_SERVICE_ACCOUNT_JSON?.trim();
   const base64 = process.env.GA4_SERVICE_ACCOUNT_BASE64?.trim();
   if (credentialPath || json || base64) {
-    const source = credentialPath
-      ? fs.readFileSync(path.resolve(process.cwd(), credentialPath), 'utf8')
-      : json || Buffer.from(base64!, 'base64').toString('utf8');
-    const parsed = JSON.parse(source);
-    return { client_email: parsed.client_email, private_key: String(parsed.private_key || '').replace(/\\n/g, '\n') };
+    try {
+      const resolvedPath = credentialPath ? path.resolve(process.cwd(), credentialPath) : '';
+      const source = resolvedPath && fs.existsSync(resolvedPath)
+        ? fs.readFileSync(resolvedPath, 'utf8')
+        : json
+          ? json.replace(/^['"]|['"]$/g, '')
+          : Buffer.from(base64!.replace(/^['"]|['"]$/g, '').replace(/\s+/g, ''), 'base64').toString('utf8');
+      const parsed = JSON.parse(source);
+      const client_email = String(parsed.client_email || '').trim();
+      const private_key = String(parsed.private_key || '').replace(/\\n/g, '\n').trim();
+      if (!client_email || !private_key.includes('BEGIN PRIVATE KEY')) throw new Error('Required service-account fields are missing');
+      return { client_email, private_key };
+    } catch (error) {
+      throw configurationError('GA4_CREDENTIALS_INVALID', 'Google Analytics service-account credentials are invalid', error);
+    }
   }
   const client_email = process.env.GA4_CLIENT_EMAIL?.trim();
   const private_key = process.env.GA4_PRIVATE_KEY?.replace(/\\n/g, '\n').trim();
@@ -39,10 +56,7 @@ const getClient = () => {
   const id = propertyId();
   const creds = credentials();
   if (!id || !creds?.client_email || !creds.private_key) {
-    const error: any = new Error('Google Analytics is not configured');
-    error.status = 503;
-    error.code = 'GA4_NOT_CONFIGURED';
-    throw error;
+    throw configurationError('GA4_NOT_CONFIGURED', 'Google Analytics is not configured');
   }
   client ||= new BetaAnalyticsDataClient({ credentials: creds });
   return { client, property: `properties/${id}` };

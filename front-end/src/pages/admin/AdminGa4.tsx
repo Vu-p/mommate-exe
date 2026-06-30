@@ -15,6 +15,7 @@ const number = (value: number) => Number(value || 0).toLocaleString('vi-VN');
 const errorMessage = (error: any) => {
   const code = error.response?.data?.error?.code;
   if (code === 'GA4_NOT_CONFIGURED') return 'GA4 chưa được cấu hình trên backend. Hãy thêm property ID và service-account credential.';
+  if (code === 'GA4_CREDENTIALS_INVALID') return 'Credential GA4 trên backend không hợp lệ. Hãy kiểm tra lại GA4_SERVICE_ACCOUNT_BASE64 và xóa GA4_SERVICE_ACCOUNT_PATH trên production.';
   if (error.response?.status === 403) return 'Tài khoản không có quyền xem dữ liệu Google Analytics.';
   if (/quota/i.test(error.response?.data?.error?.message || '')) return 'GA4 đã chạm giới hạn quota. Vui lòng thử lại sau.';
   return error.response?.data?.error?.message || 'Không thể tải dữ liệu Google Analytics.';

@@ -21,6 +21,8 @@ Never add real credentials to `.env.example`, frontend variables, source control
 
 For this workspace, the local backend uses `GA4_SERVICE_ACCOUNT_PATH=../docs/mommate-501007-998c61a999dc.json`. The file is explicitly ignored by Git. Production should use a hosting secret or mounted secret file instead of committing this JSON.
 
+On Vercel, do not set `GA4_SERVICE_ACCOUNT_PATH`. Set only `GA4_PROPERTY_ID` and `GA4_SERVICE_ACCOUNT_BASE64` for GA4 credentials, then redeploy so the serverless functions receive the updated environment.
+
 ## GA4 property settings
 
 MomMate sends SPA page views manually with `send_page_view: false`. Disable automatic history-change page views in Enhanced Measurement so routes are not counted twice. Keep automatic page-load tracking disabled if the property is configured through another tag manager.
