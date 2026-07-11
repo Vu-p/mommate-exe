@@ -152,8 +152,9 @@
 }
 
 .about-story-grid h2,
+.about-vm-header h2,
 .about-section-heading h2,
-.about-vision-band h2 {
+.about-origin-heading h2 {
   color: var(--mm-color-text);
   font-size: var(--mm-type-section-title);
   font-weight: 850;
@@ -203,21 +204,213 @@
   line-height: 1.62;
 }
 
-.about-vision-band {
+/* =========================================================
+   PHẦN 1: TẦM NHÌN VÀ SỨ MỆNH (High-End Editorial Split)
+   ========================================================= */
+.about-vision-mission-section {
   position: relative;
-  padding: clamp(72px, 9vw, 112px) 0;
+  padding: clamp(84px, 11vw, 140px) 0;
   overflow: hidden;
   background:
-    radial-gradient(circle at 80% 14%, rgba(255, 255, 255, 0.42), transparent 24rem),
-    linear-gradient(135deg, rgba(233, 224, 255, 0.76), rgba(255, 244, 249, 0.78));
+    radial-gradient(circle at 12% 40%, rgba(210, 194, 255, 0.44), transparent 28rem),
+    radial-gradient(circle at 92% 80%, rgba(237, 183, 204, 0.28), transparent 24rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(244, 239, 255, 0.6) 50%, rgba(255, 255, 255, 0) 100%);
+}
+
+.about-vm-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 1.08fr);
+  gap: clamp(36px, 7vw, 84px);
+  align-items: center;
+}
+
+.about-vm-lead {
+  margin-top: 22px;
+  color: var(--mm-color-text-muted);
+  font-size: clamp(1.05rem, 1.3vw, 1.18rem);
+  line-height: 1.82;
+  max-width: 540px;
+}
+
+.about-vm-cards {
+  display: grid;
+  gap: 20px;
+}
+
+/* Double-Bezel Architecture (Doppelrand) */
+.about-double-bezel {
+  position: relative;
+  border-radius: var(--mm-radius-2xl);
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.76);
+  box-shadow: var(--mm-shadow-md), 0 4px 20px rgba(169, 143, 232, 0.08);
+  backdrop-filter: var(--mm-glass-blur);
+  -webkit-backdrop-filter: var(--mm-glass-blur);
+  transition:
+    transform var(--mm-motion-base) var(--mm-motion-ease-soft),
+    box-shadow var(--mm-motion-base) var(--mm-motion-ease-soft);
+}
+
+.about-double-bezel:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--mm-shadow-floating), 0 8px 32px rgba(169, 143, 232, 0.16);
+}
+
+.about-bezel-inner {
+  border-radius: calc(var(--mm-radius-2xl) - 8px);
+  padding: clamp(24px, 4vw, 36px) clamp(24px, 4vw, 36px);
+  background: var(--mm-gradient-surface), rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  box-shadow: var(--mm-shadow-inset-highlight);
+}
+
+.about-card-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 20px;
+  background: rgba(233, 224, 255, 0.84);
+  color: var(--mm-color-primary-strong);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.about-icon-secondary {
+  background: rgba(255, 227, 239, 0.84);
+  color: #b84c7d;
+}
+
+.about-bezel-inner h3 {
+  color: var(--mm-color-text);
+  font-size: clamp(1.2rem, 1.8vw, 1.45rem);
+  font-weight: 850;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+}
+
+.about-bezel-inner p {
+  color: var(--mm-color-text-muted);
+  font-size: 0.98rem;
+  line-height: 1.76;
+}
+
+/* =========================================================
+   PHẦN 2: TẠI SAO MOMMATE RA ĐỜI (Visceral Origin Story)
+   ========================================================= */
+.about-origin-section {
+  position: relative;
+  padding: clamp(84px, 11vw, 140px) 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 15%, rgba(233, 224, 255, 0.64), transparent 32rem),
+    radial-gradient(circle at 15% 85%, rgba(255, 227, 239, 0.36), transparent 28rem);
+}
+
+.about-origin-heading {
+  max-width: 780px;
+  margin: 0 auto 56px;
   text-align: center;
 }
 
-.about-vision-band .container {
-  max-width: 860px;
+.about-origin-subtitle {
+  margin-top: 14px;
+  color: var(--mm-color-primary-strong);
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
-.about-vision-band span,
+.about-origin-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(24px, 4vw, 36px);
+  align-items: stretch;
+}
+
+.about-origin-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(32px, 5vw, 46px);
+  border-radius: var(--mm-radius-2xl);
+  transition: transform var(--mm-motion-base) var(--mm-motion-ease-soft);
+}
+
+.about-origin-card:hover {
+  transform: translateY(-3px);
+}
+
+.origin-card-night {
+  background: linear-gradient(150deg, rgba(238, 231, 253, 0.88) 0%, rgba(246, 242, 255, 0.72) 100%);
+  border: 1px solid rgba(169, 143, 232, 0.32);
+  box-shadow: var(--mm-shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  backdrop-filter: var(--mm-glass-blur);
+  -webkit-backdrop-filter: var(--mm-glass-blur);
+}
+
+.origin-card-dawn {
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 244, 249, 0.82) 100%);
+  border: 1px solid rgba(223, 159, 189, 0.36);
+  box-shadow: var(--mm-shadow-floating), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  backdrop-filter: var(--mm-glass-blur);
+  -webkit-backdrop-filter: var(--mm-glass-blur);
+}
+
+.origin-card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  padding: 8px 16px;
+  border-radius: var(--mm-radius-pill);
+  background: rgba(115, 87, 180, 0.12);
+  color: var(--mm-color-primary-strong);
+  font-size: var(--mm-type-caption);
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 26px;
+}
+
+.origin-card-badge.badge-dawn {
+  background: rgba(223, 159, 189, 0.18);
+  color: #b84c7d;
+}
+
+.about-origin-card h3 {
+  color: var(--mm-color-text);
+  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+  font-weight: 850;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  margin-bottom: 22px;
+}
+
+.origin-card-body p {
+  color: var(--mm-color-text-muted);
+  font-size: clamp(0.98rem, 1.1vw, 1.05rem);
+  line-height: 1.84;
+  margin-bottom: 16px;
+}
+
+.origin-card-body p:last-child {
+  margin-bottom: 0;
+}
+
+.origin-highlight {
+  margin-top: 24px !important;
+  padding: 20px 24px;
+  border-radius: var(--mm-radius-xl);
+  background: rgba(233, 224, 255, 0.48);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-left: 4px solid var(--mm-color-primary-strong);
+  color: var(--mm-color-text) !important;
+  font-weight: 750;
+  box-shadow: var(--mm-shadow-sm);
+}
+
 .about-eyebrow,
 .public-eyebrow {
   display: inline-flex;
@@ -229,7 +422,6 @@
   text-transform: uppercase;
 }
 
-.about-vision-band p,
 .about-section-heading p {
   margin-top: 14px;
   color: var(--mm-color-text-muted);
@@ -293,7 +485,9 @@
 @media (max-width: 900px) {
   .about-redesign-hero,
   .about-neutral-hero,
-  .about-story-grid {
+  .about-story-grid,
+  .about-vm-grid,
+  .about-origin-grid {
     grid-template-columns: 1fr;
   }
 
@@ -323,6 +517,18 @@
 
   .about-standard-grid article {
     grid-template-columns: 1fr;
+  }
+
+  .about-double-bezel {
+    padding: 6px;
+  }
+
+  .about-bezel-inner {
+    padding: 24px 20px;
+  }
+
+  .about-origin-card {
+    padding: 28px 22px;
   }
 }
 

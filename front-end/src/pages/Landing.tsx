@@ -12,7 +12,6 @@ import {
   Quote,
   Search,
   ShieldCheck,
-  Sparkles,
   Star,
   WalletCards,
 } from 'lucide-react';
